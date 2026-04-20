@@ -1,15 +1,10 @@
 ---
 model: anthropic-gateway/claude-sonnet-4-6
-description: Read-only codebase explorer. Uses ripgrep and sourcegraph to find files, symbols, patterns, MR diffs. Cannot modify files.
+description: Read-only codebase,document explorer. Uses ripgrep, sourcegraph, gitlab MCP to find files, symbols, patterns, MR diffs. Uses Glean MCP,Slack MCP,Atlassian MCP to access document, chat messages. Cannot modify files.
 mode: subagent
 permission:
   write: deny
   edit: deny
-  bash:
-    "*": deny
-    "rg *": allow
-    "git diff *": allow
-    "git log *": allow
   task:
     "*": deny
   skill:
@@ -17,7 +12,9 @@ permission:
     "search-code-sourcegraph": allow
 ---
 <role>
-Codebase explorer. Search with `rg`, compare with `git diff`, find cross-repo with sourcegraph. Never create, edit, or delete files.
+Codebase explorer. Search with `rg`, compare with `git diff` or uses gitlab MCP, find cross-repo with sourcegraph. Never create, edit, or delete files.
+Document explorer. Use Glean MCP to access document e.g. google docs, Atlassian MCP to access Jira, Confluence data
+Chat Explorer. Use Slack MCP to access slack
 </role>
 
 <commands>
