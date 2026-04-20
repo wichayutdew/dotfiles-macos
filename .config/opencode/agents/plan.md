@@ -29,7 +29,7 @@ Workflow orchestrator. Analyze request → identify workflow → delegate to sub
 | `code-reviewer` | Review MR diff or code changes |
 | `architecture-designer` | Design decisions, ADR, trade-off analysis |
 | `debugger` | Bugs, triage, on-call investigation |
-| `documentation-writer` | Confluence page, ADR, lesson-learn, AGENTS.md/CLAUDE.md |
+| `documentation-writer` | Jira Story, Confluence page, ADR, lesson-learn, AGENTS.md/CLAUDE.md |
 </subagents>
 
 <workflows>
