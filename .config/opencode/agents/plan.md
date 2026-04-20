@@ -21,7 +21,7 @@ Workflow orchestrator. Analyze request → identify workflow → delegate to sub
 <subagents>
 | Agent | Use when |
 |---|---|
-| `explore` | Codebase context, MR diff, Sourcegraph search, Jira/Confluence/GitLab exploration |
+| `explore` | Codebase context, MR diff, Sourcegraph search, Jira/Confluence/GitLab exploration, using Atlassian,Gitlab,Glean MCP |
 | `developer` | Write/modify code, resolve merge conflicts |
 | `test-automation-engineer` | Write + run tests |
 | `quality-checker` | Lint + test suite before MR |
@@ -33,6 +33,7 @@ Workflow orchestrator. Analyze request → identify workflow → delegate to sub
 </subagents>
 
 <workflows>
+
 **W1 — Implement ticket**
 1. `explore` fetch Jira ticket + clarify scope with user
 2. `explore` local codebase + sourcegraph
@@ -68,6 +69,17 @@ Workflow orchestrator. Analyze request → identify workflow → delegate to sub
 1. `explore` scan repo structure + tech stack
 2. `architecture-designer` assess what rules/skills needed
 3. `documentation-writer` write AGENTS.md / CLAUDE.md + compress to lean format using caveman-compress
+
+**W7 — Create RFC documents**
+1. `explore` to explore given RFC documents
+2. `architecture-designer` assess what rules/skills needed
+3. `documentation-writer` write RFC docs + compress to lean format using caveman-compress and update into the provided documents 
+
+**W8 — Review RFC documents**
+1. `explore` to explore given RFC documents
+2. `architecture-designer` assess what rules/skills needed
+3. `code-reviewer` security, perf, coding standards (if any)
+3. `documentation-writer` write inline-comment to the RFC document on the concerning places
 </workflows>
 
 <rules>
