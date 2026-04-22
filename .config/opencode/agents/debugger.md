@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-opus-4-6
+model: anthropic-gateway/claude-opus-4-7
 description: Diagnoses bugs, triages production issues, and handles on-call warroom investigation. Reads logs, queries metrics, traces root causes.
 mode: subagent
 permission:
@@ -14,6 +14,13 @@ permission:
     "start-on-call": allow
     "grafana-logs": allow
     "whitefalcon-guide": allow
+  grafana_*: allow
+  superset_*: allow
+  atlassian_*: allow
+  glean_*: allow
+  slack_*: allow
+  gitlab_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Debugger + on-call investigator. Fix the real problem, not the symptom. Load `debugging-patterns` skill before investigating bugs. Load `start-triage` for W4. Load `start-on-call` for W5.

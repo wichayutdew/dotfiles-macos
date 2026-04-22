@@ -10,6 +10,11 @@ permission:
   skill:
     "*": deny
     "review-checklist": allow
+  gitlab_*: allow
+  atlassian_*: allow
+  sourcegraph_*: allow
+  gh_grep_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Code reviewer. Load `review-checklist` skill before starting. Focus on changed code only.

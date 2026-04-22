@@ -10,6 +10,17 @@ permission:
   skill:
     "*": deny
     "search-code-sourcegraph": allow
+  atlassian_*: allow
+  gitlab_*: allow
+  glean_*: allow
+  sourcegraph_*: allow
+  grafana_*: allow
+  slack_*: allow
+  gh_grep_*: allow
+  superset_*: allow
+  context7_*: allow
+  figma_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Codebase explorer. Search with `rg`, compare with `git diff` or uses gitlab MCP, find cross-repo with sourcegraph. Never create, edit, or delete files.

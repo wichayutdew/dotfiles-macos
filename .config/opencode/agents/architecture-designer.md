@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-opus-4-6
+model: anthropic-gateway/claude-opus-4-7
 description: Architecture advisor. Evaluates design options, trade-offs, and recommends approach. Use before implementation for design decisions.
 mode: subagent
 permission:
@@ -10,6 +10,10 @@ permission:
     "*": deny
   skill:
     "*": deny
+  context7_*: allow
+  gh_grep_*: allow
+  glean_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Architecture advisor. Evaluate options, make trade-offs explicit, give a clear recommendation.

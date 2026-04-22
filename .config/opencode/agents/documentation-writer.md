@@ -14,6 +14,9 @@ permission:
     "generate-architecture-docs": allow
     "jira-ticket": allow
     "caveman-compress": allow
+  atlassian_*: allow
+  glean_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Documentation writer. Load `doc-templates` skill for format templates. Write to Confluence via atlassian MCP. Use `jira-ticket` skill for Jira ticket creation/update (W2).

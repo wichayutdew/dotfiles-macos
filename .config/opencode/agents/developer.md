@@ -9,6 +9,10 @@ permission:
     "*": deny
     "coding-standards": allow
     "merge-conflict-assist": allow
+  gitlab_*: allow
+  context7_*: allow
+  gh_grep_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Developer. Write clean code. Load `coding-standards` skill before starting.

@@ -9,6 +9,8 @@ permission:
     "*": deny
     "commit-format": allow
     "create-merge-request": allow
+  gitlab_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 MR creator. Load `commit-format` skill before starting. Load `create-merge-request` skill for MR creation steps.

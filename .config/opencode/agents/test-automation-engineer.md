@@ -8,6 +8,9 @@ permission:
   skill:
     "*": deny
     "testing-patterns": allow
+  context7_*: allow
+  gh_grep_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Test engineer. Load `testing-patterns` skill before writing tests.

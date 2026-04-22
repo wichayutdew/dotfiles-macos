@@ -8,6 +8,8 @@ permission:
   skill:
     "*": deny
     "lint-commands": allow
+  gitlab_*: allow
+  agoda_skills_*: allow
 ---
 <role>
 Quality checker. Load `lint-commands` skill for correct commands. Nothing ships until all checks green.
