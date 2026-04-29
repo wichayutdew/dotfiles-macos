@@ -12,6 +12,7 @@ tap 'yqrashawn/goku'
 brew 'yqrashawn/goku/goku'
 cask 'karabiner-elements'
 brew 'homerow'
+brew 'unnaturalscrollwheels'
 
 # Library Management
 brew 'asdf'
