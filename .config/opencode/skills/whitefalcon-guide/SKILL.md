@@ -17,7 +17,7 @@ Query time-series metrics from WhiteFalcon for troubleshooting, analysis, and mo
 Use `curl` to query WhiteFalcon API directly. All endpoints require:
 
 - `Content-Type: application/json`
-- `x-agoda-ssot-name: <your-ssot-name>` — check with your platform team
+- `x-ssot-name: <your-ssot-name>` — check with your platform team
 - ISO 8601 UTC timestamps (e.g., `2026-01-13T10:00:00+00:00`)
 
 ### 1. Discover Metrics
@@ -108,7 +108,7 @@ WF_SSOT="<your-ssot-name>"
 
 curl -X POST "$WF_BASE/v2/rest/measurements/get" \
   -H "Content-Type: application/json" \
-  -H "x-agoda-ssot-name: $WF_SSOT" \
+  -H "x-ssot-name: $WF_SSOT" \
   -d '{
     "metric": "my-service.external.dependency.latency",
     "granularity": 60,
@@ -132,7 +132,7 @@ END=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
 
 curl -X POST "$WF_BASE/v2/rest/measurements/get" \
   -H "Content-Type: application/json" \
-  -H "x-agoda-ssot-name: $WF_SSOT" \
+  -H "x-ssot-name: $WF_SSOT" \
   -d "{
     \"metric\": \"api.latency\",
     \"granularity\": 60,
@@ -156,7 +156,7 @@ WF_SSOT="<your-ssot-name>"
 ```bash
 curl -X POST "$WF_BASE/v2/rest/discovery/metrics" \
   -H "Content-Type: application/json" \
-  -H "x-agoda-ssot-name: $WF_SSOT" \
+  -H "x-ssot-name: $WF_SSOT" \
   -d '{"query": "*workflow*agents*", "from": "2026-01-13T10:00:00+00:00", "to": "2026-01-13T11:00:00+00:00", "limit": 50}'
 ```
 
@@ -165,7 +165,7 @@ curl -X POST "$WF_BASE/v2/rest/discovery/metrics" \
 ```bash
 curl -X POST "$WF_BASE/v2/rest/discovery/tagvalues" \
   -H "Content-Type: application/json" \
-  -H "x-agoda-ssot-name: $WF_SSOT" \
+  -H "x-ssot-name: $WF_SSOT" \
   -d '{"query": "*", "from": "2026-01-13T10:00:00+00:00", "to": "2026-01-13T11:00:00+00:00", "metric": "api.booking.latency", "tag": "dc", "limit": 100}'
 ```
 
@@ -177,7 +177,7 @@ END=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
 
 curl -X POST "$WF_BASE/v2/rest/measurements/get" \
   -H "Content-Type: application/json" \
-  -H "x-agoda-ssot-name: $WF_SSOT" \
+  -H "x-ssot-name: $WF_SSOT" \
   -d "{\"metric\": \"api.booking.latency\", \"granularity\": 300, \"start\": \"$START\", \"end\": \"$END\", \"tags\": {}, \"groupby\": [\"dc\"]}" \
   | jq '.datasets[] | {dc: .group.dc, avg: ([.datapoints[].sum]|add)/([.datapoints[].count]|add)}'
 ```

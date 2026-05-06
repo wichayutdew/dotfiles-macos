@@ -136,7 +136,7 @@ In YAML files (where HTML comments aren't valid), annotations use `#` comments:
 ```yaml
   SEOGPTContent:
     role: GPT/LLM content generation worker
-    # sg:lookup keyword_search query="repo:full-stack/Agoda-SEO/SEOGPTContent file:Strategies/.*.yaml"
+    # sg:lookup keyword_search query="repo:full-stack/-SEO/SEOGPTContent file:Strategies/.*.yaml"
 ```
 
 ### How to use them
@@ -144,10 +144,10 @@ In YAML files (where HTML comments aren't valid), annotations use `#` comments:
 1. **Before searching from scratch**, check if the relevant overlay/ doc already has an annotation for what you need.
 2. **To execute an annotation**, extract the tool name and query, then call the corresponding Sourcegraph MCP tool. Markdown and YAML annotations work the same way:
    ```
-   <!-- sg:lookup keyword_search query="repo:full-stack/Agoda-SEO/seo-backoffice file:.*.cs HttpPost OR HttpGet" -->
-   # sg:lookup keyword_search query="repo:full-stack/Agoda-SEO/SEOGPTContent file:Strategies/.*.yaml"
-   →  keyword_search query: "repo:full-stack/Agoda-SEO/seo-backoffice file:.*.cs HttpPost OR HttpGet"
-   →  keyword_search query: "repo:full-stack/Agoda-SEO/SEOGPTContent file:Strategies/.*.yaml"
+   <!-- sg:lookup keyword_search query="repo:full-stack/-SEO/seo-backoffice file:.*.cs HttpPost OR HttpGet" -->
+   # sg:lookup keyword_search query="repo:full-stack/-SEO/SEOGPTContent file:Strategies/.*.yaml"
+   →  keyword_search query: "repo:full-stack/-SEO/seo-backoffice file:.*.cs HttpPost OR HttpGet"
+   →  keyword_search query: "repo:full-stack/-SEO/SEOGPTContent file:Strategies/.*.yaml"
    ```
 3. **`sg:verify`** annotations are optional — only run them when freshness is in question or the user asks to verify.
 4. **`sg:lookup`** annotations should be run when the user asks for details that the prose deliberately omits (schemas, param lists, config values).
