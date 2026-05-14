@@ -141,7 +141,8 @@
       ".git/**",
       "dist/**",
       ".next/**",
-      "build/**"
+      "build/**",
+      "target/**"
     ]
   }
 }

@@ -32,10 +32,8 @@ consult with `context7` and `agoda_skills` when you are unsure with some coding 
 - `null` returns (use `Option`/`Optional`/`null` type)
 - Swallowed exceptions (`catch (e) {}`)
 - `any` type in TypeScript
-- applying non functional whitespace format. if the whitespace change is not
-  related to the logic you are working on. keep it as-is.applying whitespace
-  change on unrelated code ultimately makes reviewer confuse of the chages and
-  negatively impact the overall repo maintainability
+- non-functional whitespace changes unrelated to logic — leave as-is.
+  Whitespace-only diffs confuse reviewers and hurt maintainability.
 
 ---
 
