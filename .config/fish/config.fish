@@ -13,10 +13,6 @@ set -x PATH $PATH /Users/wphongphanpa/Library/Application\ Support/Coursier/bin
 # ---- Zoxide Initialization ----
 zoxide init fish | source
 
-# ---- ASDF JAVA HOME -----
-source /opt/homebrew/opt/asdf/libexec/asdf.fish
-source ~/.asdf/plugins/java/set-java-home.fish
-
 # ---- FZF ----
 fzf --fish | source
 
