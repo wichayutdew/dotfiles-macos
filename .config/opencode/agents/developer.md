@@ -11,6 +11,7 @@ permission:
     "executing-plans": allow
     "receiving-code-review": allow
     "using-git-worktrees": allow
+    "systematic-debugging": allow
   gitlab_*: allow
   context7_*: allow
   gh_grep_*: allow
