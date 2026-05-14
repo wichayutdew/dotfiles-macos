@@ -8,7 +8,8 @@ permission:
   skill:
     "*": deny
     "commit-format": allow
-    "create-merge-request": allow
+    "finishing-a-development-branch": allow
+    "requesting-code-review": allow
   gitlab_*: allow
   agoda_skills_*: allow
 ---

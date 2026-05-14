@@ -10,6 +10,7 @@ permission:
     "*": deny
   skill:
     "*": deny
+    "brainstorming": allow
   context7_*: allow
   gh_grep_*: allow
   glean_*: allow

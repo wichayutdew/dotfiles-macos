@@ -8,7 +8,9 @@ permission:
   skill:
     "*": deny
     "coding-standards": allow
-    "merge-conflict-assist": allow
+    "executing-plans": allow
+    "receiving-code-review": allow
+    "using-git-worktrees": allow
   gitlab_*: allow
   context7_*: allow
   gh_grep_*: allow

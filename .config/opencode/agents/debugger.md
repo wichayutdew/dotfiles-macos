@@ -9,11 +9,11 @@ permission:
     "*": deny
   skill:
     "*": deny
-    "debugging-patterns": allow
     "start-triage": allow
     "start-on-call": allow
     "grafana-logs": allow
     "whitefalcon-guide": allow
+    "systematic-debugging": allow
   grafana_*: allow
   superset_*: allow
   atlassian_*: allow

@@ -8,6 +8,7 @@ permission:
   skill:
     "*": deny
     "lint-commands": allow
+    "verification-before-completion": allow
   gitlab_*: allow
   agoda_skills_*: allow
 ---

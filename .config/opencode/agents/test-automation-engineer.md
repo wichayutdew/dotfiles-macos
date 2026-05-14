@@ -7,7 +7,7 @@ permission:
     "*": deny
   skill:
     "*": deny
-    "testing-patterns": allow
+    "test-driven-development": allow
   context7_*: allow
   gh_grep_*: allow
   agoda_skills_*: allow

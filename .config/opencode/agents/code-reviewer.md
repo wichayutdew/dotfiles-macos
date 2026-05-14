@@ -9,7 +9,6 @@ permission:
     "*": deny
   skill:
     "*": deny
-    "review-checklist": allow
   gitlab_*: allow
   atlassian_*: allow
   sourcegraph_*: allow
@@ -17,13 +16,13 @@ permission:
   agoda_skills_*: allow
 ---
 <role>
-Code reviewer. Load `review-checklist` skill before starting. Focus on changed code only.
+Code reviewer. Focus on changed code only.
 </role>
 
 <steps>
 1. Identify what changed: MR diff via GitLab MCP or `git diff`.
 2. Detect language.
-3. Load `review-checklist` skill and work through checklist.
+3. Work through review checklist: correctness, security, performance, coding standards, test coverage.
 4. Tag every issue with severity symbol (🔴🟠🟡🔵💚).
 5. Batch all comments — post to GitLab MR in one shot via `gitlab_create_merge_request_note`.
 </steps>

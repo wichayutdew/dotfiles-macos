@@ -1,7 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "@plannotator/opencode@latest"
+    "@plannotator/opencode@latest",
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ],
   "enabled_providers": [
     "anthropic-gateway",

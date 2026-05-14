@@ -10,6 +10,7 @@ permission:
   skill:
     "*": deny
     "search-code-sourcegraph": allow
+    "writing-plans": allow
   atlassian_*: allow
   gitlab_*: allow
   glean_*: allow
