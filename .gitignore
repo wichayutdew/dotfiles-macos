@@ -19,6 +19,13 @@
 !README.md
 !Brewfile
 
+# pi coding agent config
+!/.pi
+/.pi/agent/auth.json
+/.pi/agent/sessions
+/.pi/agent/bin
+/.pi/logs
+
 # ignore RUST specific files
 .config/cargo/*
 !.config/cargo/config.toml
