@@ -54,6 +54,7 @@ alias ci 'zi'
 alias c 'z'
 alias y 'yazi'
 alias cc 'opencode'
+alias q 'pi -p --model big-pickle'
 
 # ---- Agoda Specific ----
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :

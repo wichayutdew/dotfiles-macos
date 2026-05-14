@@ -42,6 +42,7 @@ cask 'font-jetbrains-mono'
 
 # AI
 cask 'opencode'
+cask 'pi-coding-agent'
 brew 'PeonPing/tap/peon-ping'
 
 # Agoda essentials
