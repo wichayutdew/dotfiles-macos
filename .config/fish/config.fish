@@ -1,3 +1,6 @@
+# ---- ASDF ----
+source $HOME/.asdf/plugins/java/set-java-home.fish
+
 # ---- FISH ----
 set fish_greeting ''
 set --global fish_key_bindings fish_vi_key_bindings
