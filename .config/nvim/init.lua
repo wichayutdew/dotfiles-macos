@@ -1,3 +1,6 @@
+--------------------- PATH ---------------------
+vim.env.PATH = "/opt/homebrew/bin:" .. vim.env.PATH
+
 --------------------- EDITOR SETTINGS ---------------------
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
