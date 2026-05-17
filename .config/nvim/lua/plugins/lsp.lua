@@ -54,9 +54,21 @@ return function()
 	end
 
 	---------------------- Treesitter ---------------------
-	require("nvim-treesitter.configs").setup({
-		ensure_installed = { "lua", "rust", "markdown", "json", "kotlin", "typescript", "javascript" },
-		highlight = { enable = true },
+	-- main branch: parser installer only, no .configs module
+	require("nvim-treesitter").install({
+		"lua", "rust", "markdown", "json", "kotlin", "typescript", "javascript",
+	})
+
+	-- Native highlighting via vim.treesitter (Nvim 0.12+ core API)
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = { "*" },
+		callback = function(args)
+			local ft = vim.bo[args.buf].filetype
+			local lang = vim.treesitter.language.get_lang(ft)
+			if lang and pcall(vim.treesitter.language.add, lang) then
+				vim.treesitter.start(args.buf, lang)
+			end
+		end,
 	})
 
 	---------------------- Formatter ---------------------
