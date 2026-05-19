@@ -4,6 +4,10 @@
   "defaultModel": "big-pickle",
   "packages": [
     "npm:@bitcraft-apps/pi-web-tools",
-    "npm:pi-research"
+    "npm:pi-research",
+    {
+      "source": "npm:@plannotator/pi-extension",
+      "skills": []
+    }
   ]
 }
