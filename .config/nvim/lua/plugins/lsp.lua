@@ -2,7 +2,6 @@
 return function()
 	---------------------- Mason ---------------------
 	require("mason").setup()
-	require("mason-lspconfig").setup({ automatic_enable = false })
 	require("mason-tool-installer").setup({
 		ensure_installed = {
 			"lua_ls",
@@ -34,7 +33,7 @@ return function()
 		"ts_ls",
 	})
 
-	local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+	local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	local servers = {
 		lua_ls = { capabilities = lsp_capabilities, filetypes = { "lua" } },
@@ -65,16 +64,23 @@ return function()
 	end
 
 	---------------------- Treesitter ---------------------
-	-- main branch: parser installer only, no .configs module
-	require("nvim-treesitter").install({
-		"lua",
-		"rust",
-		"markdown",
-		"json",
-		"kotlin",
-		"typescript",
-		"javascript",
-		"html",
+	-- nvim-treesitter main (nvim 0.12+): parser installer + query bundle.
+	-- Requires: brew install tree-sitter (>= 0.26.1)
+	-- Fires once on first startup — non-blocking, no config UI needed.
+	vim.api.nvim_create_autocmd("VimEnter", {
+		once = true,
+		callback = function()
+			require("nvim-treesitter").install({
+				"lua",
+				"rust",
+				"markdown",
+				"json",
+				"kotlin",
+				"typescript",
+				"javascript",
+				"html",
+			})
+		end,
 	})
 
 	-- Native highlighting via vim.treesitter (Nvim 0.12+ core API)
