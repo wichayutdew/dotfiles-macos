@@ -99,6 +99,7 @@ return function()
 				"typescript",
 				"javascript",
 				"html",
+				"scala",
 			})
 		end,
 	})
