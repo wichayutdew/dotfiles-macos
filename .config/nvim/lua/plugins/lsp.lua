@@ -3,25 +3,25 @@ return function()
 	---------------------- Mason ---------------------
 	require("mason").setup()
 	require("mason-tool-installer").setup({
-		ensure_installed = {
-			"lua_ls",
-			"stylua",
-			"rust_analyzer",
-			"markdownlint",
-			"marksman",
-			"jsonls",
-			"jq",
-			"cucumber_language_server",
-			"reformat-gherkin",
-			"kotlin_lsp",
-			"ktfmt",
-			"kotlin-debug-adapter",
-			"detekt",
-			"ts_ls",
-			"eslint_d",
-			"prettier",
-		},
-	})
+			ensure_installed = {
+				"lua-language-server",
+				"stylua",
+				"rust-analyzer",
+				"markdownlint",
+				"marksman",
+				"json-lsp",
+				"jq",
+				"cucumber-language-server",
+				"reformat-gherkin",
+				"kotlin-lsp",
+				"ktfmt",
+				"kotlin-debug-adapter",
+				"detekt",
+				"typescript-language-server",
+				"eslint_d",
+				"prettier",
+			},
+		})
 
 	---------------------- LSP Server Configuration ---------------------
 	vim.lsp.enable({
@@ -65,9 +65,6 @@ return function()
 	end
 
 	---------------------- Treesitter ---------------------
-	-- nvim-treesitter main (nvim 0.12+): parser installer + query bundle.
-	-- Requires: brew install tree-sitter (>= 0.26.1)
-	-- Fires once on first startup — non-blocking, no config UI needed.
 	vim.api.nvim_create_autocmd("VimEnter", {
 		once = true,
 		callback = function()
@@ -84,7 +81,6 @@ return function()
 		end,
 	})
 
-	-- Native highlighting via vim.treesitter (Nvim 0.12+ core API)
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = { "*" },
 		callback = function(args)
