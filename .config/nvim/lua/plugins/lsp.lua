@@ -66,14 +66,6 @@ return function()
 			cmd = { "intellij-server", "--stdio" },
 			capabilities = lsp_capabilities,
 			filetypes = { "kotlin" },
-			root_markers = {
-				"build.gradle",
-				"build.gradle.kts",
-				"settings.gradle",
-				"settings.gradle.kts",
-				"pom.xml",
-				".git",
-			},
 		},
 		ts_ls = {
 			cmd = { "typescript-language-server", "--stdio" },
@@ -90,19 +82,19 @@ return function()
 	vim.api.nvim_create_autocmd("VimEnter", {
 		once = true,
 		callback = function()
-			require("nvim-treesitter").install({
-				"lua",
-				"rust",
-				"markdown",
-				"json",
-				"kotlin",
-				"typescript",
-				"javascript",
-				"html",
-				"scala",
-			})
-		end,
-	})
+				require("nvim-treesitter").install({
+					"lua",
+					"rust",
+					"markdown",
+					"json",
+					"kotlin",
+					"typescript",
+					"javascript",
+					"html",
+					"scala",
+				})
+			end,
+		})
 
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = { "*" },
@@ -128,6 +120,17 @@ return function()
 			typescript = { "prettier" },
 			javascriptreact = { "prettier" },
 			typescriptreact = { "prettier" },
+			scala = { "spotless" },
+		},
+		formatters = {
+			spotless = {
+				command = "./gradlew",
+				args = { "spotlessApply" },
+				cwd = function()
+					return vim.fn.getcwd()
+				end,
+				stdin = false,
+			},
 		},
 	})
 
