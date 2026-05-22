@@ -3,25 +3,25 @@ return function()
 	---------------------- Mason ---------------------
 	require("mason").setup()
 	require("mason-tool-installer").setup({
-			ensure_installed = {
-				"lua-language-server",
-				"stylua",
-				"rust-analyzer",
-				"markdownlint",
-				"marksman",
-				"json-lsp",
-				"jq",
-				"cucumber-language-server",
-				"reformat-gherkin",
-				"kotlin-lsp",
-				"ktfmt",
-				"kotlin-debug-adapter",
-				"detekt",
-				"typescript-language-server",
-				"eslint_d",
-				"prettier",
-			},
-		})
+		ensure_installed = {
+			"lua-language-server",
+			"stylua",
+			"rust-analyzer",
+			"markdownlint",
+			"marksman",
+			"json-lsp",
+			"jq",
+			"cucumber-language-server",
+			"reformat-gherkin",
+			"kotlin-lsp",
+			"ktfmt",
+			"kotlin-debug-adapter",
+			"detekt",
+			"typescript-language-server",
+			"eslint_d",
+			"prettier",
+		},
+	})
 
 	---------------------- LSP Server Configuration ---------------------
 	vim.lsp.enable({

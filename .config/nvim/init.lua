@@ -51,12 +51,11 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-lua/plenary.nvim" }, -- Required by many plugins
 	{ src = "https://github.com/MunifTanjim/nui.nvim" }, -- required by leetcode nvim and other packages
 	{ src = "https://github.com/kevinhwang91/promise-async" }, -- required by nvim-ufo
-	{ src = "https://github.com/folke/snacks.nvim" }, -- required by claude code
 	{ src = "https://github.com/nvim-neotest/nvim-nio" }, -- required by nvim-dap-ui
 	--------------------- LSP ---------------------
 	{ src = "https://github.com/mason-org/mason.nvim" },
 	{ src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim" },
-	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/stevearc/conform.nvim" },
 	{ src = "https://github.com/mfussenegger/nvim-lint" },
 	--------------------- DAP ---------------------
