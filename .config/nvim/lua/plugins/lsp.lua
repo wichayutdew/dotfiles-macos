@@ -2,7 +2,7 @@
 return function()
 	---------------------- Mason ---------------------
 	require("mason").setup()
-	require("mason-lspconfig").setup()
+	require("mason-lspconfig").setup({ automatic_enable = false })
 	require("mason-tool-installer").setup({
 		ensure_installed = {
 			"lua_ls",
@@ -42,7 +42,18 @@ return function()
 		marksman = { capabilities = lsp_capabilities, filetypes = { "markdown" } },
 		jsonls = { capabilities = lsp_capabilities, filetypes = { "json" } },
 		cucumber_language_server = { capabilities = lsp_capabilities, filetypes = { "feature" } },
-		kotlin_lsp = { capabilities = lsp_capabilities, filetypes = { "kotlin", "kt", "kts" } },
+		kotlin_lsp = {
+			capabilities = lsp_capabilities,
+			filetypes = { "kotlin" },
+			root_markers = {
+				"build.gradle",
+				"build.gradle.kts",
+				"settings.gradle",
+				"settings.gradle.kts",
+				"pom.xml",
+				".git",
+			},
+		},
 		ts_ls = {
 			capabilities = lsp_capabilities,
 			filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
@@ -103,18 +114,15 @@ return function()
 	}
 
 	---------------------- Diagnostic Signs ---------------------
-	local sign = function(opts)
-		vim.fn.sign_define(opts.name, {
-			texthl = opts.name,
-			text = opts.text,
-			numhl = "",
-		})
-	end
-	sign({ name = "DiagnosticSignError", text = "✘" })
-	sign({ name = "DiagnosticSignWarn", text = "▲" })
-	sign({ name = "DiagnosticSignHint", text = "⚑" })
-	sign({ name = "DiagnosticSignInfo", text = "»" })
 	vim.diagnostic.config({
+		signs = {
+			text = {
+				[vim.diagnostic.severity.ERROR] = "✘",
+				[vim.diagnostic.severity.WARN] = "▲",
+				[vim.diagnostic.severity.HINT] = "⚑",
+				[vim.diagnostic.severity.INFO] = "»",
+			},
+		},
 		virtual_text = true,
 		severity_sort = true,
 		float = {
