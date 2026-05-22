@@ -5,14 +5,13 @@ tap 'FelixKratz/formulae'
 brew 'borders'
 tap 'nikitabobko/tap'
 cask 'aerospace'
-brew 'betterdisplay'
+cask 'betterdisplay'
 
 # Keyboard Remapper
 tap 'yqrashawn/goku'
 brew 'yqrashawn/goku/goku'
 cask 'karabiner-elements'
-brew 'homerow'
-brew 'unnaturalscrollwheels'
+cask 'homerow'
 
 # Library Management
 brew 'asdf'
@@ -31,7 +30,7 @@ brew 'yazi'
 brew 'tmux'
 brew 'tpm'
 brew 'lazygit'
-brew 'lazydocker'
+brew 'imagemagick'
 
 # shell
 brew 'fish'
@@ -43,14 +42,14 @@ cask 'orbstack'
 cask 'font-jetbrains-mono'
 
 # AI
-cask 'opencode'
-cask 'pi-coding-agent'
-brew 'PeonPing/tap/peon-ping'
+brew 'opencode'
+brew 'pi-coding-agent'
 
 # Agoda essentials
 brew 'metalbear-co/mirrord/mirrord'
 
 # Productivity
+cask 'unnaturalscrollwheels'
 cask 'logi-options+'
 cask 'monitorcontrol'
 cask 'raycast'
