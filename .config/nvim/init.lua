@@ -50,7 +50,6 @@ vim.pack.add({
 	--------------------- PRE-REQUISUTES ---------------------
 	{ src = "https://github.com/nvim-lua/plenary.nvim" }, -- Required by many plugins
 	{ src = "https://github.com/MunifTanjim/nui.nvim" }, -- required by leetcode nvim and other packages
-	{ src = "https://github.com/tree-sitter/tree-sitter-html" }, -- required by leetcode nvim
 	{ src = "https://github.com/kevinhwang91/promise-async" }, -- required by nvim-ufo
 	{ src = "https://github.com/folke/snacks.nvim" }, -- required by claude code
 	{ src = "https://github.com/nvim-neotest/nvim-nio" }, -- required by nvim-dap-ui

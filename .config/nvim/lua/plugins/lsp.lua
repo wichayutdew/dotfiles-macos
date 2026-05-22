@@ -56,7 +56,14 @@ return function()
 	---------------------- Treesitter ---------------------
 	-- main branch: parser installer only, no .configs module
 	require("nvim-treesitter").install({
-		"lua", "rust", "markdown", "json", "kotlin", "typescript", "javascript",
+		"lua",
+		"rust",
+		"markdown",
+		"json",
+		"kotlin",
+		"typescript",
+		"javascript",
+		"html",
 	})
 
 	-- Native highlighting via vim.treesitter (Nvim 0.12+ core API)
