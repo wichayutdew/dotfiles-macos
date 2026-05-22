@@ -16,6 +16,7 @@ return function()
 			"kotlin_lsp",
 			"ktfmt",
 			"kotlin-debug-adapter",
+			"detekt",
 			"ts_ls",
 			"eslint_d",
 			"prettier",
@@ -117,6 +118,7 @@ return function()
 		typescript = { "eslint_d" },
 		javascriptreact = { "eslint_d" },
 		typescriptreact = { "eslint_d" },
+		kotlin = { "detekt" },
 	}
 
 	---------------------- Diagnostic Signs ---------------------
