@@ -37,12 +37,33 @@ return function()
 	local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	local servers = {
-		lua_ls = { capabilities = lsp_capabilities, filetypes = { "lua" } },
-		rust_analyzer = { settings = { ["rust-analyzer"] = {} } },
-		marksman = { capabilities = lsp_capabilities, filetypes = { "markdown" } },
-		jsonls = { capabilities = lsp_capabilities, filetypes = { "json" } },
-		cucumber_language_server = { capabilities = lsp_capabilities, filetypes = { "feature" } },
+		lua_ls = {
+			cmd = { "lua-language-server" },
+			capabilities = lsp_capabilities,
+			filetypes = { "lua" },
+		},
+		rust_analyzer = {
+			cmd = { "rust-analyzer" },
+			capabilities = lsp_capabilities,
+			settings = { ["rust-analyzer"] = {} },
+		},
+		marksman = {
+			cmd = { "marksman", "server" },
+			capabilities = lsp_capabilities,
+			filetypes = { "markdown" },
+		},
+		jsonls = {
+			cmd = { "vscode-json-language-server", "--stdio" },
+			capabilities = lsp_capabilities,
+			filetypes = { "json" },
+		},
+		cucumber_language_server = {
+			cmd = { "cucumber-language-server", "--stdio" },
+			capabilities = lsp_capabilities,
+			filetypes = { "feature" },
+		},
 		kotlin_lsp = {
+			cmd = { "intellij-server", "--stdio" },
 			capabilities = lsp_capabilities,
 			filetypes = { "kotlin" },
 			root_markers = {
@@ -55,6 +76,7 @@ return function()
 			},
 		},
 		ts_ls = {
+			cmd = { "typescript-language-server", "--stdio" },
 			capabilities = lsp_capabilities,
 			filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
 		},
