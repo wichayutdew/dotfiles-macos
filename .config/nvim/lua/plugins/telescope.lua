@@ -26,17 +26,10 @@ return function()
 				hidden = true,
 			},
 		},
-		extensions = {
-			["ui-select"] = {
-				require("telescope.themes").get_dropdown({}),
-			},
-		},
 	})
 
 	-- Load extensions
-	require("telescope").load_extension("ui-select")
 	require("telescope").load_extension("bookmarks")
-	require("telescope").load_extension("lsp_handlers")
 
 	-- Keymaps
 	local builtin = require("telescope.builtin")
