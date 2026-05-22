@@ -4,18 +4,18 @@
            :macbook-keyboard [{:is_built_in_keyboard true}]
            }
  :main, [
-;          {
-;           :des "Swap backspace to esc" 
-;           :rules [
-;                   [:##delete_or_backspace :escape :macbook-keyboard ]
-; ]
-;           }
-;          {
-;           :des "Swap caps lock to backspace" 
-;           :rules [
-;                   [:##caps_lock :delete_or_backspace :macbook-keyboard ]
-;                   ]
-;           }
+         {
+          :des "Swap backspace to esc" 
+          :rules [
+                  [:##delete_or_backspace :escape :macbook-keyboard ]
+]
+          }
+         {
+          :des "Swap caps lock to backspace" 
+          :rules [
+                  [:##caps_lock :delete_or_backspace :macbook-keyboard ]
+                  ]
+          }
          {
           :des "Meh key" 
           :rules [
