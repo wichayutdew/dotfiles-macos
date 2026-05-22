@@ -8,7 +8,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.scrolloff = 999
 vim.opt.wrap = false
-vim.api.nvim_set_option_value("colorcolumn", "80", {})
+vim.opt.colorcolumn = "80"
 vim.opt.sidescrolloff = 8
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
@@ -55,23 +55,16 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-neotest/nvim-nio" }, -- required by nvim-dap-ui
 	--------------------- LSP ---------------------
 	{ src = "https://github.com/mason-org/mason.nvim" },
-	{ src = "https://github.com/mason-org/mason-lspconfig.nvim" },
 	{ src = "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim" },
-	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
 	{ src = "https://github.com/stevearc/conform.nvim" },
 	{ src = "https://github.com/mfussenegger/nvim-lint" },
-	--------------------- COMPLETION ---------------------
-	{ src = "https://github.com/hrsh7th/nvim-cmp" },
-	{ src = "https://github.com/hrsh7th/cmp-nvim-lsp" },
 	--------------------- DAP ---------------------
 	{ src = "https://github.com/mfussenegger/nvim-dap" },
 	{ src = "https://github.com/rcarriga/nvim-dap-ui" },
 	{ src = "https://github.com/theHamsta/nvim-dap-virtual-text" },
 	--------------------- TELESCOPE(FZF) ---------------------
 	{ src = "https://github.com/nvim-telescope/telescope.nvim" },
-	{ src = "https://github.com/gbrlsnchs/telescope-lsp-handlers.nvim" },
-	{ src = "https://github.com/nvim-telescope/telescope-ui-select.nvim" },
 	{ src = "https://github.com/nvim-telescope/telescope-dap.nvim" },
 	--------------------- MINI ---------------------
 	{ src = "https://github.com/nvim-mini/mini.icons" }, -- add icons
