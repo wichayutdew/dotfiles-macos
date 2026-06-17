@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-opus-4-7
+model: anthropic-gateway/claude-opus-4-8
 description: Diagnoses bugs, triages production issues, and handles on-call warroom investigation. Reads logs, queries metrics, traces root causes.
 mode: subagent
 permission:

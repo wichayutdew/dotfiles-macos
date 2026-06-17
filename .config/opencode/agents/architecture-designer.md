@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-opus-4-7
+model: anthropic-gateway/claude-opus-4-8
 description: Architecture advisor. Evaluates design options, trade-offs, and recommends approach. Use before implementation for design decisions.
 mode: subagent
 permission:
