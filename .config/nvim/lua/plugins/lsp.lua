@@ -45,6 +45,8 @@ return function()
 		rust_analyzer = {
 			cmd = { "rust-analyzer" },
 			capabilities = lsp_capabilities,
+			filetypes = { "rust" },
+			root_markers = { "Cargo.toml", "Cargo.lock" },
 			settings = { ["rust-analyzer"] = {} },
 		},
 		marksman = {
@@ -72,7 +74,6 @@ return function()
 				"settings.gradle",
 				"settings.gradle.kts",
 				"pom.xml",
-				".git",
 			},
 		},
 		ts_ls = {
