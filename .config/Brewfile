@@ -32,6 +32,7 @@ brew 'tpm'
 brew 'lazygit'
 brew 'imagemagick'
 brew 'tree-sitter'
+brew 'mole'
 
 # shell
 brew 'fish'
