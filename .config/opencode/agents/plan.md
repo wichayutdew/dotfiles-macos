@@ -16,6 +16,9 @@ permission:
     "writing-plans": allow
     "dispatching-parallel-agents": allow
     "subagent-driven-development": allow
+    "plannotator-compound": allow
+    "plannotator-setup-goal": allow
+    "plannotator-visual-explainer": allow
 
 ---
 
