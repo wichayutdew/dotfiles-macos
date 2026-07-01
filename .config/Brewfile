@@ -62,3 +62,6 @@ cask 'spotify'
 cask 'appcleaner'
 cask 'raindropio'
 cask 'zen'
+tap 'zennotes/tap'
+cask 'zennotes'
+
