@@ -13,6 +13,13 @@ starship init fish | source
 set -x PATH $PATH /Users/wphongphanpa/Library/Application\ Support/JetBrains/Toolbox/scripts
 set -x PATH $PATH /Users/wphongphanpa/Library/Application\ Support/Coursier/bin
 
+# ---- AGODA IOS CLIENT RUBY ----
+set IOS_ENV_DIR $HOME/.iosenv # root directory of environment
+set BUNDLE_PATH $IOS_ENV_DIR/bundle # bundler directory
+set GEM_HOME $IOS_ENV_DIR/gem # all gems will be saved here
+set CP_HOME_DIR $IOS_ENV_DIR/cocoapods # [optional] cache directory for Cocoapods in case you still use them
+
+
 # ---- Zoxide Initialization ----
 zoxide init fish | source
 
