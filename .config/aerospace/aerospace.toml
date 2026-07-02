@@ -90,11 +90,13 @@ outer.right =      10
 alt-s = 'workspace 1'
 alt-d = 'workspace 2'
 alt-f = 'workspace 3'
+alt-g = 'workspace 4'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
 alt-shift-s = 'move-node-to-workspace 1 --focus-follows-window'
 alt-shift-d = 'move-node-to-workspace 2 --focus-follows-window'
 alt-shift-f = 'move-node-to-workspace 3 --focus-follows-window'
+alt-shift-g = 'move-node-to-workspace 4 --focus-follows-window'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-b = 'mode window'
