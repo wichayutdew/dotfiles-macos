@@ -45,7 +45,7 @@ pdf_embed_in_edit_mode = "compact"  # compact | full
 [appearance]
 theme_family = "gruvbox"  # apple | gruvbox | catppuccin | github | solarized | one | nord | tokyo-night | kanagawa | black-metal
 theme_mode = "auto"  # light | dark | auto
-theme_id = "light-soft"  # resolved theme id; normally set automatically from family + mode
+theme_id = "dark-hard"  # resolved theme id; normally set automatically from family + mode
 dark_sidebar = true  # tint the sidebar darker than the canvas
 show_sidebar_chevrons = true  # show disclosure arrows in the sidebar
 content_align = "center"  # center | left
