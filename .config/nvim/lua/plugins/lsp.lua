@@ -20,20 +20,12 @@ return function()
 			"typescript-language-server",
 			"eslint_d",
 			"prettier",
+			"omnisharp",
+			"csharpier",
 		},
 	})
 
 	---------------------- LSP Server Configuration ---------------------
-	vim.lsp.enable({
-		"lua_ls",
-		"rust_analyzer",
-		"marksman",
-		"jsonls",
-		"cucumber_language_server",
-		"kotlin_lsp",
-		"ts_ls",
-	})
-
 	local lsp_capabilities = vim.lsp.protocol.make_client_capabilities()
 
 	local servers = {
@@ -81,11 +73,38 @@ return function()
 			capabilities = lsp_capabilities,
 			filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
 		},
+		omnisharp = {
+			cmd = { "OmniSharp", "--languageserver" },
+			capabilities = lsp_capabilities,
+			filetypes = { "cs", "vb" },
+			root_markers = { "*.sln", "*.csproj", "*.fsproj", "global.json", ".git" },
+			settings = {
+				FormattingOptions = {
+					EnableEditorConfigSupport = true,
+					OrganizeImports = true,
+				},
+				RoslynExtensionsOptions = {
+					EnableAnalyzersSupport = true,
+					EnableImportCompletion = true,
+				},
+			},
+		},
 	}
 
 	for server, config in pairs(servers) do
 		vim.lsp.config(server, config)
 	end
+
+	vim.lsp.enable({
+		"lua_ls",
+		"rust_analyzer",
+		"marksman",
+		"jsonls",
+		"cucumber_language_server",
+		"kotlin_lsp",
+		"ts_ls",
+		"omnisharp",
+	})
 
 	---------------------- Treesitter ---------------------
 	vim.api.nvim_create_autocmd("VimEnter", {
@@ -101,6 +120,7 @@ return function()
 				"javascript",
 				"html",
 				"scala",
+				"c_sharp",
 			})
 		end,
 	})
@@ -130,6 +150,7 @@ return function()
 			javascriptreact = { "prettier" },
 			typescriptreact = { "prettier" },
 			scala = { "spotless" },
+			cs = { "csharpier" },
 		},
 		formatters = {
 			spotless = {
