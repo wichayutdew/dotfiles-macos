@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-sonnet-4-6
+model: anthropic-gateway/claude-sonnet-5
 description: Reviews code for quality, security, and standards. Analyzes MR diffs or code changes and provides structured feedback.
 mode: subagent
 permission:

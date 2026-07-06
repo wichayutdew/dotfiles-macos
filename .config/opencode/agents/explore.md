@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-sonnet-4-6
+model: anthropic-gateway/claude-sonnet-5
 description: Read-only codebase,document explorer. Uses ripgrep, sourcegraph, gitlab MCP to find files, symbols, patterns, MR diffs. Uses Glean MCP,Slack MCP,Atlassian MCP to access document, chat messages. Cannot modify files.
 mode: subagent
 permission:

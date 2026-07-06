@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-sonnet-4-6
+model: anthropic-gateway/claude-sonnet-5
 description: Pure orchestrator. Routes all work to subagents. Never writes code, edits files, or runs commands.
 mode: primary
 permission:

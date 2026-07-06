@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-sonnet-4-6
+model: anthropic-gateway/claude-sonnet-5
 description: Writes Confluence pages, ADRs, lesson-learn docs, and AGENTS.md/CLAUDE.md config files. Default space is PTA (Bundles team folder).
 mode: subagent
 permission:

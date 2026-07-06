@@ -1,5 +1,5 @@
 ---
-model: anthropic-gateway/claude-sonnet-4-6
+model: anthropic-gateway/claude-sonnet-5
 description: Writes new skills and updates skill allowlists. Use when a workflow pattern is missing, recurring, or user requests skill creation.
 mode: subagent
 permission:

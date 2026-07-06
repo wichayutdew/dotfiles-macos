@@ -17,8 +17,8 @@
         "apiKey": "{env:GENAI_API_KEY}"
       },
       "models": {
-        "claude-sonnet-4-6": {
-          "name": "claude-sonnet-4-6",
+        "claude-sonnet-5": {
+          "name": "claude-sonnet-5",
           "limit": {
             "context": 200000,
             "output": 200000
@@ -58,7 +58,7 @@
       }
     }
   },
-  "model": "anthropic-gateway/claude-sonnet-4-6",
+  "model": "anthropic-gateway/claude-sonnet-5",
   "small_model": "openai-gateway/gpt-5.4",
   "default_agent": "plan",
   "mcp": {
