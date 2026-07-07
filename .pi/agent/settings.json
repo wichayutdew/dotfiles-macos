@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.74.0",
+  "lastChangelogVersion": "0.80.3",
   "defaultProvider": "opencode",
   "defaultModel": "big-pickle",
   "packages": [
@@ -9,5 +9,12 @@
       "source": "npm:@plannotator/pi-extension",
       "skills": []
     }
-  ]
+  ],
+  "theme": "light/dark",
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "defaultThinkingLevel": "high"
 }
