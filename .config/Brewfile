@@ -40,7 +40,6 @@ brew 'fish'
 # Development
 cask 'postman'
 cask 'ghostty'
-cask 'orbstack'
 cask 'font-jetbrains-mono'
 
 # AI
@@ -48,17 +47,16 @@ brew 'opencode'
 brew 'pi-coding-agent'
 
 # Agoda essentials
+cask 'orbstack'
 brew 'metalbear-co/mirrord/mirrord'
 
 # Productivity
-cask 'unnaturalscrollwheels'
 cask 'logi-options+'
 cask 'raycast'
 cask 'shottr'
 cask 'lookaway'
 cask 'hiddenbar'
 cask 'spotify'
-cask 'appcleaner'
 cask 'raindropio'
 cask 'zen'
 tap 'zennotes/tap'
