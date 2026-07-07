@@ -1,27 +1,44 @@
-;; Tutorial https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#command-a-to-control-1
+;; Tutorial
+;; https://github.com/yqrashawn/GokuRakuJoudo/blob/master/tutorial.md#command-a-to-control-1
+
 {
- :devices {
-           :macbook-keyboard [{:is_built_in_keyboard true}]
-           }
- :main, [
-         ; {
-         ;  :des "Swap backspace to esc" 
-         ;  :rules [
-         ;          [:##delete_or_backspace :escape :macbook-keyboard ]
-         ;          ]
-         ; }
-         ; {
-         ;  :des "Swap caps lock to backspace" 
-         ;  :rules [
-         ;          [:##caps_lock :delete_or_backspace :macbook-keyboard ]
-         ;          ]
-         ;  }
-         {
-          :des "Meh key" 
-          :rules [
-                  ;; fn -> control + option + shift
-                  [:##fn :!SOleft_control :macbook-keyboard]
-                  ]
-          }
-         ]
- }
+  :devices
+  {:macbook-keyboard [{:is_built_in_keyboard true}]
+   :dell-mouse       [{:vendor_id 16700
+                       :product_id 9482
+                       :is_pointing_device true}]}
+
+  :main
+  [
+    ; {
+    ;   :des "Swap backspace to esc"
+    ;   :rules [
+    ;     [:##delete_or_backspace :escape :macbook-keyboard]
+    ;   ]
+    ; }
+
+    ; {
+    ;   :des "Swap caps lock to backspace"
+    ;   :rules [
+    ;     [:##caps_lock :delete_or_backspace :macbook-keyboard]
+    ;   ]
+    ; }
+
+    {
+      :des "Meh key"
+      :rules [
+        ;; fn -> control + option + shift
+        [:##fn :!SOleft_control :macbook-keyboard]
+      ]
+    }
+
+    {
+      :des "Flip vertical wheel for dell mouse"
+      :rules [
+        [{:type :mouse_basic
+          :flip [:vertical_wheel]}
+         :dell-mouse]
+      ]
+    }
+  ]
+}
