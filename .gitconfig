@@ -8,6 +8,8 @@
   pager = delta
 	excludesfile = /Users/wphongphanpa/.config/git/.gitignore
 
+  untrackedCache = true
+  fsmonitor = true
 [interactive]
   diffFilter = delta --color-only
 
@@ -25,3 +27,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[push]
+	autoSetupRemote = true
