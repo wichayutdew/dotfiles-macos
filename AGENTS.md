@@ -12,11 +12,15 @@ Agent + skill prompts must be generic. No hardcoded org names, URLs, project key
 Config is public — any file readable by anyone.
 Replace specifics with: `<your-X>`, env vars, or omit.
 
-## File Search — rg Only
-Never use `find` command. Use `rg` (ripgrep) instead for file/content search.
+## File Search — rg Only (HARD BAN)
+`find` command: BANNED. No exceptions, no bash fallback, no subagent bypass.
+Use `rg` (ripgrep) always.
 `find . -name "*.ts"` → `rg --files -g "*.ts"`
 `find . -type f` → `rg --files`
-Applies to all agents, all shells, all tasks.
+`find . -iname "*foo*"` → `rg --files -i -g "*foo*"`
+`find . -mtime -1` → no rg equivalent, use `rg --files | xargs stat` or `fd` if avail
+Before any bash call containing literal `find `: stop, rewrite w/ `rg`.
+Applies to: all agents, subagents, chains, parallel tasks, all shells, all tasks, every session — no per-session exceptions.
 
 ## Caveman Mode — Always On
 Respond terse like smart caveman. Technical substance stay. Fluff die.

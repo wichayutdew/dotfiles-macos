@@ -1,0 +1,4 @@
+---
+description: Generate terse caveman-style commit message
+---
+Load the `caveman-commit` skill (~/.agents/skills/caveman-commit/SKILL.md) and generate a commit message for the current staged changes. Conventional Commits format. Subject: ≤50 chars, imperative, lowercase after type. Body: only when 'why' isn't obvious from subject. Why over what. No period on subject.
