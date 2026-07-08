@@ -135,6 +135,11 @@
       "*": "ask"
     }
   },
+  "skills": {
+    "paths": [
+      "~/.agents/skill"
+    ]
+  },
   "watcher": {
     "ignore": [
       "node_modules/**",

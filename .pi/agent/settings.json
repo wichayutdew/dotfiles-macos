@@ -16,5 +16,8 @@
   },
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
-  "defaultThinkingLevel": "high"
+  "defaultThinkingLevel": "high",
+  "skills": [
+    "~/.agents/skill"
+  ]
 }
