@@ -26,6 +26,7 @@
 /.pi/agent/auth.json
 /.pi/agent/sessions
 /.pi/agent/bin
+/.pi/agent/git/github.com/obra/superpowers
 /.pi/logs
 *.cache
 mcp-cache.json

@@ -10,7 +10,8 @@
       "source": "npm:@plannotator/pi-extension",
       "skills": []
     },
-    "npm:pi-subagents"
+    "npm:pi-subagents",
+    "git:github.com/obra/superpowers"
   ],
   "theme": "light/dark",
   "terminal": {
