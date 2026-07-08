@@ -18,6 +18,6 @@
   "treeFilterMode": "default",
   "defaultThinkingLevel": "high",
   "skills": [
-    "~/.agents/skill"
+    "~/.agents/skills"
   ]
 }

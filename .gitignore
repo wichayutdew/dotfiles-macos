@@ -9,6 +9,7 @@
 /.config/karabiner
 !/notes
 !/.1password
+!/.agents
 
 # except these files
 !.asdfrc

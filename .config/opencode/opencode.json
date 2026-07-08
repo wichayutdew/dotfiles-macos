@@ -137,7 +137,7 @@
   },
   "skills": {
     "paths": [
-      "~/.agents/skill"
+      "~/.agents/skills"
     ]
   },
   "watcher": {
