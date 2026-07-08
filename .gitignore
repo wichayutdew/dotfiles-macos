@@ -27,6 +27,9 @@
 /.pi/agent/sessions
 /.pi/agent/bin
 /.pi/logs
+*.cache
+mcp-cache.json
+mcp-oauth
 
 # ignore RUST specific files
 .config/cargo/*

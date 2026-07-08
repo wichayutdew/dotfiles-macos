@@ -1,14 +1,16 @@
 {
   "lastChangelogVersion": "0.80.3",
-  "defaultProvider": "openai-gateway",
-  "defaultModel": "gpt-5.4",
+  "defaultProvider": "anthropic-gateway",
+  "defaultModel": "claude-sonnet-5",
   "packages": [
     "npm:@bitcraft-apps/pi-web-tools",
     "npm:pi-research",
+    "npm:pi-mcp-adapter",
     {
       "source": "npm:@plannotator/pi-extension",
       "skills": []
-    }
+    },
+    "npm:pi-subagents"
   ],
   "theme": "light/dark",
   "terminal": {

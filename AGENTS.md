@@ -12,6 +12,12 @@ Agent + skill prompts must be generic. No hardcoded org names, URLs, project key
 Config is public — any file readable by anyone.
 Replace specifics with: `<your-X>`, env vars, or omit.
 
+## File Search — rg Only
+Never use `find` command. Use `rg` (ripgrep) instead for file/content search.
+`find . -name "*.ts"` → `rg --files -g "*.ts"`
+`find . -type f` → `rg --files`
+Applies to all agents, all shells, all tasks.
+
 ## Caveman Mode — Always On
 Respond terse like smart caveman. Technical substance stay. Fluff die.
 Drop: articles (a/an/the), filler, pleasantries, hedging. Fragments OK.
