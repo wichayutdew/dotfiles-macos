@@ -23,6 +23,7 @@
 
 # pi coding agent config
 !/.pi
+/.pi/agent/auth.json
 /.pi/agent/sessions
 /.pi/agent/bin
 /.pi/logs
