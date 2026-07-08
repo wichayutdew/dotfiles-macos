@@ -43,7 +43,6 @@ cask 'ghostty'
 cask 'font-jetbrains-mono'
 
 # AI
-brew 'opencode'
 brew 'pi-coding-agent'
 
 # Agoda essentials

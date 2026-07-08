@@ -59,7 +59,7 @@ alias t 'tmux'
 alias ci 'zi'
 alias c 'z'
 alias y 'yazi'
-alias cc 'opencode'
+alias cc 'pi --plan'
 alias q 'pi -p --model big-pickle'
 
 # ---- Agoda Specific ----
