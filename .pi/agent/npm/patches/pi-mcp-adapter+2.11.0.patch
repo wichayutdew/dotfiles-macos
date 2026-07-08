@@ -1,0 +1,128 @@
+diff --git a/node_modules/pi-mcp-adapter/commands.ts b/node_modules/pi-mcp-adapter/commands.ts
+index d3a055b..b41e727 100644
+--- a/node_modules/pi-mcp-adapter/commands.ts
++++ b/node_modules/pi-mcp-adapter/commands.ts
+@@ -18,7 +18,7 @@ import { buildToolMetadata } from "./tool-metadata.ts";
+ import { supportsOAuth, authenticate, removeAuth } from "./mcp-auth-flow.ts";
+ import { getAuthForUrl } from "./mcp-auth.ts";
+ import { loadOnboardingState, markSetupCompleted as persistSetupCompleted, markSharedConfigHintShown } from "./onboarding-state.ts";
+-import { openPath } from "./utils.ts";
++import { openPath, interpolateEnvVars } from "./utils.ts";
+ 
+ export async function showStatus(state: McpExtensionState, ctx: ExtensionContext): Promise<void> {
+   if (!ctx.hasUI) return;
+@@ -168,7 +168,7 @@ export async function authenticateServer(
+ 
+   try {
+     ctx.ui.setStatus("mcp-auth", `Authenticating ${serverName}...`);
+-    const status = await authenticate(serverName, definition.url, definition, {
++    const status = await authenticate(serverName, interpolateEnvVars(definition.url), definition, {
+       onAuthorizationUrl: (authorizationUrl) => {
+         ctx.ui.notify(
+           `Open this URL to authenticate ${serverName}:\n\n${authorizationUrl}\n\n` +
+diff --git a/node_modules/pi-mcp-adapter/direct-tools.ts b/node_modules/pi-mcp-adapter/direct-tools.ts
+index 423862a..028642c 100644
+--- a/node_modules/pi-mcp-adapter/direct-tools.ts
++++ b/node_modules/pi-mcp-adapter/direct-tools.ts
+@@ -13,7 +13,7 @@ import { maybeStartUiSession, type UiSessionRuntime } from "./ui-session.ts";
+ import { formatToolName, isToolExcluded } from "./types.ts";
+ import { resourceNameToToolName } from "./resource-tools.ts";
+ import { authenticate, supportsOAuth } from "./mcp-auth-flow.ts";
+-import { formatAuthRequiredMessage } from "./utils.ts";
++import { formatAuthRequiredMessage, interpolateEnvVars } from "./utils.ts";
+ 
+ const BUILTIN_NAMES = new Set(["read", "bash", "edit", "write", "grep", "find", "ls", "mcp"]);
+ 
+@@ -64,7 +64,7 @@ async function attemptDirectAutoAuth(
+   }
+ 
+   try {
+-    await authenticate(serverName, definition.url, definition);
++    await authenticate(serverName, interpolateEnvVars(definition.url), definition);
+     return { status: "success" };
+   } catch (error) {
+     const message = error instanceof Error ? error.message : String(error);
+diff --git a/node_modules/pi-mcp-adapter/metadata-cache.ts b/node_modules/pi-mcp-adapter/metadata-cache.ts
+index 5d9a6e0..54055c8 100644
+--- a/node_modules/pi-mcp-adapter/metadata-cache.ts
++++ b/node_modules/pi-mcp-adapter/metadata-cache.ts
+@@ -7,7 +7,7 @@ import { getToolUiResourceUri } from "@modelcontextprotocol/ext-apps/app-bridge"
+ import type { McpTool, McpResource, ServerEntry, ToolMetadata } from "./types.ts";
+ import { formatToolName, isToolExcluded } from "./types.ts";
+ import { resourceNameToToolName } from "./resource-tools.ts";
+-import { extractToolUiStreamMode, interpolateEnvRecord, resolveBearerToken, resolveConfigPath } from "./utils.ts";
++import { extractToolUiStreamMode, interpolateEnvRecord, interpolateEnvVars, resolveBearerToken, resolveConfigPath } from "./utils.ts";
+ 
+ const CACHE_VERSION = 1;
+ const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+@@ -90,7 +90,7 @@ export function computeServerHash(definition: ServerEntry): string {
+     args: definition.args,
+     env: interpolateEnvRecord(definition.env),
+     cwd: resolveConfigPath(definition.cwd),
+-    url: definition.url,
++    url: definition.url !== undefined ? interpolateEnvVars(definition.url) : undefined,
+     headers: interpolateEnvRecord(definition.headers),
+     auth: definition.auth,
+     bearerToken: resolveBearerToken(definition),
+diff --git a/node_modules/pi-mcp-adapter/proxy-modes.ts b/node_modules/pi-mcp-adapter/proxy-modes.ts
+index 70945e9..77db626 100644
+--- a/node_modules/pi-mcp-adapter/proxy-modes.ts
++++ b/node_modules/pi-mcp-adapter/proxy-modes.ts
+@@ -10,7 +10,7 @@ import { buildToolMetadata, getToolNames, findToolByName, formatSchema } from ".
+ import { resolveMcpResultContent, transformMcpContent } from "./tool-registrar.ts";
+ import { guardMcpOutput, guardedMcpDetails, resolveMcpOutputGuardOptions } from "./mcp-output-guard.ts";
+ import { maybeStartUiSession, type UiSessionRuntime } from "./ui-session.ts";
+-import { formatAuthRequiredMessage, truncateAtWord } from "./utils.ts";
++import { formatAuthRequiredMessage, truncateAtWord, interpolateEnvVars } from "./utils.ts";
+ import { authenticate, completeAuthFromInput, startAuth, supportsOAuth } from "./mcp-auth-flow.ts";
+ 
+ type ProxyToolResult = AgentToolResult<Record<string, unknown>>;
+@@ -101,7 +101,7 @@ async function attemptAutoAuth(
+   }
+ 
+   try {
+-    await authenticate(serverName, definition.url, definition);
++    await authenticate(serverName, interpolateEnvVars(definition.url), definition);
+     return { status: "success" };
+   } catch (error) {
+     const message = error instanceof Error ? error.message : String(error);
+@@ -263,7 +263,7 @@ export async function executeAuthStart(state: McpExtensionState, serverName: str
+   }
+ 
+   try {
+-    const { authorizationUrl } = await startAuth(serverName, definition.url, definition);
++    const { authorizationUrl } = await startAuth(serverName, interpolateEnvVars(definition.url), definition);
+     if (!authorizationUrl) {
+       return {
+         content: [{ type: "text" as const, text: `OAuth authentication successful for "${serverName}".` }],
+diff --git a/node_modules/pi-mcp-adapter/server-manager.ts b/node_modules/pi-mcp-adapter/server-manager.ts
+index e3b68cc..58f1d3b 100644
+--- a/node_modules/pi-mcp-adapter/server-manager.ts
++++ b/node_modules/pi-mcp-adapter/server-manager.ts
+@@ -27,7 +27,7 @@ import {
+   registerElicitationHandler,
+   type ServerElicitationConfig,
+ } from "./elicitation-handler.ts";
+-import { interpolateEnvRecord, resolveBearerToken, resolveConfigPath } from "./utils.ts";
++import { interpolateEnvRecord, interpolateEnvVars, resolveBearerToken, resolveConfigPath } from "./utils.ts";
+ import { abortable, throwIfAborted } from "./abort.ts";
+ 
+ interface ServerConnection {
+@@ -280,7 +280,7 @@ export class McpServerManager {
+     signal?: AbortSignal,
+   ): Promise<Transport> {
+     throwIfAborted(signal);
+-    const url = new URL(definition.url!);
++    const url = new URL(interpolateEnvVars(definition.url!));
+ 
+     // Build headers first (including any bearer token)
+     const headers = resolveHeaders(definition.headers) ?? {};
+@@ -302,7 +302,7 @@ export class McpServerManager {
+       const oauthConfig = extractOAuthConfig(definition);
+       authProvider = new McpOAuthProvider(
+         serverName,
+-        definition.url!,
++        interpolateEnvVars(definition.url!),
+         oauthConfig,
+         {
+           onRedirect: async (_authUrl) => {
