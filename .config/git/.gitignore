@@ -4,3 +4,5 @@ metals.sbt
 .DS_Store
 .tool-versions
 .superpowers/
+.pi-subagents/artifacts/
+**/.pi-subagents/artifacts/
