@@ -3,3 +3,4 @@
 metals.sbt
 .DS_Store
 .tool-versions
+.superpowers/
