@@ -23,14 +23,26 @@
 
 # pi coding agent config
 !/.pi
+
+# pi secrets
 /.pi/agent/auth.json
-/.pi/agent/sessions
-/.pi/agent/bin
-/.pi/agent/git/github.com/obra/superpowers
-/.pi/logs
-*.cache
-mcp-cache.json
-mcp-oauth
+
+# pi runtime / cache / memory
+/.pi/agent/sessions/
+/.pi/agent/logs/
+/.pi/logs/
+/.pi/agent/bin/
+/.pi/agent/**/*.jsonl
+/.pi/agent/**/node_modules/
+/.pi/agent/**/.cache/
+/.pi/agent/**/mcp-cache.json
+/.pi/agent/**/mcp-oauth
+/.pi/agent/git/github.com/obra/superpowers/
+
+# opencode runtime / cache
+/.config/opencode/**/.cache/
+/.config/opencode/**/mcp-cache.json
+/.config/opencode/**/mcp-oauth
 
 # ignore RUST specific files
 .config/cargo/*
