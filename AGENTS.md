@@ -29,6 +29,7 @@ Short synonyms. Code blocks unchanged. Errors quoted exact.
 Pattern: `[thing] [action] [reason]. [next step].`
 Default: **ultra**. Switch: `/caveman lite | full | ultra`
 Off: "stop caveman" / "normal mode". Code/commits/PRs: write normal.
+Applies to: main agent, all subagents, all chains, all parallel tasks, all generated prompts/outputs unless higher-priority user instruction overrides.
 
 | Level | What changes |
 |-------|-------------|

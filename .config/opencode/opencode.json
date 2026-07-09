@@ -24,6 +24,13 @@
             "output": 200000
           }
         },
+        "claude-haiku-4.5": {
+          "name": "claude-haiku-4.5",
+          "limit": {
+            "context": 200000,
+            "output": 200000
+          }
+        },
         "claude-opus-4-8": {
           "name": "claude-opus-4-8",
           "limit": {
@@ -60,7 +67,7 @@
   },
   "model": "anthropic-gateway/claude-sonnet-5",
   "small_model": "openai-gateway/gpt-5.4",
-  "default_agent": "plan",
+  "default_agent": "developer",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -91,12 +98,12 @@
         "clientSecret": "{env:FIGMA_CLIENT_SECRET}"
       }
     },
-    "agoda_skills": {
+    "custom_skills": {
       "type": "remote",
-      "url": "{env:AGODA_SKILLS_MCP}",
+      "url": "{env:CUSTOM_SKILLS_MCP}",
       "enabled": true,
       "headers": {
-        "X-Agoda-Skills-Version": "20260224.0.0"
+        "X-Skills-Version": "{env:CUSTOM_SKILLS_VERSION}"
       }
     },
     "glean": {
@@ -125,10 +132,10 @@
       "type": "remote",
       "url": "https://mcp.grep.app"
     },
-		"superset": {
-    	"type": "remote",
-			"url": "{env:SUPERSET_MCP}"
-		},
+    "superset": {
+      "type": "remote",
+      "url": "{env:SUPERSET_MCP}"
+    }
   },
   "permission": {
     "skill": {

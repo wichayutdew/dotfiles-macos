@@ -1,14 +1,13 @@
 {
   "subagents": {
     "agentOverrides": {
-      "architecture-designer": { "model": "anthropic-gateway/claude-opus-4-8" },
-      "code-reviewer": { "model": "anthropic-gateway/claude-opus-4-8" },
-      "debugger": { "model": "anthropic-gateway/claude-opus-4-8" },
+      "architecture-designer": { "model": "anthropic-gateway/claude-sonnet-5" },
+      "code-reviewer": { "model": "anthropic-gateway/claude-sonnet-5" },
+      "debugger": { "model": "anthropic-gateway/claude-sonnet-5" },
       "developer": { "model": "openai-gateway/gpt-5.4" },
       "documentation-writer": { "model": "anthropic-gateway/claude-sonnet-5" },
-      "explore": { "model": "anthropic-gateway/claude-sonnet-5" },
+      "explore": { "model": "anthropic-gateway/claude-haiku-4.5" },
       "mr-creator": { "model": "openai-gateway/gpt-5.4" },
-      "plan": { "model": "anthropic-gateway/claude-opus-4-8" },
       "quality-checker": { "model": "openai-gateway/gpt-5.4" },
       "skill-writer": { "model": "anthropic-gateway/claude-sonnet-5" },
       "test-automation-engineer": { "model": "openai-gateway/gpt-5.4" }

@@ -80,9 +80,9 @@ As of now I have 4 main MCP
 
 # Agents
 
-I build the agent workflow by using [Plan](agent/plan.md) as a main
-orchestrator and the rest of the agent will be subagent specialized in their
-own field
+I build the agent workflow around small specialized agents with minimal overlap.
+Removed style-only duplicates and heavy top-level orchestrator prompts. Keep one
+agent per core role and delegate only when specialization/context isolation helps.
 
 And each subagent will utilize [skill](skill) and [rules](rules)
 
@@ -99,4 +99,4 @@ And each subagent will utilize [skill](skill) and [rules](rules)
 
 ## [Caveman](https://github.com/JuliusBrussee/caveman)
 
-> Rule to make agent only output necessary word
+> Ground rule for terse output. Applies to main agent, subagents, chains, and generated prompts/outputs unless higher-priority user instruction overrides.
