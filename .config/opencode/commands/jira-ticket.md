@@ -1,8 +1,8 @@
 ---
-description: Create or update a Jira story/task from context or arguments
+description: Investigate and implement a Jira ticket as a verified local diff
+agent: build
 ---
 
-Load skill from `skills/jira-ticket/SKILL.md` and follow it.
+Use the native skill tool to load `jira-ticket` only if ticket-field handling is needed.
 
-If $ARGUMENTS provided, use as initial context (issue key to update, or draft description to create from).
-If no arguments, use current conversation context as ticket input; if insufficient, prompt user interactively.
+Implement $ARGUMENTS. Read the ticket and repository evidence; extract testable acceptance criteria and unknowns. Use one bounded read-only scout for non-trivial work. Use Plannotator only for ambiguous, cross-file, or cross-system scope. Keep one writer; add regression tests with behavior; run focused and repository-required checks; use one fresh `code-reviewer` after meaningful changes. Stop at a verified local diff. Do not edit Jira, commit, push, or create a merge request unless explicitly requested.

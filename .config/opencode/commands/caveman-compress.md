@@ -1,9 +1,5 @@
 ---
-description: Compress a markdown file into caveman format to save tokens
+description: Compress a memory file while preserving technical substance
 ---
 
-Load skill from `skills/caveman-compress/SKILL.md` and follow it.
-
-Compress the file passed as argument: $ARGUMENTS
-
-If no argument provided, ask user which file to compress.
+Use the native skill tool to load `caveman-compress`, then process $ARGUMENTS. If no path is provided, ask for one. Do not apply this compressor to plans, tickets, requirements, evidence, code, tests, or external documents.

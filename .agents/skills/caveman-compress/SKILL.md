@@ -3,7 +3,8 @@ name: caveman-compress
 description: >
   Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format
   to save input tokens. Preserves all technical substance, code, URLs, and structure.
-  Compressed version overwrites the original file. Human-readable backup saved as FILE.original.md.
+  Sends approved file content to Anthropic, then overwrites the original with a compressed copy.
+  Human-readable backup saved as FILE.original.md. Requires secret scan and transmission consent.
   Trigger: /caveman-compress FILEPATH or "compress memory file"
 ---
 
@@ -19,13 +20,19 @@ Compress natural language files (CLAUDE.md, todos, preferences) into caveman-spe
 
 ## Process
 
-1. The compression scripts live in `scripts/` (adjacent to this SKILL.md). If the path is not immediately available, search for `scripts/__main__.py` next to this SKILL.md.
+1. Resolve the exact user-supplied path. Reject unsupported types, backup files, files over 500 KB, directories, symlinks escaping the requested workspace, and paths the user did not name.
 
-2. From the directory containing this SKILL.md, run:
+2. Explain that the complete file content will be transmitted to Anthropic through the API or Claude CLI. Get explicit confirmation unless the user already authorized that transmission in the same request.
+
+3. Scan without printing values for likely secrets or private data: API keys, tokens, passwords, private keys, credentials, cookies, connection strings, secret-bearing environment assignments, and sensitive personal data. If found, stop and ask for a redacted copy. Never include matched values in chat or tool output.
+
+4. Read `SECURITY.md`. The compression scripts live in `scripts/` adjacent to this file. If the path is not immediately available, search for `scripts/__main__.py` next to this SKILL.md.
+
+5. From the directory containing this SKILL.md, run:
 
 python3 -m scripts <absolute_filepath>
 
-3. The CLI will:
+6. The CLI will:
 - detect file type (no tokens)
 - call Claude to compress
 - validate output (no tokens)
@@ -33,7 +40,7 @@ python3 -m scripts <absolute_filepath>
 - retry up to 2 times
 - if still failing after 2 retries: report error to user, leave original file untouched
 
-4. Return result to user
+7. Return result, backup path, validation status, and transmission method. Never echo file contents.
 
 ## Compression Rules
 

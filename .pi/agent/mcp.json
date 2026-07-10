@@ -5,7 +5,7 @@
       "headers": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
       },
-      "directTools": true
+      "directTools": ["resolve-library-id", "query-docs"]
     },
     "atlassian": {
       "url": "https://mcp.atlassian.com/v1/mcp",
@@ -47,7 +47,7 @@
     },
     "gh_grep": {
       "url": "https://mcp.grep.app",
-      "directTools": true
+      "directTools": ["searchGitHub"]
     },
     "superset": {
       "url": "${SUPERSET_MCP}"

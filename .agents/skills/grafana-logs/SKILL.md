@@ -1,135 +1,37 @@
 ---
 name: grafana-logs
-description: Investigate production issues by querying Grafana Loki logs. Use for error analysis, log pattern investigation, and production debugging.
-license: MIT
-compatibility: opencode
+description: Query Grafana Loki logs for production debugging using narrow, evidence-driven LogQL searches. Use for errors, request traces, runtime patterns, and hypothesis testing.
 ---
 
+# Grafana Loki Investigation
 
-# Grafana Logs Investigation
+Run inside the current bounded investigator. Do not spawn another agent solely because this skill loaded.
 
-## WARNING: Always Use Subagent
+## Query Discipline
 
-**ALL log investigation must be done under a subagent** (Task tool). The Grafana MCP is extremely token-heavy and will consume context rapidly. The subagent isolates token usage from the main conversation.
+1. Confirm environment, application label, exact time range/time zone, and investigation question.
+2. Discover Loki datasource and labels; never hardcode datasource IDs or assume label names.
+3. Start with a narrow time window and result limit of 20-30.
+4. Search an exact request ID, error string, endpoint, or known label before broad regex.
+5. Refine based on observed fields. Expand time or limit only when needed.
+6. Preserve timestamps and correlation IDs, but redact secrets and minimize private identifiers.
 
-## Instructions
+Generic patterns:
 
-### 1. Launch Investigation Subagent
-
-Before any MCP calls, spawn a subagent:
-
-```
-Use Task tool with:
-- subagent_type: general
-- prompt: "Investigate [issue description] in [applicationName] logs using Grafana Loki MCP"
-```
-
-### 2. Discover Loki Datasource UID
-
-Inside the subagent, list Loki datasources to find the UID — do not hardcode:
-
-```
-Tool: grafana_list_datasources
-{ "type": "loki" }
+```logql
+{<app-label>="<service>"} |= "<exact-text>"
+{<app-label>="<service>"} |~ "(?i)<error-pattern>"
+{<app-label>="<service>", <env-label>="<environment>"} != "<noise>"
 ```
 
-Pick the datasource UID with type `loki` or `LK` from the results.
+Use RFC3339 timestamps with explicit offsets. Never substitute current time from memory.
 
-### 3. Query Logs with LogQL
+## Evidence Output
 
-**Key Query Patterns:**
+- Query, datasource, environment, time range, and result limit.
+- Observed pattern with representative timestamps and counts.
+- Negative evidence: expected events not found and searched scope.
+- Hypothesis supported or falsified; confidence and next check.
+- Query limitations, truncation, missing logs, or clock uncertainty.
 
-Most applications use `applicationName` as the primary label for filtering:
-
-```
-# Basic application logs
-{applicationName="my-service"}
-
-# Filter by label
-{applicationName="my-service", env="prod"}
-
-# Search for patterns (case-insensitive)
-{applicationName="my-service"} |~ "(?i)error|exception|failed"
-
-# Multiple pattern matches
-{applicationName="my-service"} |~ "(?i)payment.*400|payment.*failed"
-
-# Exclude patterns
-{applicationName="my-service"} |!~ "(?i)healthcheck"
-```
-
-**MCP Call:**
-
-```
-Tool: grafana_query_loki_logs
-{
-  "datasourceUid": "<UID-from-step-2>",
-  "logql": "{applicationName=\"my-service\"} |~ \"(?i)error|exception\"",
-  "limit": 30,
-  "startRfc3339": "2026-01-11T00:00:00Z",
-  "endRfc3339": "2026-01-11T01:00:00Z"
-}
-```
-
-### 4. Time Range Specification
-
-Use RFC3339 format:
-
-```
-2026-01-11T00:00:00Z        # Start of hour
-2026-01-11T14:30:00Z        # Specific time
-2026-01-11T23:59:59Z        # End of day
-```
-
-## Workflow Summary
-
-1. **Launch subagent** with Task tool (MANDATORY)
-2. Inside subagent: **List datasources** via `grafana_list_datasources` to find Loki UID
-3. Inside subagent: **Query logs** via `grafana_query_loki_logs` with appropriate LogQL filters
-4. Inside subagent: **Analyze results** and identify patterns
-5. Return findings to main conversation
-
-## Common Use Cases
-
-### Error Investigation
-```
-Tool: grafana_query_loki_logs
-{
-  "datasourceUid": "<loki-uid>",
-  "logql": "{applicationName=\"myapp\"} |~ \"(?i)error|exception\"",
-  "limit": 50,
-  "startRfc3339": "2026-01-11T00:00:00Z"
-}
-```
-
-### Specific Service Debugging
-```
-Tool: grafana_query_loki_logs
-{
-  "datasourceUid": "<loki-uid>",
-  "logql": "{applicationName=\"my-service\"} |~ \"SearchService.*failed\"",
-  "limit": 100
-}
-```
-
-### API Error Tracking
-```
-Tool: grafana_query_loki_logs
-{
-  "datasourceUid": "<loki-uid>",
-  "logql": "{applicationName=\"api-gateway\"} |~ \"status.*[45][0-9]{2}\"",
-  "limit": 30,
-  "startRfc3339": "2026-01-11T12:00:00Z",
-  "endRfc3339": "2026-01-11T13:00:00Z"
-}
-```
-
-## Tips
-
-- **Start broad, then narrow**: Begin with `{applicationName="app"}`, then add filters
-- **Case-insensitive regex**: Use `(?i)` prefix for pattern matching
-- **Combine patterns**: Use `|` for OR: `error|exception|failed`
-- **Time windows**: Specify `startRfc3339` and `endRfc3339` for specific time ranges
-- **Limit results**: Start with low `limit` (30–50) to avoid token explosion
-- **Iterate**: Refine LogQL queries based on initial results
-- **NEVER run investigation in main conversation** — always use subagent to contain token usage
+Logs show correlation, not automatically causation. Cross-check code path, deployment history, metrics, or request flow before declaring root cause.

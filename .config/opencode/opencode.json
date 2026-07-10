@@ -1,8 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "@plannotator/opencode@latest",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "@plannotator/opencode@0.22.0"
   ],
   "enabled_providers": [
     "anthropic-gateway",
@@ -14,28 +13,41 @@
       "name": "Anthropic Gateway",
       "options": {
         "baseURL": "{env:AI_GATEWAY_URL}",
-        "apiKey": "{env:GENAI_API_KEY}"
+        "apiKey": "{env:GENAI_API_KEY}",
+        "timeout": 600000,
+        "chunkTimeout": 60000
       },
       "models": {
         "claude-sonnet-5": {
           "name": "claude-sonnet-5",
+          "reasoning": true,
           "limit": {
             "context": 200000,
-            "output": 200000
-          }
-        },
-        "claude-haiku-4.5": {
-          "name": "claude-haiku-4.5",
-          "limit": {
-            "context": 200000,
-            "output": 200000
+            "output": 32768
+          },
+          "options": {
+            "reasoningEffort": "high"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            }
           }
         },
         "claude-opus-4-8": {
           "name": "claude-opus-4-8",
+          "reasoning": true,
           "limit": {
             "context": 200000,
-            "output": 200000
+            "output": 32768
+          },
+          "options": {
+            "reasoningEffort": "high"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            }
           }
         }
       }
@@ -45,29 +57,79 @@
       "name": "OpenAI Gateway",
       "options": {
         "baseURL": "{env:AI_GATEWAY_URL}",
-        "apiKey": "{env:GENAI_API_KEY}"
+        "apiKey": "{env:GENAI_API_KEY}",
+        "timeout": 600000,
+        "chunkTimeout": 60000
       },
       "models": {
         "gpt-5.4": {
           "name": "gpt-5.4",
+          "reasoning": true,
           "limit": {
             "context": 200000,
-            "output": 200000
+            "output": 32768
+          },
+          "options": {
+            "reasoningEffort": "xhigh",
+            "textVerbosity": "low",
+            "reasoningSummary": "auto"
+          },
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "textVerbosity": "low",
+              "reasoningSummary": "auto"
+            }
           }
         },
         "gpt-5.3-codex": {
           "name": "gpt-5.3-codex",
+          "reasoning": true,
           "limit": {
             "context": 200000,
-            "output": 200000
+            "output": 32768
+          },
+          "options": {
+            "reasoningEffort": "xhigh",
+            "textVerbosity": "low",
+            "reasoningSummary": "auto"
+          },
+          "variants": {
+            "xhigh": {
+              "reasoningEffort": "xhigh",
+              "textVerbosity": "low",
+              "reasoningSummary": "auto"
+            }
           }
         }
       }
     }
   },
-  "model": "anthropic-gateway/claude-sonnet-5",
-  "small_model": "openai-gateway/gpt-5.4",
-  "default_agent": "developer",
+  "model": "openai-gateway/gpt-5.4",
+  "small_model": "anthropic-gateway/claude-sonnet-5",
+  "default_agent": "build",
+  "agent": {
+    "build": {
+      "model": "openai-gateway/gpt-5.3-codex",
+      "variant": "xhigh"
+    },
+    "plan": {
+      "model": "openai-gateway/gpt-5.4",
+      "variant": "xhigh"
+    },
+    "general": {
+      "model": "openai-gateway/gpt-5.4",
+      "variant": "xhigh"
+    },
+    "explore": {
+      "model": "anthropic-gateway/claude-sonnet-5",
+      "variant": "high"
+    },
+    "scout": {
+      "model": "anthropic-gateway/claude-sonnet-5",
+      "variant": "high"
+    }
+  },
   "mcp": {
     "context7": {
       "type": "remote",
@@ -89,29 +151,6 @@
       "enabled": true,
       "oauth": {}
     },
-    "figma": {
-      "type": "remote",
-      "url": "https://mcp.figma.com/mcp",
-      "enabled": true,
-      "oauth": {
-        "clientId": "{env:FIGMA_CLIENT_ID}",
-        "clientSecret": "{env:FIGMA_CLIENT_SECRET}"
-      }
-    },
-    "custom_skills": {
-      "type": "remote",
-      "url": "{env:CUSTOM_SKILLS_MCP}",
-      "enabled": true,
-      "headers": {
-        "X-Skills-Version": "{env:CUSTOM_SKILLS_VERSION}"
-      }
-    },
-    "glean": {
-      "type": "remote",
-      "url": "{env:GLEAN_MCP}",
-      "enabled": true,
-      "oauth": {}
-    },
     "sourcegraph": {
       "type": "remote",
       "url": "{env:SOURCEGRAPH_MCP}",
@@ -122,30 +161,73 @@
     },
     "grafana": {
       "type": "remote",
-      "url": "{env:GRAFANA_MCP}"
+      "url": "{env:GRAFANA_MCP}",
+      "enabled": true
     },
     "slack": {
       "type": "remote",
-      "url": "{env:SLACK_MCP}"
+      "url": "{env:SLACK_MCP}",
+      "enabled": true
+    },
+    "figma": {
+      "type": "remote",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": false,
+      "oauth": {
+        "clientId": "{env:FIGMA_CLIENT_ID}",
+        "clientSecret": "{env:FIGMA_CLIENT_SECRET}"
+      }
+    },
+    "custom_skills": {
+      "type": "remote",
+      "url": "{env:CUSTOM_SKILLS_MCP}",
+      "enabled": false,
+      "headers": {
+        "X-Skills-Version": "{env:CUSTOM_SKILLS_VERSION}"
+      }
+    },
+    "glean": {
+      "type": "remote",
+      "url": "{env:GLEAN_MCP}",
+      "enabled": false,
+      "oauth": {}
     },
     "gh_grep": {
       "type": "remote",
-      "url": "https://mcp.grep.app"
+      "url": "https://mcp.grep.app",
+      "enabled": false
     },
     "superset": {
       "type": "remote",
-      "url": "{env:SUPERSET_MCP}"
+      "url": "{env:SUPERSET_MCP}",
+      "enabled": false
     }
   },
   "permission": {
     "skill": {
-      "*": "ask"
+      "*": "allow"
     }
   },
   "skills": {
     "paths": [
-      "~/.agents/skills"
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/brainstorming",
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/systematic-debugging",
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/test-driven-development",
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/verification-before-completion",
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/receiving-code-review",
+      "~/.pi/agent/git/github.com/obra/superpowers/skills/requesting-code-review"
     ]
+  },
+  "tool_output": {
+    "max_lines": 500,
+    "max_bytes": 40000
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 4,
+    "preserve_recent_tokens": 30000,
+    "reserved": 32768
   },
   "watcher": {
     "ignore": [

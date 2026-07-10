@@ -3,7 +3,6 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 const gatewayUrl = process.env.AI_GATEWAY_URL?.trim();
 
 const sharedModelConfig = {
-  reasoning: false,
   input: ["text"],
   cost: {
     input: 0,
@@ -12,20 +11,17 @@ const sharedModelConfig = {
     cacheWrite: 0,
   },
   contextWindow: 200000,
+  maxTokens: 32768,
 } as const;
 
-const anthropicModelConfig = {
+const reasoningModelConfig = {
   ...sharedModelConfig,
-  maxTokens: 128000,
-} as const;
-
-const openAiModelConfig = {
-  ...sharedModelConfig,
-  maxTokens: 128000,
+  reasoning: true,
 } as const;
 
 export default function registerGatewayModels(pi: ExtensionAPI) {
   if (!gatewayUrl) {
+    console.warn("Gateway models disabled: AI_GATEWAY_URL is not set.");
     return;
   }
 
@@ -37,12 +33,12 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
       {
         id: "claude-sonnet-5",
         name: "claude-sonnet-5",
-        ...anthropicModelConfig,
+        ...reasoningModelConfig,
       },
       {
         id: "claude-opus-4-8",
         name: "claude-opus-4-8",
-        ...anthropicModelConfig,
+        ...reasoningModelConfig,
       },
     ],
   });
@@ -55,12 +51,14 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
       {
         id: "gpt-5.4",
         name: "gpt-5.4",
-        ...openAiModelConfig,
+        api: "openai-responses",
+        ...reasoningModelConfig,
       },
       {
         id: "gpt-5.3-codex",
         name: "gpt-5.3-codex",
-        ...openAiModelConfig,
+        api: "openai-responses",
+        ...reasoningModelConfig,
       },
     ],
   });

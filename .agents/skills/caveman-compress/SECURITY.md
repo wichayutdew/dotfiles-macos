@@ -10,6 +10,17 @@
 
 2. **File read/write**: The skill reads the file the user explicitly points it at, compresses it, and writes the result back to the same path. A `.original.md` backup is saved alongside it. No files outside the user-specified path are read or written.
 
+### Required preflight
+
+Before running the script, the agent must:
+
+1. State that the complete file will be sent to Anthropic through the API or Claude CLI.
+2. Obtain explicit transmission consent unless already given in the same request.
+3. Scan for likely secrets and sensitive personal data without printing values.
+4. Stop on a match and request a redacted copy.
+
+The script itself does not provide a local/offline compression path. Do not describe it as local processing.
+
 ### What the skill does NOT do
 
 - Does not execute user file content as code

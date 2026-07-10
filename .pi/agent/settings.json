@@ -2,16 +2,27 @@
   "lastChangelogVersion": "0.80.3",
   "defaultProvider": "openai-gateway",
   "defaultModel": "gpt-5.4",
+  "defaultThinkingLevel": "xhigh",
   "packages": [
     "npm:@bitcraft-apps/pi-web-tools",
-    "npm:pi-research",
     "npm:pi-mcp-adapter",
     {
       "source": "npm:@plannotator/pi-extension",
       "skills": []
     },
     "npm:pi-subagents",
-    "git:github.com/obra/superpowers"
+    {
+      "source": "git:github.com/obra/superpowers",
+      "extensions": [],
+      "skills": [
+        "brainstorming",
+        "systematic-debugging",
+        "test-driven-development",
+        "verification-before-completion",
+        "receiving-code-review",
+        "requesting-code-review"
+      ]
+    }
   ],
   "theme": "light/dark",
   "terminal": {
@@ -19,41 +30,42 @@
   },
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
-  "defaultThinkingLevel": "high",
-  "skills": [
-    "~/.agents/skills"
-  ],
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 32768,
+    "keepRecentTokens": 24000
+  },
   "subagents": {
     "agentOverrides": {
-      "architecture-designer": {
-        "model": "anthropic-gateway/claude-sonnet-5"
+      "scout": {
+        "model": "anthropic-gateway/claude-sonnet-5",
+        "thinking": "high",
+        "systemPromptMode": "replace",
+        "inheritProjectContext": true,
+        "inheritSkills": false,
+        "defaultContext": "fresh",
+        "tools": ["read", "grep", "ls", "bash"],
+        "systemPrompt": "You are a read-only evidence scout. Answer one bounded question. Read repository instructions and current state. Search only with rg or rg --files, including through bash; never use find. Trace relevant code, tests, and history without editing. Stop when evidence answers the question. Return only: FACT claim — path:line or command; HYPOTHESIS confidence — support, contradiction, falsifier; UNKNOWN blocking? — next check; CHECKED — exact files and commands. Never invent files, behavior, requirements, or ownership."
       },
-      "code-reviewer": {
-        "model": "anthropic-gateway/claude-sonnet-5"
+      "worker": {
+        "model": "openai-gateway/gpt-5.3-codex",
+        "thinking": "xhigh",
+        "systemPromptMode": "replace",
+        "inheritProjectContext": true,
+        "inheritSkills": false,
+        "defaultContext": "fresh",
+        "tools": ["read", "grep", "ls", "bash", "edit", "write", "contact_supervisor"],
+        "systemPrompt": "You are the sole implementation writer for one bounded task. Read supplied requirements, repository instructions, evidence, target files, callers, and tests. Search only with rg or rg --files; never use find. Reuse existing patterns and make the smallest coherent diff. For behavior changes, create or identify a failing regression check before implementation when practical. Own code, tests, focused checks, and relevant wider checks. Preserve unrelated work. Do not make product or architecture choices not supported by the brief; contact the supervisor when a blocking decision remains. Return changed files, requirement-to-change-to-test mapping, exact validation commands/results, and remaining risks. Do not commit, push, or mutate external systems."
       },
-      "debugger": {
-        "model": "anthropic-gateway/claude-sonnet-5"
-      },
-      "developer": {
-        "model": "openai-gateway/gpt-5.4"
-      },
-      "documentation-writer": {
-        "model": "anthropic-gateway/claude-sonnet-5"
-      },
-      "explore": {
-        "model": "anthropic-gateway/claude-haiku-4.5"
-      },
-      "mr-creator": {
-        "model": "openai-gateway/gpt-5.4"
-      },
-      "quality-checker": {
-        "model": "openai-gateway/gpt-5.4"
-      },
-      "skill-writer": {
-        "model": "anthropic-gateway/claude-sonnet-5"
-      },
-      "test-automation-engineer": {
-        "model": "openai-gateway/gpt-5.4"
+      "reviewer": {
+        "model": "openai-gateway/gpt-5.4",
+        "thinking": "xhigh",
+        "systemPromptMode": "replace",
+        "inheritProjectContext": true,
+        "inheritSkills": false,
+        "defaultContext": "fresh",
+        "tools": ["read", "grep", "ls", "bash"],
+        "systemPrompt": "You are a read-only final reviewer. Inspect repository instructions, stated requirements, git status, actual diff, affected callers/tests, and fresh verification output. Search only with rg or rg --files; never use find. Check correctness, edge and error paths, security, concurrency, compatibility, unintended scope, and requirement coverage. Report only evidence-backed actionable findings as: severity path:line — problem — impact — smallest fix. Finish with CHECKED, UNKNOWN, and VERDICT. Never edit, post comments, delegate, invent issues, or claim a test passed without output."
       }
     }
   }
