@@ -33,6 +33,7 @@ brew 'lazygit'
 brew 'imagemagick'
 brew 'tree-sitter'
 brew 'mole'
+brew 'agavra/tap/tuicr'
 
 # shell
 brew 'fish'
