@@ -31,15 +31,6 @@ end
 # ---- YAZI OPEN IN NVIM ----
 set -gx EDITOR 'nvim'
 
-# ---- RESHIM AFTER INSTALL, TO PREVENT MISSING $HOME PATH ---
-# Auto-reshim after cargo install
-function cargo
-    command cargo $argv
-    and if test "$argv[1]" = "install"
-        asdf reshim rust
-    end
-end
-
 # ---- ALIASES ----
 alias leet 'nvim leetcode.nvim'
 alias cfg 'nvim ~/.config/fish/config.fish'

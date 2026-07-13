@@ -34,6 +34,7 @@ brew 'imagemagick'
 brew 'tree-sitter'
 brew 'mole'
 brew 'agavra/tap/tuicr'
+brew 'neovim'
 
 # shell
 brew 'fish'
@@ -51,7 +52,6 @@ cask 'orbstack'
 brew 'metalbear-co/mirrord/mirrord'
 
 # Productivity
-cask 'logi-options+'
 cask 'raycast'
 cask 'shottr'
 cask 'lookaway'
