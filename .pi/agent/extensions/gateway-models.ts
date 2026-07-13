@@ -10,8 +10,8 @@ const sharedModelConfig = {
     cacheRead: 0,
     cacheWrite: 0,
   },
-  contextWindow: 200000,
-  maxTokens: 32768,
+  contextWindow: 1000000,
+  maxTokens: 128000,
 } as const;
 
 const reasoningModelConfig = {
@@ -33,7 +33,7 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
       {
         id: "claude-sonnet-5",
         name: "claude-sonnet-5",
-        ...reasoningModelConfig,
+        ...sharedModelConfig,
       },
       {
         id: "claude-opus-4-8",
@@ -49,14 +49,20 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
     apiKey: "$GENAI_API_KEY",
     models: [
       {
-        id: "gpt-5.4",
-        name: "gpt-5.4",
+        id: "gpt-5.6-luna",
+        name: "gpt-5.6-luna",
         api: "openai-responses",
-        ...reasoningModelConfig,
+        ...sharedModelConfig,
       },
       {
-        id: "gpt-5.3-codex",
-        name: "gpt-5.3-codex",
+        id: "gpt-5.6-terra",
+        name: "gpt-5.6-terra",
+        api: "openai-responses",
+        ...sharedModelConfig,
+      },
+      {
+        id: "gpt-5.6-sol",
+        name: "gpt-5.6-sol",
         api: "openai-responses",
         ...reasoningModelConfig,
       },
