@@ -33,7 +33,7 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
       {
         id: "claude-sonnet-5",
         name: "claude-sonnet-5",
-        ...sharedModelConfig,
+        ...reasoningModelConfig,
       },
       {
         id: "claude-opus-4-8",
@@ -52,13 +52,13 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         id: "gpt-5.6-luna",
         name: "gpt-5.6-luna",
         api: "openai-responses",
-        ...sharedModelConfig,
+        ...reasoningModelConfig,
       },
       {
         id: "gpt-5.6-terra",
         name: "gpt-5.6-terra",
         api: "openai-responses",
-        ...sharedModelConfig,
+        ...reasoningModelConfig,
       },
       {
         id: "gpt-5.6-sol",
@@ -67,5 +67,19 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         ...reasoningModelConfig,
       },
     ],
+  });
+
+  pi.on("before_provider_request", (event, ctx) => {
+    if (
+      ctx.model?.provider !== "openai-gateway" ||
+      ctx.model.api !== "openai-responses" ||
+      typeof event.payload !== "object" ||
+      event.payload === null ||
+      Array.isArray(event.payload)
+    ) {
+      return;
+    }
+
+    return { ...event.payload, store: true };
   });
 }
