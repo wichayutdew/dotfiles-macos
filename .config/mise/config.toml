@@ -1,0 +1,9 @@
+[tools]
+dotnet = "latest"
+java = "zulu-21"
+node = "25"
+pnpm = "latest"
+poetry = "latest"
+python = "3.13"
+ruby = "3.4.9"
+rust = "latest"
