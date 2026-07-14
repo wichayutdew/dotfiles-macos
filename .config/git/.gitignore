@@ -3,6 +3,7 @@
 metals.sbt
 .DS_Store
 .tool-versions
+mise.toml
 .superpowers/
 .pi-subagents/artifacts/
 **/.pi-subagents/artifacts/
