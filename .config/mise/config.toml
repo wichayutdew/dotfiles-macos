@@ -1,5 +1,4 @@
 [tools]
-dotnet = "latest"
 java = "zulu-21"
 node = "25"
 pnpm = "latest"

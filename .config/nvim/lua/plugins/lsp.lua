@@ -11,8 +11,6 @@ return function()
 			"marksman",
 			"json-lsp",
 			"jq",
-			"cucumber-language-server",
-			"reformat-gherkin",
 			"kotlin-lsp",
 			"ktfmt",
 			"kotlin-debug-adapter",
@@ -20,8 +18,6 @@ return function()
 			"typescript-language-server",
 			"eslint_d",
 			"prettier",
-			"omnisharp",
-			"csharpier",
 		},
 	})
 
@@ -51,11 +47,6 @@ return function()
 			capabilities = lsp_capabilities,
 			filetypes = { "json" },
 		},
-		cucumber_language_server = {
-			cmd = { "cucumber-language-server", "--stdio" },
-			capabilities = lsp_capabilities,
-			filetypes = { "feature" },
-		},
 		kotlin_lsp = {
 			cmd = { "intellij-server", "--stdio" },
 			capabilities = lsp_capabilities,
@@ -73,22 +64,6 @@ return function()
 			capabilities = lsp_capabilities,
 			filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
 		},
-		omnisharp = {
-			cmd = { "OmniSharp", "--languageserver" },
-			capabilities = lsp_capabilities,
-			filetypes = { "cs", "vb" },
-			root_markers = { "*.sln", "*.csproj", "*.fsproj", "global.json", ".git" },
-			settings = {
-				FormattingOptions = {
-					EnableEditorConfigSupport = true,
-					OrganizeImports = true,
-				},
-				RoslynExtensionsOptions = {
-					EnableAnalyzersSupport = true,
-					EnableImportCompletion = true,
-				},
-			},
-		},
 	}
 
 	for server, config in pairs(servers) do
@@ -100,10 +75,8 @@ return function()
 		"rust_analyzer",
 		"marksman",
 		"jsonls",
-		"cucumber_language_server",
 		"kotlin_lsp",
 		"ts_ls",
-		"omnisharp",
 	})
 
 	---------------------- Treesitter ---------------------
@@ -119,8 +92,6 @@ return function()
 				"typescript",
 				"javascript",
 				"html",
-				"scala",
-				"c_sharp",
 			})
 		end,
 	})
@@ -149,8 +120,6 @@ return function()
 			typescript = { "prettier" },
 			javascriptreact = { "prettier" },
 			typescriptreact = { "prettier" },
-			scala = { "spotless" },
-			cs = { "csharpier" },
 		},
 		formatters = {
 			spotless = {
