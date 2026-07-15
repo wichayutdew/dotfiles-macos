@@ -58,7 +58,6 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/stevearc/conform.nvim" },
 	{ src = "https://github.com/mfussenegger/nvim-lint" },
-	{ src = "https://github.com/scalameta/nvim-metals" }, -- Scala LSP (standalone, not mason-managed)
 	--------------------- DAP ---------------------
 	{ src = "https://github.com/mfussenegger/nvim-dap" },
 	{ src = "https://github.com/rcarriga/nvim-dap-ui" },
@@ -97,4 +96,3 @@ require("plugins.telescope")()
 require("plugins.mini")()
 require("plugins.ui")()
 require("plugins.extra")()
-require("plugins.scala")()
