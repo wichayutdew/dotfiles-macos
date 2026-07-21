@@ -4,12 +4,6 @@ const gatewayUrl = process.env.AI_GATEWAY_URL?.trim();
 
 const sharedModelConfig = {
   input: ["text"],
-  cost: {
-    input: 0,
-    output: 0,
-    cacheRead: 0,
-    cacheWrite: 0,
-  },
   contextWindow: 1000000,
   maxTokens: 128000,
 } as const;
@@ -17,6 +11,49 @@ const sharedModelConfig = {
 const reasoningModelConfig = {
   ...sharedModelConfig,
   reasoning: true,
+} as const;
+
+const sonnetModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
+} as const;
+
+const opusModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
+} as const;
+
+const lunaModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 1, output: 6, cacheRead: 0.1, cacheWrite: 1.25 },
+  tiers: [
+    {
+      inputTokensAbove: 272000,
+      input: 2, output: 9, cacheRead: 0.2, cacheWrite: 2.5,
+    },
+  ],
+} as const;
+
+const terraModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 2.5, output: 15, cacheRead: 0.25, cacheWrite: 3.125 },
+  tiers: [
+    {
+      inputTokensAbove: 272000,
+      input: 5, output: 22.5, cacheRead: 0.5, cacheWrite: 6.25,
+    },
+  ],
+} as const;
+
+const solModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 5, output: 30, cacheRead: 0.5, cacheWrite: 6.25 },
+  tiers: [
+    {
+      inputTokensAbove: 272000,
+      input: 10, output: 45, cacheRead: 1, cacheWrite: 12.5,
+    },
+  ],
 } as const;
 
 export default function registerGatewayModels(pi: ExtensionAPI) {
@@ -33,12 +70,12 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
       {
         id: "claude-sonnet-5",
         name: "claude-sonnet-5",
-        ...reasoningModelConfig,
+        ...sonnetModelConfig,
       },
       {
         id: "claude-opus-4-8",
         name: "claude-opus-4-8",
-        ...reasoningModelConfig,
+        ...opusModelConfig,
       },
     ],
   });
@@ -52,19 +89,19 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         id: "gpt-5.6-luna",
         name: "gpt-5.6-luna",
         api: "openai-responses",
-        ...reasoningModelConfig,
+        ...lunaModelConfig,
       },
       {
         id: "gpt-5.6-terra",
         name: "gpt-5.6-terra",
         api: "openai-responses",
-        ...reasoningModelConfig,
+        ...terraModelConfig,
       },
       {
         id: "gpt-5.6-sol",
         name: "gpt-5.6-sol",
         api: "openai-responses",
-        ...reasoningModelConfig,
+        ...solModelConfig,
       },
     ],
   });
