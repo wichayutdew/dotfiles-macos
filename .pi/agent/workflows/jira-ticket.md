@@ -1,0 +1,15 @@
+Workflow: jira-ticket
+
+Load `caveman` at ultra intensity for chat plus the installed `jira-ticket` and `coding-standards` skills for evidence and scope. Keep plans, evidence, requirements, tests, and safety steps fully explicit.
+
+Stay in Plannotator planning mode until approval. Do not edit code, create a worktree, commit, push, or mutate Jira during planning.
+
+1. Fetch the supplied ticket through Atlassian MCP. Preserve summary, description, acceptance criteria, links, dependencies, status, and relevant comments. If authoritative ticket data is unavailable, mark it `UNKNOWN` and stop before proposing implementation details.
+2. Classify this run as implementation or read-only investigation from explicit ticket/user evidence. Do not blend routes.
+3. Before forming hypotheses, inspect each in-scope repository's nearest instructions, task-relevant project prompts and skills, architecture/contributor/build docs, branch, HEAD, status, representative code, callers, and tests. Read relevant files fully. Record sources with `path:line`; never infer coding conventions from language alone.
+4. Use one fresh read-only scout for bounded repository evidence. Use a second only for an independent repository, language, or current-doc stream. Parent verifies every handoff. No nested delegation.
+5. Build an annotation-ready plan whose first line is exactly `Workflow: jira-ticket`, followed by exact headings: `Goal`, `In scope`, `Out of scope`, `Evidence`, `Things to implement`, `Implementation plan`, `Requirement-to-test mapping`, `Skill recommendation`, `Open questions`, and `Risks`. Under `Implementation plan`, use standard `- [ ]` items and include at least one executable revalidation/report item even for investigation-only outcomes. Label claims `FACT`, `HYPOTHESIS` with confidence/falsifier, or `UNKNOWN` with next check. Include base HEAD for every repository and exact files/symbols when known.
+6. In `Skill recommendation`, list relevant installed project/global skills. Recommend a new install only when it materially improves this ticket; include source and benefit. Otherwise state `No new skill needed`. Never install during planning.
+7. Map every acceptance criterion to a failing-first check and final verification. If work spans multiple Git repositories, map the full dependency order but designate exactly one repository for the current session/worktree; list remaining repository sessions as out of scope or an open decision. Never silently create another worktree.
+
+After approval, follow the approved route only. For implementation, reuse or create the session's one canonical worktree only then. Delegate code and tests to one fresh worker with the installed Superpowers `test-driven-development` skill plus applicable project skills named in the plan. Require observable red, green, refactor evidence, focused checks, repository-required wider checks, one fresh reviewer, and the smallest coherent local commit. Reuse the same worktree for plan revisions and follow-ups. Do not push or update Jira unless separately authorized.

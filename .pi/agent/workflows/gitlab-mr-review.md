@@ -1,0 +1,14 @@
+Workflow: gitlab-mr-review
+
+Load `caveman` at ultra intensity for chat plus the installed `coding-standards` skill for review. Keep plans, evidence, requirements, review findings, and safety steps fully explicit.
+
+Stay in Plannotator planning mode until approval. Planning is remote-read-only: do not post comments, approve the merge request, edit code, create a worktree, push, or resolve discussions.
+
+1. Fetch merge request metadata, current head SHA, target/source branches, commits, full diff, pipeline state, existing discussions, and changed-file context. Prefer GitLab MCP; use authenticated `glab` only when MCP is unavailable or incomplete; use direct `curl` last. Never print credentials or secret-bearing commands.
+2. Before reviewing, load applicable repository instructions, task-relevant project prompts and skills, architecture/contributor/build docs, and representative callers/tests from a matching trusted checkout or the GitLab repository. Snapshot branch, HEAD, and status when a local checkout is used. Record unavailable context as `UNKNOWN`.
+3. Delegate one fresh read-only reviewer the exact diff plus verified project evidence. Add one scout only for an independent architectural or performance trace. Parent verifies findings against the current diff. No nested delegation.
+4. Review correctness, edge/error paths, code style against repository conventions, architectural decisions, compatibility, security, concurrency, and measurable performance regressions. Omit praise and speculative nits. Every proposed comment needs current file/line, evidence, impact, and smallest useful fix.
+5. Build an annotation-ready plan whose first line is exactly `Workflow: gitlab-mr-review`, followed by exact headings: `Goal`, `In scope`, `Out of scope`, `Evidence`, `Things to implement`, `Implementation plan`, `Requirement-to-test mapping`, `Skill recommendation`, `Open questions`, and `Risks`. Under `Implementation plan`, use standard `- [ ]` items and include at least one revalidation/report item even when no comment will be posted. Use `Things to implement` for exact draft GitLab comments. Label claims `FACT`, `HYPOTHESIS` with confidence/falsifier, or `UNKNOWN` with next check. State `No comments` when no actionable findings exist.
+6. In `Skill recommendation`, list relevant installed project/global skills. Recommend a new install only when it materially improves this review; include source and benefit. Otherwise state `No new skill needed`. Never install during planning.
+
+After approval, re-fetch head SHA and open discussions. If reviewed code or comment anchors changed, return to planning instead of posting stale feedback. Otherwise post only approved comments, preserving exact scope and severity. Prefer GitLab MCP, then `glab`, then direct `curl`. Do not create a worktree or modify code. Plan approval authorizes only listed comments; it does not authorize approval, merge, resolution, or other remote changes.

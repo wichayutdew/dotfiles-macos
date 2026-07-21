@@ -1,5 +1,6 @@
 {
   "toolDescriptionMode": "compact",
+  "worktreeBaseDir": "/Users/wphongphanpa/repositories/agoda/worktrees",
   "globalConcurrencyLimit": 3,
   "maxSubagentSpawnsPerSession": 12,
   "parallel": {
