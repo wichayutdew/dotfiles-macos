@@ -7,3 +7,4 @@ mise.toml
 .superpowers/
 .pi-subagents/artifacts/
 **/.pi-subagents/artifacts/
+.plannotator/
