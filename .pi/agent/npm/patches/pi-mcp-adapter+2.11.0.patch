@@ -1,5 +1,5 @@
 diff --git a/node_modules/pi-mcp-adapter/commands.ts b/node_modules/pi-mcp-adapter/commands.ts
-index d3a055b..b41e727 100644
+index d3a055b..38259df 100644
 --- a/node_modules/pi-mcp-adapter/commands.ts
 +++ b/node_modules/pi-mcp-adapter/commands.ts
 @@ -18,7 +18,7 @@ import { buildToolMetadata } from "./tool-metadata.ts";
@@ -20,6 +20,15 @@ index d3a055b..b41e727 100644
        onAuthorizationUrl: (authorizationUrl) => {
          ctx.ui.notify(
            `Open this URL to authenticate ${serverName}:\n\n${authorizationUrl}\n\n` +
+@@ -328,7 +328,7 @@ function buildMcpPanelCallbacks(
+         && definition.url
+         && definition.oauth !== false
+         && definition.oauth?.grantType !== "client_credentials"
+-        && !getAuthForUrl(serverName, definition.url)?.tokens
++        && !getAuthForUrl(serverName, interpolateEnvVars(definition.url))?.tokens
+       ) {
+         return "needs-auth";
+       }
 diff --git a/node_modules/pi-mcp-adapter/direct-tools.ts b/node_modules/pi-mcp-adapter/direct-tools.ts
 index 423862a..028642c 100644
 --- a/node_modules/pi-mcp-adapter/direct-tools.ts
@@ -42,6 +51,29 @@ index 423862a..028642c 100644
      return { status: "success" };
    } catch (error) {
      const message = error instanceof Error ? error.message : String(error);
+diff --git a/node_modules/pi-mcp-adapter/mcp-auth-flow.ts b/node_modules/pi-mcp-adapter/mcp-auth-flow.ts
+index a5f9603..fd7ec31 100644
+--- a/node_modules/pi-mcp-adapter/mcp-auth-flow.ts
++++ b/node_modules/pi-mcp-adapter/mcp-auth-flow.ts
+@@ -32,6 +32,7 @@ import {
+   type StoredTokens,
+ } from "./mcp-auth.ts"
+ import type { ServerEntry } from "./types.ts"
++import { interpolateEnvVars } from "./utils.ts"
+
+ /** Auth status for a server */
+ export type AuthStatus = "authenticated" | "expired" | "not_authenticated"
+@@ -70,8 +71,8 @@ export function extractOAuthConfig(definition: ServerEntry): McpOAuthConfig {
+
+   const config: McpOAuthConfig = {}
+   if (definition.oauth?.grantType !== undefined) config.grantType = definition.oauth.grantType
+-  if (definition.oauth?.clientId !== undefined) config.clientId = definition.oauth.clientId
+-  if (definition.oauth?.clientSecret !== undefined) config.clientSecret = definition.oauth.clientSecret
++  if (definition.oauth?.clientId !== undefined) config.clientId = interpolateEnvVars(definition.oauth.clientId)
++  if (definition.oauth?.clientSecret !== undefined) config.clientSecret = interpolateEnvVars(definition.oauth.clientSecret)
+   if (definition.oauth?.scope !== undefined) config.scope = definition.oauth.scope
+   if (definition.oauth?.redirectUri !== undefined) {
+     if (typeof definition.oauth.redirectUri !== "string") {
 diff --git a/node_modules/pi-mcp-adapter/metadata-cache.ts b/node_modules/pi-mcp-adapter/metadata-cache.ts
 index 5d9a6e0..54055c8 100644
 --- a/node_modules/pi-mcp-adapter/metadata-cache.ts

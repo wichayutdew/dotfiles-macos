@@ -23,7 +23,8 @@
         "requesting-code-review"
       ]
     },
-    "npm:pi-hermes-memory"
+    "npm:pi-hermes-memory",
+    "npm:context-mode"
   ],
   "theme": "light/dark",
   "terminal": {
