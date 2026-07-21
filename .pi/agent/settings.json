@@ -24,9 +24,11 @@
       ]
     },
     "npm:pi-hermes-memory",
-    "npm:context-mode"
+    "npm:context-mode",
+    "npm:@llttlltt/poimandres-pi",
+    "npm:pi-zentui"
   ],
-  "theme": "light/dark",
+  "theme": "poimandres white/poimandres storm",
   "terminal": {
     "showTerminalProgress": true,
     "clearOnShrink": true
