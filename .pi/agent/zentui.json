@@ -30,7 +30,7 @@
     "gitCounts": true,
     "sessionDuration": true,
     "username": false,
-    "time": true,
+    "time": false,
     "cwd": true,
     "gitBranch": true,
     "os": true,
@@ -40,7 +40,8 @@
     "cost": true,
     "packageVersion": true,
     "gitCommit": true,
-    "gitMetrics": true
+    "gitMetrics": true,
+    "gitStatus": true
   },
   "extensionStatuses": {
     "placements": {
