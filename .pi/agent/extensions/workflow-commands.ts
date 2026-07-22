@@ -9,6 +9,7 @@ import type { ImageContent } from "@earendil-works/pi-ai";
 const PLANNOTATOR_REQUEST_CHANNEL = "plannotator:request";
 const PLANNOTATOR_TIMEOUT_MS = 5_000;
 const WORKFLOW_STATE_ENTRY = "workflow-loop-state";
+const WORKFLOW_RESUME_ENTRY = "workflow-resume-state";
 const WORKFLOW_STATE_VERSION = 1;
 const REQUIRED_REVIEWER_COMMAND_IDS = ["full-tests", "format", "lint"] as const;
 const GIT_OUTPUT_LIMIT_BYTES = 64 * 1024 * 1024;
@@ -157,15 +158,26 @@ function isGitLabMergeRequestUrl(input: string): boolean {
   }
 }
 
-function loadWorkflowMessage(workflow: ActiveWorkflow): string {
+function loadWorkflowMessage(workflow: ActiveWorkflow, cwd?: string): string {
   const spec = workflows[workflow.name];
-  const templateUrl = new URL(`../workflows/${spec.template}`, import.meta.url);
-  const template = readFileSync(templateUrl, "utf8").trim();
-  return `${template}\n\nWorkflow input:\n${workflow.input}`;
+  const projectTemplatePath = cwd ? resolve(cwd, ".pi", "workflows", spec.template) : undefined;
+  let template: string | undefined;
+  if (projectTemplatePath) {
+    try {
+      template = readFileSync(projectTemplatePath, "utf8");
+    } catch {
+      // Project-local workflow templates are optional overrides.
+    }
+  }
+  if (template === undefined) {
+    const templateUrl = new URL(`../workflows/${spec.template}`, import.meta.url);
+    template = readFileSync(templateUrl, "utf8");
+  }
+  return `${template.trim()}\n\nWorkflow input:\n${workflow.input}`;
 }
 
-function loadWorkflowIterationMessage(workflow: ActiveWorkflow, followUp: string): string {
-  return `${loadWorkflowMessage(workflow)}
+function loadWorkflowIterationMessage(workflow: ActiveWorkflow, followUp: string, cwd?: string): string {
+  return `${loadWorkflowMessage(workflow, cwd)}
 
 Workflow iteration ${workflow.iteration}:
 This user follow-up belongs to the active workflow. Re-enter planning before any new implementation or remote action. Reuse the existing plan file. Refresh authoritative data, repository state, diff, and verification; use a new bounded foreground fresh read-only scout; revise the plan and submit it for approval. Preserve the canonical worktree and previously approved work. Do not execute this follow-up under an earlier approval.
@@ -328,10 +340,6 @@ function hashRepositoryPath(
 function captureRepositorySnapshot(cwd: string): string {
   try {
     const root = repositoryRoot(cwd);
-    if (root !== canonicalPath(cwd)) {
-      throw new Error("workflow cwd must be the Git repository root for repository-wide verification");
-    }
-
     const before = repositoryInputs(root);
     const hash = createHash("sha256");
     hashPart(hash, "head", before.head);
@@ -770,6 +778,24 @@ function persistWorkflow(pi: ExtensionAPI, workflow: ActiveWorkflow | null): voi
   });
 }
 
+function restoreResumableWorkflow(entries: readonly unknown[]): ActiveWorkflow | null {
+  for (let index = entries.length - 1; index >= 0; index -= 1) {
+    const entry = entries[index];
+    if (!isRecord(entry) || entry.type !== "custom" || entry.customType !== WORKFLOW_RESUME_ENTRY) continue;
+    if (!isRecord(entry.data) || entry.data.version !== WORKFLOW_STATE_VERSION) return null;
+    if (entry.data.workflow === null) return null;
+    return parseActiveWorkflow(entry.data.workflow);
+  }
+  return null;
+}
+
+function persistResumableWorkflow(pi: ExtensionAPI, workflow: ActiveWorkflow | null): void {
+  pi.appendEntry(WORKFLOW_RESUME_ENTRY, {
+    version: WORKFLOW_STATE_VERSION,
+    workflow,
+  });
+}
+
 function withQueuedFollowUp(
   workflow: ActiveWorkflow,
   followUp: string,
@@ -1156,11 +1182,16 @@ export default function registerWorkflowCommands(
   runtime?: WorkflowRuntime,
 ): void {
   let activeWorkflow: ActiveWorkflow | null = null;
+  let resumableWorkflow: ActiveWorkflow | null = null;
   let transitionInProgress = false;
 
   const setActiveWorkflow = (workflow: ActiveWorkflow | null) => {
     activeWorkflow = workflow;
     persistWorkflow(pi, workflow);
+  };
+  const setResumableWorkflow = (workflow: ActiveWorkflow | null) => {
+    resumableWorkflow = workflow;
+    persistResumableWorkflow(pi, workflow);
   };
 
   const transitionToPlanning = async (): Promise<string | undefined> => {
@@ -1216,7 +1247,7 @@ export default function registerWorkflowCommands(
       const queued = activeWorkflow;
       let text: string;
       try {
-        text = loadWorkflowIterationMessage(queued, queued.pendingFollowUp);
+        text = loadWorkflowIterationMessage(queued, queued.pendingFollowUp, context.cwd);
       } catch (error) {
         context.ui.notify(
           `Workflow iteration not started: ${error instanceof Error ? error.message : String(error)}. The follow-up is preserved; run /workflow-retry.`,
@@ -1251,7 +1282,9 @@ export default function registerWorkflowCommands(
   };
 
   const restoreCurrentBranch = (context: ExtensionContext) => {
-    activeWorkflow = restoreWorkflow(context.sessionManager.getBranch());
+    const entries = context.sessionManager.getBranch();
+    activeWorkflow = restoreWorkflow(entries);
+    resumableWorkflow = restoreResumableWorkflow(entries);
     transitionInProgress = false;
   };
 
@@ -1679,10 +1712,11 @@ export default function registerWorkflowCommands(
           return;
         }
 
+        setResumableWorkflow(null);
         const workflow: ActiveWorkflow = { name, input, iteration: 1 };
         let message: string;
         try {
-          message = loadWorkflowMessage(workflow);
+          message = loadWorkflowMessage(workflow, context.cwd);
         } catch (error) {
           context.ui.notify(
             `Workflow template unavailable: ${error instanceof Error ? error.message : String(error)}`,
@@ -1751,6 +1785,32 @@ export default function registerWorkflowCommands(
     },
   });
 
+  pi.registerCommand("workflow-continue", {
+    description: "Resume an aborted workflow through a new planning iteration",
+    handler: async (_rawInput, context) => {
+      if (activeWorkflow) {
+        context.ui.notify("An active workflow already exists; use its current planning or execution path.", "warning");
+        return;
+      }
+      if (!resumableWorkflow) {
+        context.ui.notify("No aborted workflow is available to continue.", "warning");
+        return;
+      }
+      if (!context.isIdle()) {
+        context.ui.notify("Agent busy; aborted workflow continuation is deferred.", "warning");
+        return;
+      }
+
+      const workflow = withQueuedFollowUp(
+        resumableWorkflow,
+        "Continue from this workflow after /workflow-abort.",
+      );
+      setResumableWorkflow(null);
+      setActiveWorkflow(workflow);
+      await dispatchPendingIteration(context, true);
+    },
+  });
+
   pi.registerCommand("workflow-retry", {
     description: "Retry a preserved workflow follow-up",
     handler: async (_rawInput, context) => {
@@ -1794,6 +1854,7 @@ export default function registerWorkflowCommands(
       }
 
       setActiveWorkflow(null);
+      setResumableWorkflow(null);
       context.ui.notify("Workflow loop finished.", "info");
     },
   });
@@ -1815,8 +1876,10 @@ export default function registerWorkflowCommands(
         context.ui.notify(`Workflow loop not aborted: ${transitionError}`, "error");
         return;
       }
+      const workflow = activeWorkflow;
       setActiveWorkflow(null);
-      context.ui.notify("Workflow loop aborted without a completion claim.", "warning");
+      setResumableWorkflow(workflow);
+      context.ui.notify("Workflow loop aborted without a completion claim. Run /workflow-continue to re-enter planning.", "warning");
     },
   });
 }

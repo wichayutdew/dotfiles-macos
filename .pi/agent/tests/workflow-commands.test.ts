@@ -376,10 +376,30 @@ test("registers workflow commands and explicit loop completion", () => {
     "ticket",
     "work",
     "workflow-abort",
+    "workflow-continue",
     "workflow-done",
     "workflow-retry",
     "workflow-status",
   ]);
+});
+
+test("ticket loads a project-local workflow template override", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    const templateDirectory = join(cwd, ".pi", "workflows");
+    mkdirSync(templateDirectory, { recursive: true });
+    writeFileSync(
+      join(templateDirectory, "jira-ticket.md"),
+      "Workflow: jira-ticket\n\nProject-local multi-repository workflow template.",
+    );
+    const { commands, context, sentMessages } = createHarness("idle", undefined, [], cwd);
+
+    await commands.get("ticket")!.handler("ACTB-2758", context);
+
+    assert.match(sentMessages[0]!, /Project-local multi-repository workflow template\./);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 });
 
 test("work starts a local plan and implementation loop", async () => {
@@ -390,6 +410,25 @@ test("work starts a local plan and implementation loop", async () => {
   assert.equal(sentMessages.length, 1);
   assert.match(sentMessages[0]!, /^Workflow: local-work/);
   assert.match(sentMessages[0]!, /Add deterministic retries/);
+});
+
+test("approves a plan from a shared nested Git directory", async () => {
+  const root = mkdtempSync(join(tmpdir(), "pi-root-"));
+  const cwd = join(root, "shared");
+  try {
+    execFileSync("git", ["init", "--quiet", root]);
+    mkdirSync(cwd);
+    writePlan(cwd, "plan.md", readOnlyPlan("local-work"));
+    const harness = createHarness("idle", undefined, [], cwd);
+
+    await harness.commands.get("work")!.handler("Plan shared workspace work", harness.context);
+    await approvePlan(harness);
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+
+    assert.match(harness.notices.at(-1)!.message, /approved \.plannotator\/plan\.md/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("ticket enters Plannotator before starting workflow", async () => {
@@ -775,6 +814,20 @@ test("persists workflow abort as a tombstone without claiming completion", async
   await restored.startSession();
 
   assert.deepEqual(await restored.routeInput("Unrelated request."), { action: "continue" });
+});
+
+test("continues an aborted workflow through a new planning iteration", async () => {
+  const first = createHarness();
+  await first.commands.get("ticket")!.handler("ABC-123", first.context);
+  await first.commands.get("workflow-abort")!.handler("", first.context);
+
+  const restored = createHarness("idle", undefined, first.sessionEntries);
+  await restored.startSession();
+  await restored.commands.get("workflow-continue")!.handler("", restored.context);
+
+  assert.match(restored.sentMessages.at(-1)!, /^Workflow: jira-ticket/);
+  assert.match(restored.sentMessages.at(-1)!, /Workflow iteration 2:/);
+  assert.match(restored.sentMessages.at(-1)!, /Continue from this workflow after \/workflow-abort\./);
 });
 
 test("retries a preserved follow-up after a failed phase transition", async () => {
@@ -1343,6 +1396,18 @@ test("does not restore old approval after a queued follow-up", async () => {
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
+});
+
+test("Jira workflow defines ordered multi-repository sessions", () => {
+  const template = readFileSync(new URL("../workflows/jira-ticket.md", import.meta.url), "utf8");
+
+  assert.match(template, /reviewable ordered repository-session overview/i);
+  assert.match(template, /global defaults and project-local overrides/i);
+  assert.match(template, /fresh explicit approval before each repository session/i);
+  assert.match(template, /exactly one isolated worktree/i);
+  assert.match(template, /red.*green.*refactor/i);
+  assert.match(template, /branch name for every repository/i);
+  assert.doesNotMatch(template, /MR URL/i);
 });
 
 test("Plannotator plan contract persists route and executable checklist", () => {
