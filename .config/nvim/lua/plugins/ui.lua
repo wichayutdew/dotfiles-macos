@@ -53,6 +53,11 @@ return function()
 		completions = { lsp = { enabled = true } },
 	})
 
+	---------------------- Markdown Preview ---------------------
+	require("markdown_preview").setup({})
+	vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreview<CR>", { desc = "Preview Markdown or Mermaid" })
+	vim.keymap.set("n", "<leader>ms", "<cmd>MarkdownPreviewStop<CR>", { desc = "Stop Markdown or Mermaid preview" })
+
 	--------------------- INDENT BLANKLINE ---------------------
 	require("ibl").setup({})
 end

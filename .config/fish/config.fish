@@ -48,7 +48,7 @@ alias ci 'zi'
 alias c 'z'
 alias y 'yazi'
 alias cc 'pi'
-alias q 'pi -p --model big-pickle'
+alias q 'pi -p --model openai-gateway/gpt-5.6-luna'
 
 # ---- Agoda Specific ----
 source ~/.orbstack/shell/init2.fish 2>/dev/null || :

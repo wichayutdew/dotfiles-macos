@@ -78,6 +78,8 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-mini/mini.jump2d" },
 	--------------------- UI ---------------------
 	{ src = "https://github.com/MeanderingProgrammer/render-markdown.nvim" }, -- render markdown
+	{ src = "https://github.com/selimacerbas/live-server.nvim" }, -- required by markdown-preview.nvim
+	{ src = "https://github.com/selimacerbas/markdown-preview.nvim" }, -- preview Markdown and Mermaid
 	{ src = "https://github.com/tomasky/bookmarks.nvim" },
 	{ src = "https://github.com/f4z3r/gruvbox-material.nvim" },
 	{ src = "https://github.com/folke/noice.nvim" }, -- Better command line and messages
