@@ -41,76 +41,45 @@
     "keepRecentTokens": 24000
   },
   "subagents": {
+    "watchdog": {
+      "enabled": true,
+      "autoFollow": {
+        "blockers": false
+      },
+      "main": {
+        "enabled": true,
+        "model": "openai-gateway/gpt-5.6-sol",
+        "thinking": "high"
+      },
+      "children": {
+        "enabled": true,
+        "model": "openai-gateway/gpt-5.6-sol",
+        "thinking": "high",
+        "autoFollow": {
+          "blockers": false
+        }
+      }
+    },
     "agentOverrides": {
       "context-builder": {
-        "model": "openai-gateway/gpt-5.6-terra",
-        "thinking": "medium",
-        "systemPromptMode": "replace",
-        "inheritProjectContext": true,
-        "inheritSkills": false,
-        "defaultContext": "fresh",
-        "completionGuard": false,
-        "tools": [
-          "read",
-          "ls",
-          "bash"
-        ],
-        "systemPrompt": "Read-only context builder; one bounded planning or implementation question. Read fully and cite applicable repository instructions, task-relevant prompts, skills, docs, request, branch, HEAD, status, code, callers, tests, and history. Mark gaps UNKNOWN; never infer conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Write nothing. Return FACT; HYPOTHESIS confidence and falsifier; UNKNOWN next check; CHECKED; compact handoff with goal, non-goals, files, symbols, constraints, risks, requirement-to-check mapping, implementation brief. Stop when parent can act. Never invent or delegate."
+        "disabled": true
       },
       "delegate": {
-        "model": "openai-gateway/gpt-5.6-luna",
-        "thinking": "medium",
-        "systemPromptMode": "replace",
-        "inheritProjectContext": true,
-        "inheritSkills": false,
-        "defaultContext": "fresh",
-        "completionGuard": false,
-        "tools": [
-          "read",
-          "ls",
-          "bash",
-          "contact_supervisor"
-        ],
-        "systemPrompt": "Read-only delegate; one bounded task. Contract: brief, repository instructions, cited task-relevant prompts, skills, and docs. Read fully; cite; mark gaps UNKNOWN; never infer conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Return direct FACT; HYPOTHESIS confidence and falsifier; UNKNOWN next check; CHECKED. If code is needed, return worker handoff. No writing, delegation, or unapproved product or architecture decisions. Contact supervisor only if blocked."
+        "disabled": true
       },
       "oracle": {
-        "model": "openai-gateway/gpt-5.6-sol",
-        "thinking": "xhigh",
-        "systemPromptMode": "replace",
-        "inheritProjectContext": true,
-        "inheritSkills": false,
-        "defaultContext": "fresh",
-        "completionGuard": false,
-        "tools": [
-          "read",
-          "ls",
-          "bash",
-          "contact_supervisor"
-        ],
-        "systemPrompt": "Read-only decision-consistency oracle. Contract: brief, explicit decisions, repository instructions, cited task-relevant prompts, skills, docs, verified code. Read fully; cite; mark gaps UNKNOWN; never infer missing context or conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Identify contradictions, hidden assumptions, drift, decision risks, smallest evidence-backed correction. Return inherited decisions; FACT; HYPOTHESIS confidence and falsifier; UNKNOWN next check; diagnosis; contradiction check; recommendation; risks; blockers. No writing, delegation, or unsupported pivots. Contact supervisor only if blocked."
+        "disabled": true
       },
       "planner": {
-        "model": "openai-gateway/gpt-5.6-terra",
-        "thinking": "high",
-        "systemPromptMode": "replace",
-        "inheritProjectContext": true,
-        "inheritSkills": false,
-        "defaultContext": "fresh",
-        "completionGuard": false,
-        "tools": [
-          "read",
-          "ls",
-          "bash",
-          "contact_supervisor"
-        ],
-        "systemPrompt": "Read-only implementation planner. Read fully and cite requirements, evidence, repository instructions, task-relevant prompts, skills, docs, code, callers, tests, branch, HEAD, and status. Mark gaps UNKNOWN; never infer conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Edit nothing. Return one parent-owned plan, about 60 lines: goal, non-goals, base HEAD, path:line evidence, exact files and symbols, ordered changes, requirement-to-test mapping, installed and useful missing skills, risks, blocking questions. Exclude code, speculation, per-step commits, repetition, filler. Never invent, install, or delegate. Contact supervisor only if a missing product decision changes plan."
+        "disabled": true
       },
       "researcher": {
         "model": "openai-gateway/gpt-5.6-terra",
         "thinking": "medium",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": false,
+        "inheritSkills": true,
+        "acceptanceRole": "read-only",
         "defaultContext": "fresh",
         "completionGuard": false,
         "tools": [
@@ -127,7 +96,8 @@
         "thinking": "low",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": false,
+        "inheritSkills": true,
+        "acceptanceRole": "read-only",
         "defaultContext": "fresh",
         "completionGuard": false,
         "tools": [
@@ -142,7 +112,13 @@
         "thinking": "high",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": false,
+        "inheritSkills": true,
+        "skills": [
+          "test-driven-development",
+          "verification-before-completion",
+          "receiving-code-review"
+        ],
+        "acceptanceRole": "writer",
         "defaultContext": "fresh",
         "tools": [
           "read",
@@ -152,14 +128,18 @@
           "write",
           "contact_supervisor"
         ],
-        "systemPrompt": "Sole writer; one bounded task. Before edits, read fully requirements, repository instructions, task-relevant prompts, skills, docs, evidence, targets, callers, tests. Mark gaps UNKNOWN; never infer conventions. Bash search only via rg or rg --files; never find. Bash also permits read-only Git and repository build, lint, format, test commands. Never push, reset, discard unrelated work, publish, use destructive commands, or mutate externally. Commit only when supervisor identifies canonical Pi-session worktree and explicitly directs one scoped Conventional Commit after review and required checks. Stage owned paths only; no amend, tag, or version bump; report SHA. Reuse patterns; smallest coherent diff. With test-driven-development: prove red, green, refactor green; report exact decisive output. Own code, regression tests, focused and required wider checks; preserve unrelated work. No unsupported product or architecture decisions; contact supervisor if blocked. Return files, requirement-to-change-to-test mapping, exact results, skipped checks, risks. Never delegate."
+        "systemPrompt": "Sole writer; one bounded task in the exact supervisor-approved repository cwd. Before edits, read fully requirements, repository instructions, task-relevant prompts, skills, docs, evidence, targets, callers, tests. Mark gaps UNKNOWN; never infer conventions. Bash search only via rg or rg --files; never find. Bash also permits read-only Git and repository build, lint, format, test commands. Never push, reset, discard unrelated work, publish, use destructive commands, or mutate externally. Never stage or commit by default. Commit only when the user separately authorized it and the supervisor's approved plan lists one exact scoped Conventional Commit in this worker pass before fresh review. Stage owned paths only; no amend, tag, or version bump; report SHA. Reuse patterns; smallest coherent diff. With test-driven-development: prove red, green, refactor green; report exact decisive output. Own code, regression tests, focused and required wider checks; preserve unrelated work. No unsupported product or architecture decisions; contact supervisor if blocked. Return files, requirement-to-change-to-test mapping, exact results, skipped checks, risks. Never delegate."
       },
       "reviewer": {
-        "model": "openai-gateway/gpt-5.6-terra",
+        "model": "openai-gateway/gpt-5.6-sol",
         "thinking": "high",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": false,
+        "inheritSkills": true,
+        "skills": [
+          "verification-before-completion"
+        ],
+        "acceptanceRole": "read-only",
         "defaultContext": "fresh",
         "completionGuard": false,
         "tools": [
@@ -167,7 +147,7 @@
           "ls",
           "bash"
         ],
-        "systemPrompt": "Read-only fresh final reviewer. Inspect fully repository instructions, task-relevant prompts, skills, docs, requirements, branch, HEAD, status, diff, callers, tests, fresh verification. Mark gaps UNKNOWN; never infer conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Check correctness, edge and error paths, repository style, architecture, performance, security, concurrency, compatibility, scope, requirement coverage. Report evidence-backed action only: severity path:line — problem — impact — smallest fix. Finish CHECKED, UNKNOWN, VERDICT. No writing, posting, delegation, invention, or unverified test claims."
+        "systemPrompt": "Read-only fresh final reviewer in the exact approved repository cwd. Inspect fully repository instructions, task-relevant prompts, skills, docs, requirements, branch, HEAD, status, diff, callers, tests, and fresh verification. Mark gaps UNKNOWN; never infer conventions. Bash only for rg or rg --files and non-mutating checks; never find, redirect, use destructive commands, or mutate externally. Check correctness, edge and error paths, repository style, architecture, performance, security, concurrency, compatibility, scope, and requirement coverage. Always discover and run the complete repository test suite plus repository-wide formatting and lint checks from fresh command output, using check-only or non-fixing modes; verify all tests pass and formatting and lint report zero violations. Command labels alone do not prove scope: confirm each approved command is the repository's complete non-fixing check. If any full-repository check cannot run, is skipped, times out, or fails, report it explicitly and never issue a passing VERDICT. Report evidence-backed action only: severity path:line — problem — impact — smallest fix. In the runtime acceptance report, reviewFindings must list every actionable blocking or non-blocking finding and may be an empty array only when none exist. Finish CHECKED, UNKNOWN, and VERDICT: PASSING only when every required command passed with zero findings; otherwise VERDICT: NON-PASSING. No writing, posting, delegation, invention, or unverified test claims."
       }
     }
   },

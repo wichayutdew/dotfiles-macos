@@ -2,7 +2,7 @@
   "toolDescriptionMode": "compact",
   "worktreeBaseDir": "/Users/wphongphanpa/repositories/agoda/worktrees",
   "globalConcurrencyLimit": 3,
-  "maxSubagentSpawnsPerSession": 12,
+  "maxSubagentSpawnsPerSession": 100,
   "parallel": {
     "maxTasks": 4,
     "concurrency": 3
