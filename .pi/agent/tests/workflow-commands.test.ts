@@ -189,6 +189,7 @@ function createHarness(
   let phase = initialPhase;
   let nextToolCall = 0;
   const toolCallIds = new WeakMap<Record<string, unknown>, string>();
+  const submittedPlanToolCallIds = new Set<string>();
 
   const pi = {
     events: {
@@ -263,7 +264,11 @@ function createHarness(
   ) => {
     assert.ok(toolCallHandler, "tool_call handler registered");
     toolCallIds.set(input, toolCallId);
-    return toolCallHandler({ toolCallId, toolName, input }, context);
+    const result = await toolCallHandler({ toolCallId, toolName, input }, context);
+    if (toolName === "plannotator_submit_plan" && result === undefined) {
+      submittedPlanToolCallIds.add(toolCallId);
+    }
+    return result;
   };
   const routeToolResult = async (
     toolName: string,
@@ -412,6 +417,29 @@ test("work starts a local plan and implementation loop", async () => {
   assert.match(sentMessages[0]!, /Add deterministic retries/);
 });
 
+test("exits Plannotator planning before dispatching approved code execution", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(cwd, "plan.md", codePlan(cwd));
+    const harness = createHarness("idle", undefined, [], cwd);
+
+    await harness.commands.get("work")!.handler("Implement the approved plan", harness.context);
+    await approvePlan(harness);
+
+    assert.equal(harness.sentMessages.length, 1);
+    assert.equal(harness.requestedModes.at(-1), "exit");
+    await harness.settleAgent();
+
+    assert.equal(harness.sentMessages.length, 2);
+    assert.match(
+      harness.sentMessages.at(-1)!,
+      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+    );
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
 test("approves a plan from a shared nested Git directory", async () => {
   const root = mkdtempSync(join(tmpdir(), "pi-root-"));
   const cwd = join(root, "shared");
@@ -428,6 +456,39 @@ test("approves a plan from a shared nested Git directory", async () => {
     assert.match(harness.notices.at(-1)!.message, /approved \.plannotator\/plan\.md/);
   } finally {
     rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("permits a contract-bound canonical worktree outside the plan artifact repository", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "pi-session-cross-repo");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "plan.md", codePlan(targetCwd));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { sessionKey: "cross-repo", worktreeBaseDir: base },
+    );
+
+    await harness.commands.get("work")!.handler("Implement in the canonical worktree", harness.context);
+    await approvePlan(harness);
+
+    const worker = await harness.routeToolCall("subagent", {
+      agent: "worker",
+      task: "Implement the approved change",
+      context: "fresh",
+      cwd: targetCwd,
+      acceptance: verifiedAcceptance(workerVerification),
+    });
+    assert.equal(worker, undefined);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
   }
 });
 
@@ -566,6 +627,33 @@ test("blocks planning mutations except the plan file", async () => {
       });
       assert.equal(remoteWrite?.block, true);
       assert.match(remoteWrite?.reason ?? "", /blocked until the current plan is approved/i);
+    }
+
+    assert.equal(
+      await harness.routeToolCall("atlassian_getJiraIssue", { issueIdOrKey: "EXAMPLE-1" }),
+      undefined,
+    );
+    assert.equal(
+      await harness.routeToolCall("agoda_skills_searchCatalog", { query: "workflow" }),
+      undefined,
+    );
+    assert.equal(
+      await harness.routeToolCall("mcp", { tool: "atlassian_getJiraIssue", args: "{}" }),
+      undefined,
+    );
+    assert.equal(
+      await harness.routeToolCall("mcp", { describe: "atlassian_getJiraIssue" }),
+      undefined,
+    );
+
+    for (const [toolName, input] of [
+      ["atlassian_readThenSend", {}],
+      ["atlassian_retrieveJiraIssue", {}],
+      ["mcp", { tool: "atlassian_getOrCreateJiraIssue", args: "{}" }],
+      ["mcp", { action: "auth-start", server: "atlassian" }],
+    ] as const) {
+      const blocked = await harness.routeToolCall(toolName, input);
+      assert.equal(blocked?.block, true);
     }
 
     assert.equal(
@@ -738,6 +826,24 @@ test("binds approval to the submitted plan snapshot and rejects approval feedbac
     assert.match(changed.notices.at(-1)!.message, /changed while approval was pending/i);
 
     writePlan(cwd, "plan.md", readOnlyPlan("local-work"));
+    const repositoryChanged = createHarness("idle", undefined, [], cwd);
+    await repositoryChanged.commands.get("work")!.handler("Investigate the task", repositoryChanged.context);
+    await runPlanningScout(repositoryChanged);
+    const repositoryChangedInput = { filePath: ".plannotator/plan.md" };
+    assert.equal(
+      await repositoryChanged.routeToolCall("plannotator_submit_plan", repositoryChangedInput),
+      undefined,
+    );
+    writeFileSync(join(cwd, "unrelated-change.txt"), "changed during approval\n");
+    await repositoryChanged.routeToolResult(
+      "plannotator_submit_plan",
+      repositoryChangedInput,
+      { approved: true },
+    );
+    await repositoryChanged.commands.get("workflow-status")!.handler("", repositoryChanged.context);
+    assert.match(repositoryChanged.notices.at(-1)!.message, /approved \.plannotator\/plan\.md/i);
+
+    writePlan(cwd, "plan.md", readOnlyPlan("local-work"));
     const feedback = createHarness("idle", undefined, [], cwd);
     await feedback.commands.get("work")!.handler("Investigate the task", feedback.context);
     await runPlanningScout(feedback);
@@ -803,6 +909,48 @@ test("persists an active workflow across extension reload", async () => {
   if (result.action !== "transform") assert.fail("restored follow-up was not transformed");
   assert.match(result.text, /^Workflow: jira-ticket/);
   assert.match(result.text, /The regression still fails\./);
+});
+
+test("resumes a pending approved continuation after extension reload", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(cwd, "plan.md", codePlan(cwd));
+    const first = createHarness("idle", undefined, [], cwd);
+    await first.commands.get("work")!.handler("Implement the approved plan", first.context);
+    await approvePlan(first);
+
+    const restored = createHarness("planning", undefined, first.sessionEntries, cwd);
+    await restored.startSession();
+
+    assert.equal(restored.requestedModes.at(-1), "exit");
+    assert.match(
+      restored.sentMessages.at(-1)!,
+      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+    );
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("re-dispatches an approved code plan after a reload without a pending continuation", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(cwd, "plan.md", codePlan(cwd));
+    const first = createHarness("idle", undefined, [], cwd);
+    await first.commands.get("work")!.handler("Implement the approved plan", first.context);
+    await approvePlan(first);
+    await first.settleAgent();
+
+    const restored = createHarness("idle", undefined, first.sessionEntries, cwd);
+    await restored.startSession();
+
+    assert.match(
+      restored.sentMessages.at(-1)!,
+      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+    );
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
 });
 
 test("persists workflow abort as a tombstone without claiming completion", async () => {
@@ -1401,6 +1549,9 @@ test("does not restore old approval after a queued follow-up", async () => {
 test("Jira workflow defines ordered multi-repository sessions", () => {
   const template = readFileSync(new URL("../workflows/jira-ticket.md", import.meta.url), "utf8");
 
+  assert.match(template, /may first conduct bounded read-only context exploration/i);
+  assert.match(template, /memory search, repository snapshots.*bounded scout/i);
+  assert.match(template, /required before making ticket-derived claims.*ticket-driven actions/i);
   assert.match(template, /reviewable ordered repository-session overview/i);
   assert.match(template, /global defaults and project-local overrides/i);
   assert.match(template, /fresh explicit approval before each repository session/i);
@@ -1493,7 +1644,9 @@ test("keeps only four active subagent roles with explicit contracts", () => {
     .sort();
 
   assert.deepEqual(active, ["researcher", "reviewer", "scout", "worker"]);
-  for (const role of active) assert.equal(overrides[role]!.inheritSkills, true);
+  for (const role of active) assert.equal(overrides[role]!.inheritSkills, false);
+  assert.equal(overrides.researcher.skills, undefined);
+  assert.equal(overrides.scout.skills, undefined);
   assert.equal(overrides.worker.acceptanceRole, "writer");
   assert.deepEqual(overrides.worker.skills, [
     "test-driven-development",
@@ -1502,8 +1655,8 @@ test("keeps only four active subagent roles with explicit contracts", () => {
   ]);
   assert.equal(overrides.reviewer.acceptanceRole, "read-only");
   assert.deepEqual(overrides.reviewer.skills, ["verification-before-completion"]);
-  assert.match(contract, /All four active roles inherit Pi's discovered skills catalog/);
-  assert.match(contract, /loads only catalog skills whose descriptions match its bounded task/i);
+  assert.match(contract, /Active roles do not inherit Pi's discovered skills catalog/);
+  assert.match(contract, /Load only explicitly configured or single-run skills needed by that role's bounded task/i);
   assert.match(contract, /A skill never grants tools, mutation authority, broader scope/i);
   assert.match(contract, /Parent-only orchestration skills stay unavailable to children/i);
 });
@@ -1515,4 +1668,30 @@ test("keeps enough bounded spawn capacity for repeated plan and implementation i
 
   assert.equal(config.maxSubagentSpawnsPerSession, 100);
   assert.equal(config.globalConcurrencyLimit, 3);
+});
+
+test("uses source repository, Jira ticket ID, and rough description for the canonical worktree", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "plan-artifact-ABC-123_fix-cache-invalidation");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "plan.md", codePlan(targetCwd, "jira-ticket"));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { sessionKey: "ignored-session-key", worktreeBaseDir: base },
+    );
+
+    await harness.commands.get("ticket")!.handler("ABC-123 Fix cache invalidation", harness.context);
+    await approvePlan(harness);
+
+    assert.match(harness.notices.at(-1)!.message, /Plan approved/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
 });

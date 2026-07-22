@@ -1,342 +1,248 @@
-#!/usr/bin/env python3
-"""
-Caveman Memory Compression Orchestrator
+"""Harness-neutral preparation, validation, backup, and apply operations."""
 
-Usage:
-    python scripts/compress.py <filepath>
-"""
+from __future__ import annotations
 
+from contextlib import contextmanager
+from hashlib import sha256
+import json
 import os
-import re
-import shutil
-import subprocess
-import sys
 from pathlib import Path
-from typing import List
+import secrets
+import tempfile
+from typing import Callable, Iterator
 
-OUTER_FENCE_REGEX = re.compile(
-    r"\A\s*(`{3,}|~{3,})[^\n]*\n(.*)\n\1\s*\Z", re.DOTALL
-)
-
-# YAML frontmatter: starts at file start with --- on its own line, ends with --- on its own line.
-# Captures the entire block (including delimiters and trailing newline) and the body after.
-FRONTMATTER_REGEX = re.compile(
-    r"\A(---\r?\n.*?\r?\n---\r?\n)(.*)", re.DOTALL
-)
-
-
-def split_frontmatter(text: str):
-    """Split YAML frontmatter from body. Returns (frontmatter, body).
-
-    Memory files (and many other markdown docs) start with a YAML frontmatter
-    block delimited by `---` lines. The compression LLM has a habit of stripping
-    or rewriting these despite preserve-structure rules in the prompt — so we
-    surgically remove the frontmatter before compression and prepend it back
-    verbatim to the output. Files without frontmatter pass through unchanged.
-    """
-    m = FRONTMATTER_REGEX.match(text)
-    if m:
-        return m.group(1), m.group(2)
-    return "", text
-
-# Filenames and paths that almost certainly hold secrets or PII. Compressing
-# them ships raw bytes to the Anthropic API — a third-party data boundary that
-# developers on sensitive codebases cannot cross. detect.py already skips .env
-# by extension, but credentials.md / secrets.txt / ~/.aws/credentials would
-# slip through the natural-language filter. This is a hard refuse before read.
-SENSITIVE_BASENAME_REGEX = re.compile(
-    r"(?ix)^("
-    r"\.env(\..+)?"
-    r"|\.netrc"
-    r"|credentials(\..+)?"
-    r"|secrets?(\..+)?"
-    r"|passwords?(\..+)?"
-    r"|id_(rsa|dsa|ecdsa|ed25519)(\.pub)?"
-    r"|authorized_keys"
-    r"|known_hosts"
-    r"|.*\.(pem|key|p12|pfx|crt|cer|jks|keystore|asc|gpg)"
-    r")$"
-)
-
-SENSITIVE_PATH_COMPONENTS = frozenset({".ssh", ".aws", ".gnupg", ".kube", ".docker"})
-
-SENSITIVE_NAME_TOKENS = (
-    "secret", "credential", "password", "passwd",
-    "apikey", "accesskey", "token", "privatekey",
-)
-
-
-def backup_dir_for(filepath: Path) -> Path:
-    """Resolve the out-of-tree backup directory for a given source file.
-
-    Backups must live OUTSIDE the source directory so skill auto-loaders
-    (Claude Code rules/, opencode instructions/, etc.) stop re-ingesting the
-    `.original.md` copies as live files. Base dir is platform-aware:
-      - Windows: %LOCALAPPDATA%\\caveman-compress\\backups
-      - else:    $XDG_DATA_HOME/caveman-compress/backups if set,
-                 else ~/.local/share/caveman-compress/backups
-
-    The source file's parent-dir name is mirrored under the base to reduce
-    cross-project collisions (e.g. two `task.md` files in different repos).
-    """
-    if os.name == "nt" or sys.platform == "win32":
-        local_appdata = os.environ.get("LOCALAPPDATA")
-        base = Path(local_appdata) if local_appdata else Path.home() / "AppData" / "Local"
-        base = base / "caveman-compress" / "backups"
-    else:
-        xdg = os.environ.get("XDG_DATA_HOME")
-        base = Path(xdg) if xdg else Path.home() / ".local" / "share"
-        base = base / "caveman-compress" / "backups"
-    return base / filepath.parent.name
-
-
-def is_sensitive_path(filepath: Path) -> bool:
-    """Heuristic denylist for files that must never be shipped to a third-party API."""
-    name = filepath.name
-    if SENSITIVE_BASENAME_REGEX.match(name):
-        return True
-    lowered_parts = {p.lower() for p in filepath.parts}
-    if lowered_parts & SENSITIVE_PATH_COMPONENTS:
-        return True
-    # Normalize separators so "api-key" and "api_key" both match "apikey".
-    lower = re.sub(r"[_\-\s.]", "", name.lower())
-    return any(tok in lower for tok in SENSITIVE_NAME_TOKENS)
-
-
-def strip_llm_wrapper(text: str) -> str:
-    """Strip outer ```markdown ... ``` fence when it wraps the entire output."""
-    m = OUTER_FENCE_REGEX.match(text)
-    if m:
-        return m.group(2)
-    return text
-
-from .detect import should_compress
 from .validate import validate
 
-MAX_RETRIES = 2
+MAX_FILE_SIZE = 500_000
+REQUEST_VERSION = 1
+SENSITIVE_PATH_COMPONENTS = {
+    ".aws",
+    ".gnupg",
+    ".ssh",
+    "credential",
+    "credentials",
+    "secret",
+    "secrets",
+    "vault",
+}
 
 
-# ---------- Claude Calls ----------
+class CompressionError(RuntimeError):
+    """Base error for local compression workflow failures."""
 
 
-def call_claude(prompt: str) -> str:
-    """Send a prompt to Claude.
+class StaleSourceError(CompressionError):
+    """The source differs from the content used to create a request."""
 
-    Prefers the Anthropic SDK when ANTHROPIC_API_KEY is set; otherwise falls
-    back to the ``claude --print`` CLI (which handles desktop auth).
 
-    On Windows the CLI subprocess decoding defaults to the system codepage
-    (cp1251 / cp1252) and crashes on UTF-8 output — see issue #152. Pinning
-    ``encoding="utf-8"`` with ``errors="replace"`` matches the CLI's actual
-    native I/O and prevents the UnicodeDecodeError before validation can
-    report. Windows users with non-ASCII content can also set
-    ``ANTHROPIC_API_KEY`` to route through the SDK and skip the subprocess.
-    """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if api_key:
-        try:
-            import anthropic
+class ApplyLockError(CompressionError):
+    """Another cooperating harness is applying a candidate for this source."""
 
-            client = anthropic.Anthropic(api_key=api_key)
-            msg = client.messages.create(
-                model=os.environ.get("CAVEMAN_MODEL", "claude-sonnet-4-5"),
-                max_tokens=8192,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return strip_llm_wrapper(msg.content[0].text.strip())
-        except ImportError:
-            pass  # anthropic not installed, fall back to CLI
-    # Fallback: use claude CLI (handles desktop auth).
-    # Resolve binary via shutil.which so Windows .cmd/.bat shims (e.g.
-    # %APPDATA%\npm\claude.CMD) work without shell=True. On POSIX,
-    # shutil.which returns the same absolute path as the implicit lookup,
-    # so this is a no-op there. Falls back to bare "claude" if not found
-    # on PATH so subprocess raises a clear FileNotFoundError.
-    claude_bin = shutil.which("claude") or "claude"
+
+class CandidateValidationError(CompressionError):
+    """The candidate changed protected document structure or content."""
+
+
+def _read_text(path: Path) -> str:
     try:
-        result = subprocess.run(
-            [claude_bin, "--print"],
-            input=prompt,
-            text=True,
-            capture_output=True,
-            check=True,
-            encoding="utf-8",
-            errors="replace",
-        )
-        return strip_llm_wrapper(result.stdout.strip())
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Claude call failed:\n{e.stderr}")
+        return path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as error:
+        raise CompressionError(f"File must be UTF-8 text: {path}") from error
 
 
-def build_compress_prompt(original: str) -> str:
-    return f"""
-Compress this markdown into caveman format.
-
-STRICT RULES:
-- Do NOT modify anything inside ``` code blocks
-- Do NOT modify anything inside inline backticks
-- Preserve ALL URLs exactly
-- Preserve ALL headings exactly
-- Preserve file paths and commands
-- Return ONLY the compressed markdown body — do NOT wrap the entire output in a ```markdown fence or any other fence. Inner code blocks from the original stay as-is; do not add a new outer fence around the whole file.
-
-Only compress natural language.
-
-TEXT:
-{original}
-"""
+def _digest(text: str) -> str:
+    return sha256(text.encode("utf-8")).hexdigest()
 
 
-def build_fix_prompt(original: str, compressed: str, errors: List[str]) -> str:
-    errors_str = "\n".join(f"- {e}" for e in errors)
-    return f"""You are fixing a caveman-compressed markdown file. Specific validation errors were found.
-
-CRITICAL RULES:
-- DO NOT recompress or rephrase the file
-- ONLY fix the listed errors — leave everything else exactly as-is
-- The ORIGINAL is provided as reference only (to restore missing content)
-- Preserve caveman style in all untouched sections
-
-ERRORS TO FIX:
-{errors_str}
-
-HOW TO FIX:
-- Missing URL: find it in ORIGINAL, restore it exactly where it belongs in COMPRESSED
-- Code block mismatch: find the exact code block in ORIGINAL, restore it in COMPRESSED
-- Heading mismatch: restore the exact heading text from ORIGINAL into COMPRESSED
-- Do not touch any section not mentioned in the errors
-
-ORIGINAL (reference only):
-{original}
-
-COMPRESSED (fix this):
-{compressed}
-
-Return ONLY the fixed compressed file. No explanation.
-"""
+def _split_frontmatter(text: str) -> tuple[str, str]:
+    if not text.startswith("---\n"):
+        return "", text
+    closing = text.find("\n---\n", 4)
+    if closing < 0:
+        raise CompressionError("YAML frontmatter is missing its closing delimiter")
+    end = closing + len("\n---\n")
+    return text[:end], text[end:]
 
 
-# ---------- Core Logic ----------
+def _assert_source(path: Path) -> Path:
+    source = path.resolve()
+    if any(component.lower() in SENSITIVE_PATH_COMPONENTS for component in source.parts):
+        raise CompressionError(f"Refusing sensitive path: {source}")
+    if not source.exists():
+        raise FileNotFoundError(f"File not found: {source}")
+    if not source.is_file():
+        raise CompressionError(f"Not a regular file: {source}")
+    if source.stat().st_size > MAX_FILE_SIZE:
+        raise CompressionError(f"File exceeds {MAX_FILE_SIZE} byte limit: {source}")
+    return source
 
 
-def compress_file(filepath: Path) -> bool:
-    # Resolve and validate path
-    filepath = filepath.resolve()
-    MAX_FILE_SIZE = 500_000  # 500KB
-    if not filepath.exists():
-        raise FileNotFoundError(f"File not found: {filepath}")
-    if filepath.stat().st_size > MAX_FILE_SIZE:
-        raise ValueError(f"File too large to compress safely (max 500KB): {filepath}")
+def default_backup_path(source: Path) -> Path:
+    """Return a human-readable backup path without overwriting an existing backup."""
+    return source.with_name(f"{source.name}.original.md")
 
-    # Refuse files that look like they contain secrets or PII. Compressing ships
-    # the raw bytes to the Anthropic API — a third-party boundary — so we fail
-    # loudly rather than silently exfiltrate credentials or keys. Override is
-    # intentional: the user must rename the file if the heuristic is wrong.
-    if is_sensitive_path(filepath):
-        raise ValueError(
-            f"Refusing to compress {filepath}: filename looks sensitive "
-            "(credentials, keys, secrets, or known private paths). "
-            "Compression sends file contents to the Anthropic API. "
-            "Rename the file if this is a false positive."
-        )
 
-    print(f"Processing: {filepath}")
+def build_compression_instructions(source: Path) -> str:
+    return "\n".join(
+        [
+            "Compress the specified UTF-8 natural-language file into caveman format.",
+            "Use this harness's own model capability; do not call a vendor-specific CLI or API.",
+            "Read the source from its local path. Write only the complete candidate document.",
+            "Preserve every fenced code block, inline code span, URL, file path, heading, list structure,",
+            "frontmatter block, proper noun, technical term, number, date, and environment variable exactly.",
+            "Compress prose outside protected regions. Do not add wrappers, commentary, or markdown fences.",
+            f"Source path: {source}",
+        ]
+    )
 
-    if not should_compress(filepath):
-        print("Skipping (not natural language)")
-        return False
 
-    original_text = filepath.read_text(errors="ignore")
-    # Store backup outside the source directory so skill auto-loaders don't
-    # re-ingest the `.original.md` copy as a live file. Mirror the source's
-    # parent-dir name + stem under a platform-aware base to reduce collisions.
-    backup_dir = backup_dir_for(filepath)
-    backup_dir.mkdir(parents=True, exist_ok=True)
-    backup_path = backup_dir / (filepath.stem + ".original.md")
+def prepare_request(filepath: Path, request_path: Path) -> dict[str, object]:
+    """Create a local, vendor-neutral compression request for an agent harness."""
+    source = _assert_source(filepath)
+    original = _read_text(source)
+    if not original.strip():
+        raise CompressionError("Refusing to compress an empty or whitespace-only file")
+    _split_frontmatter(original)
 
-    if not original_text.strip():
-        print("❌ Refusing to compress: file is empty or whitespace-only.")
-        return False
+    request = {
+        "version": REQUEST_VERSION,
+        "source_path": str(source),
+        "source_sha256": _digest(original),
+        "instructions": build_compression_instructions(source),
+    }
+    destination = request_path.resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return request
 
-    # Check if backup already exists to prevent accidental overwriting
-    if backup_path.exists():
-        print(f"⚠️ Backup file already exists: {backup_path}")
-        print("The original backup may contain important content.")
-        print("Aborting to prevent data loss. Please remove or rename the backup file if you want to proceed.")
-        return False
 
-    # Split YAML frontmatter off before compression. Claude tends to strip or
-    # rewrite frontmatter despite preserve-structure rules; we keep it verbatim
-    # by removing it from the input and re-prepending it to the output.
-    frontmatter, body = split_frontmatter(original_text)
-    if frontmatter:
-        print(f"Detected YAML frontmatter ({len(frontmatter)} chars) — preserving verbatim")
+def _load_request(request_path: Path, source: Path) -> dict[str, object]:
+    try:
+        request = json.loads(request_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise CompressionError(f"Invalid compression request: {request_path}") from error
+    if not isinstance(request, dict) or request.get("version") != REQUEST_VERSION:
+        raise CompressionError("Unsupported compression request version")
+    if request.get("source_path") != str(source):
+        raise CompressionError("Compression request belongs to another source file")
+    digest = request.get("source_sha256")
+    if not isinstance(digest, str) or len(digest) != 64:
+        raise CompressionError("Compression request has no valid source digest")
+    return request
 
-    if not body.strip():
-        print("❌ Refusing to compress: body is empty after frontmatter removal.")
-        return False
 
-    # Step 1: Compress (body only, frontmatter excluded)
-    print("Compressing with Claude...")
-    compressed_body = call_claude(build_compress_prompt(body))
+@contextmanager
+def _exclusive_lock(source: Path) -> Iterator[None]:
+    """Cooperative cross-harness lock for prepare/apply clients on one source file."""
+    lock_path = source.with_name(f"{source.name}.caveman-compress.lock")
+    token = secrets.token_hex(16)
+    try:
+        descriptor = os.open(lock_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    except FileExistsError as error:
+        raise ApplyLockError(f"Compression apply lock already exists: {lock_path}") from error
 
-    if compressed_body is None or not compressed_body.strip():
-        print("❌ Compression aborted: Claude returned an empty response.")
-        print("   Original file is untouched (no backup created).")
-        return False
-
-    # Compare the BODY (not the whole file) — frontmatter is preserved verbatim
-    # and would never change, so identity must be judged on the compressible part.
-    if compressed_body.strip() == body.strip():
-        print("❌ Compression aborted: output is identical to input.")
-        print("   Likely causes: Claude refused, returned the prompt verbatim, or the file is")
-        print("   already in caveman form. Original file is untouched (no backup created).")
-        return False
-
-    # Reassemble: frontmatter (verbatim) + compressed body
-    compressed = frontmatter + compressed_body
-
-    # Save original as backup, then verify the backup readback before
-    # touching the input file. If the filesystem dropped bytes (encoding,
-    # antivirus, disk full), unlink the bad backup and abort instead of
-    # leaving the user with a corrupt backup + compressed primary.
-    backup_path.write_text(original_text)
-    backup_readback = backup_path.read_text(errors="ignore")
-    if backup_readback != original_text:
-        print(f"❌ Backup write verification failed: {backup_path}")
-        print("   In-memory original differs from on-disk backup. Aborting before touching the input file.")
+    try:
+        os.write(descriptor, token.encode("ascii"))
+        os.fsync(descriptor)
+        yield
+    finally:
+        os.close(descriptor)
         try:
-            backup_path.unlink()
+            if lock_path.read_text(encoding="ascii") == token:
+                lock_path.unlink()
         except OSError:
             pass
-        return False
-    filepath.write_text(compressed)
 
-    # Step 2: Validate + Retry
-    for attempt in range(MAX_RETRIES):
-        print(f"\nValidation attempt {attempt + 1}")
 
-        result = validate(backup_path, filepath)
+def _assert_digest(source: Path, expected: str) -> str:
+    current = _read_text(source)
+    if _digest(current) != expected:
+        raise StaleSourceError("Source changed after prepare; create a new request and candidate")
+    return current
 
-        if result.is_valid:
-            print("Validation passed")
-            break
 
-        print("❌ Validation failed:")
-        for err in result.errors:
-            print(f"   - {err}")
+def _validate_candidate(source: Path, candidate: Path, original: str) -> str:
+    if not candidate.exists() or not candidate.is_file():
+        raise CompressionError(f"Candidate file not found: {candidate}")
+    compressed = _read_text(candidate)
+    if _split_frontmatter(compressed)[0] != _split_frontmatter(original)[0]:
+        raise CandidateValidationError("Candidate changed YAML frontmatter")
 
-        if attempt == MAX_RETRIES - 1:
-            # Restore original on failure
-            filepath.write_text(original_text)
-            backup_path.unlink(missing_ok=True)
-            print("❌ Failed after retries — original restored")
-            return False
+    result = validate(source, candidate)
+    if not result.is_valid:
+        details = "; ".join(result.errors)
+        raise CandidateValidationError(f"Candidate failed validation: {details}")
+    return compressed
 
-        print("Fixing with Claude...")
-        compressed = call_claude(
-            build_fix_prompt(original_text, compressed, result.errors)
-        )
-        filepath.write_text(compressed)
 
-    return True
+def _write_exclusive(path: Path, text: str) -> None:
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+            output.write(text)
+            output.flush()
+            os.fsync(output.fileno())
+    except Exception:
+        try:
+            path.unlink()
+        except OSError:
+            pass
+        raise
+
+
+def _write_replacement(source: Path, text: str) -> Path:
+    descriptor, temp_name = tempfile.mkstemp(prefix=f".{source.name}.", suffix=".tmp", dir=source.parent)
+    temp_path = Path(temp_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+            output.write(text)
+            output.flush()
+            os.fsync(output.fileno())
+        return temp_path
+    except Exception:
+        temp_path.unlink(missing_ok=True)
+        raise
+
+
+def apply_candidate(
+    filepath: Path,
+    request_path: Path,
+    candidate_path: Path,
+    backup_path: Path | None = None,
+    *,
+    before_commit: Callable[[], None] | None = None,
+) -> Path:
+    """Validate and atomically apply a harness-produced candidate document.
+
+    The sidecar lock coordinates cooperating harnesses. Non-cooperating editors
+    can ignore that advisory lock, so the source digest is checked both after
+    acquisition and immediately before backup/replacement.
+    """
+    source = _assert_source(filepath)
+    request = _load_request(request_path.resolve(), source)
+    expected_digest = request["source_sha256"]
+    assert isinstance(expected_digest, str)
+    backup = (backup_path or default_backup_path(source)).resolve()
+    candidate = candidate_path.resolve()
+
+    with _exclusive_lock(source):
+        original = _assert_digest(source, expected_digest)
+        compressed = _validate_candidate(source, candidate, original)
+        if before_commit is not None:
+            before_commit()
+        _assert_digest(source, expected_digest)
+        if backup.exists():
+            raise CompressionError(f"Backup already exists: {backup}")
+
+        replacement = _write_replacement(source, compressed)
+        try:
+            _assert_digest(source, expected_digest)
+            _write_exclusive(backup, original)
+            _assert_digest(source, expected_digest)
+            os.replace(replacement, source)
+        except Exception:
+            replacement.unlink(missing_ok=True)
+            backup.unlink(missing_ok=True)
+            raise
+
+    return backup

@@ -1,118 +1,89 @@
 ---
 name: caveman-compress
 description: >
-  Compress natural language memory files (CLAUDE.md, todos, preferences) into caveman format
-  to save input tokens. Preserves all technical substance, code, URLs, and structure.
-  Sends approved file content to Anthropic, then overwrites the original with a compressed copy.
-  Human-readable backup saved as FILE.original.md. Requires secret scan and transmission consent.
-  Trigger: /caveman-compress FILEPATH or "compress memory file"
+  Compress natural-language memory files into concise caveman format with any agent harness.
+  Uses local prepare, validate, and atomic apply steps; no vendor CLI or API dependency.
+  Use when asked to compress Markdown, text, or prose-heavy memory files while preserving protected content.
 ---
 
 # Caveman Compress
 
 ## Purpose
 
-Compress natural language files (CLAUDE.md, todos, preferences) into caveman-speak to reduce input tokens. Compressed version overwrites original. Human-readable backup saved as `<filename>.original.md`.
+Compress prose with the current agent harness. Local scripts never select a model, call a vendor API, or invoke a vendor CLI.
 
-## Trigger
+Protected content stays exact:
 
-`/caveman-compress <filepath>` or when user asks to compress a memory file.
+- fenced and indented code;
+- inline code;
+- URLs, paths, environment variables, technical terms, proper nouns, dates, and numbers;
+- headings, list nesting, and YAML frontmatter.
 
-## Process
+## Supported files
 
-1. Resolve the exact user-supplied path. Reject unsupported types, backup files, files over 500 KB, directories, symlinks escaping the requested workspace, and paths the user did not name.
+Only natural-language `.md`, `.txt`, `.typ`, `.typst`, `.tex`, or extensionless files. Never compress code or configuration files. Reject backups, directories, symlinks escaping requested workspace, files over 500 KB, and sensitive paths.
 
-2. Explain that the complete file content will be transmitted to Anthropic through the API or Claude CLI. Get explicit confirmation unless the user already authorized that transmission in the same request.
+## Required preflight
 
-3. Scan without printing values for likely secrets or private data: API keys, tokens, passwords, private keys, credentials, cookies, connection strings, secret-bearing environment assignments, and sensitive personal data. If found, stop and ask for a redacted copy. Never include matched values in chat or tool output.
+1. Resolve exact user-named path.
+2. Explain that the active agent harness may send source content to its configured model provider. Get explicit consent if that harness requires external model processing.
+3. Scan for secrets and sensitive personal data without printing values. Stop on a match; request a redacted copy.
+4. Read `SECURITY.md`.
 
-4. Read `SECURITY.md`. The compression scripts live in `scripts/` adjacent to this file. If the path is not immediately available, search for `scripts/__main__.py` next to this SKILL.md.
+## Harness-neutral workflow
 
-5. From the directory containing this SKILL.md, run:
+From this skill directory:
 
-python3 -m scripts <absolute_filepath>
+```bash
+python3 -m scripts prepare /absolute/source.md --request /tmp/source.request.json
+```
 
-6. The CLI will:
-- detect file type (no tokens)
-- call Claude to compress
-- validate output (no tokens)
-- if errors: cherry-pick fix with Claude (targeted fixes only, no recompression)
-- retry up to 2 times
-- if still failing after 2 retries: report error to user, leave original file untouched
+`prepare` performs local checks and writes a request containing source path, SHA-256 digest, and protected-content instructions.
 
-7. Return result, backup path, validation status, and transmission method. Never echo file contents.
+Use the **current agent harness** to read the source, create a complete compressed candidate, and save it outside the source path. Do not add explanation, wrappers, or markdown fences around the candidate.
 
-## Compression Rules
+Validate without mutation:
 
-### Remove
-- Articles: a, an, the
-- Filler: just, really, basically, actually, simply, essentially, generally
-- Pleasantries: "sure", "certainly", "of course", "happy to", "I'd recommend"
-- Hedging: "it might be worth", "you could consider", "it would be good to"
-- Redundant phrasing: "in order to" → "to", "make sure to" → "ensure", "the reason is because" → "because"
-- Connective fluff: "however", "furthermore", "additionally", "in addition"
+```bash
+python3 -m scripts validate /absolute/source.md /tmp/source.candidate.md
+```
 
-### Preserve EXACTLY (never modify)
-- Code blocks (fenced ``` and indented)
-- Inline code (`backtick content`)
-- URLs and links (full URLs, markdown links)
-- File paths (`/src/components/...`, `./config.yaml`)
-- Commands (`npm install`, `git commit`, `docker build`)
-- Technical terms (library names, API names, protocols, algorithms)
-- Proper nouns (project names, people, companies)
-- Dates, version numbers, numeric values
-- Environment variables (`$HOME`, `NODE_ENV`)
+Apply only after validation passes:
 
-### Preserve Structure
-- All markdown headings (keep exact heading text, compress body below)
-- Bullet point hierarchy (keep nesting level)
-- Numbered lists (keep numbering)
-- Tables (compress cell text, keep structure)
-- Frontmatter/YAML headers in markdown files
+```bash
+python3 -m scripts apply \
+  /absolute/source.md \
+  /tmp/source.request.json \
+  /tmp/source.candidate.md \
+  --backup /absolute/source.md.original.md
+```
 
-### Compress
-- Use short synonyms: "big" not "extensive", "fix" not "implement a solution for", "use" not "utilize"
-- Fragments OK: "Run tests before commit" not "You should always run tests before committing"
-- Drop "you should", "make sure to", "remember to" — just state the action
-- Merge redundant bullets that say the same thing differently
-- Keep one example where multiple examples show the same pattern
+## Apply guarantees
 
-CRITICAL RULE:
-Anything inside ``` ... ``` must be copied EXACTLY.
-Do not:
-- remove comments
-- remove spacing
-- reorder lines
-- shorten commands
-- simplify anything
+`apply`:
 
-Inline code (`...`) must be preserved EXACTLY.
-Do not modify anything inside backticks.
+- obtains an exclusive cooperative per-file lock;
+- rejects candidates if the source digest changed after `prepare`;
+- rechecks source digest immediately before backup and replacement;
+- validates protected structure and frontmatter;
+- refuses to overwrite an existing backup;
+- writes a verified backup, then atomically replaces the source from a same-directory temporary file;
+- removes its new backup and temporary output if apply fails.
 
-If file contains code blocks:
-- Treat code blocks as read-only regions
-- Only compress text outside them
-- Do not merge sections around code
+The lock coordinates cooperating harnesses. An editor that ignores the lock can still race at filesystem level; the digest rechecks detect edits before replacement, but portable cross-platform compare-and-swap is unavailable.
 
-## Pattern
+## Compression rules
 
-Original:
-> You should always make sure to run the test suite before pushing any changes to the main branch. This is important because it helps catch bugs early and prevents broken builds from being deployed to production.
+Remove articles, filler, hedging, redundant phrasing, and duplicate examples. Use short exact prose. Preserve all protected content and structure exactly. If uncertain whether text is protected, leave it unchanged.
 
-Compressed:
-> Run tests before push to main. Catch bugs early, prevent broken prod deploys.
+## Completion
 
-Original:
-> The application uses a microservices architecture with the following components. The API gateway handles all incoming requests and routes them to the appropriate service. The authentication service is responsible for managing user sessions and JWT tokens.
+Report only:
 
-Compressed:
-> Microservices architecture. API gateway route all requests to services. Auth service manage user sessions + JWT tokens.
+- request path;
+- candidate validation result;
+- backup path;
+- apply result;
+- active harness transmission method, if any.
 
-## Boundaries
-
-- ONLY compress natural language files (.md, .txt, .typ, .typst, .tex, extensionless)
-- NEVER modify: .py, .js, .ts, .json, .yaml, .yml, .toml, .env, .lock, .css, .html, .xml, .sql, .sh
-- If file has mixed content (prose + code), compress ONLY the prose sections
-- If unsure whether something is code or prose, leave it unchanged
-- Original file is backed up as FILE.original.md before overwriting
-- Never compress FILE.original.md (skip it)
+Never echo source or candidate contents.

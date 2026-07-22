@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { lstatSync, readFileSync, readlinkSync, realpathSync } from "node:fs";
-import { isAbsolute, relative, resolve, sep } from "node:path";
+import { basename, isAbsolute, relative, resolve, sep } from "node:path";
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { ImageContent } from "@earendil-works/pi-ai";
@@ -101,8 +101,11 @@ type ActiveWorkflow = {
   name: WorkflowName;
   input: string;
   iteration: number;
+  // Preserve the original canonical worktree across /workflow-abort → /workflow-continue.
+  canonicalCwd?: string;
   pendingFollowUp?: string;
   pendingImages?: ImageContent[];
+  pendingExecutionContinuation?: boolean;
   approvedPlan?: ApprovedPlan;
   executionGate?: ExecutionGate;
   planningScoutGate?: PlanningScoutGate;
@@ -535,7 +538,46 @@ function resolvePlanPath(
   return { fullPath, relativePath: relative(canonicalCwd, fullPath) };
 }
 
-function expectedCanonicalCwd(workflow: ActiveWorkflow, runtime?: WorkflowRuntime): string {
+function jiraWorktreeIdentity(input: string): string {
+  const match = input.match(/\b[A-Za-z][A-Za-z0-9]+-\d+\b/);
+  if (!match || match.index === undefined) {
+    throw new Error("Jira workflow input has no stable ticket ID");
+  }
+
+  const roughDescription = input.slice(match.index + match[0].length)
+    .normalize("NFKD")
+    .replace(/\p{Mark}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!roughDescription) {
+    throw new Error("Jira workflow input requires a rough description after the ticket ID or URL");
+  }
+
+  return `${match[0].toUpperCase()}_${roughDescription}`;
+}
+
+function sourceRepositoryName(cwd: string): string {
+  const normalized = basename(repositoryRoot(cwd))
+    .normalize("NFKD")
+    .replace(/\p{Mark}/gu, "")
+    .replace(/[^A-Za-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!normalized) throw new Error("source repository name is unavailable");
+  return normalized;
+}
+
+function isCanonicalWorktreeName(workflow: ActiveWorkflow, name: string): boolean {
+  if (workflow.name !== "ticket") return name.startsWith("pi-session-");
+  return /^[A-Za-z0-9._-]+-[A-Za-z][A-Za-z0-9]+-\d+_[a-z0-9-]+$/.test(name);
+}
+
+function expectedCanonicalCwd(
+  workflow: ActiveWorkflow,
+  runtime?: WorkflowRuntime,
+  recoveryCwd?: string,
+  sourceCwd?: string,
+): string {
   const sessionKey = runtime ? runtime.sessionKey : process.env.PI_SUBAGENT_PARENT_SESSION;
   if (sessionKey === undefined) {
     throw new Error("stable PI_SUBAGENT_PARENT_SESSION key is unavailable");
@@ -559,13 +601,30 @@ function expectedCanonicalCwd(workflow: ActiveWorkflow, runtime?: WorkflowRuntim
     throw new Error("subagent worktreeBaseDir must be absolute");
   }
 
-  let identity = sessionKey;
-  if (workflow.name === "ticket") {
-    const ticketId = workflow.input.match(/\b[A-Za-z][A-Za-z0-9]+-\d+\b/)?.[0];
-    if (!ticketId) throw new Error("Jira workflow input has no stable ticket ID");
-    identity = `${ticketId}-${sessionKey}`;
+  const persistedOrRecoveredCwd =
+    workflow.canonicalCwd ?? (workflow.iteration > 1 ? recoveryCwd : undefined);
+  if (persistedOrRecoveredCwd) {
+    const persistedCwd = resolve(persistedOrRecoveredCwd);
+    const persistedRelativePath = relative(worktreeBaseDir, persistedCwd);
+    if (
+      !persistedRelativePath ||
+      persistedRelativePath === ".." ||
+      persistedRelativePath.startsWith(`..${sep}`) ||
+      isAbsolute(persistedRelativePath) ||
+      persistedRelativePath.includes(sep) ||
+      !isCanonicalWorktreeName(workflow, persistedRelativePath)
+    ) {
+      throw new Error("persisted canonical worktree is outside configured worktreeBaseDir");
+    }
+    captureRepositorySnapshot(persistedCwd);
+    return persistedCwd;
   }
-  return resolve(worktreeBaseDir, `pi-session-${identity}`);
+
+  if (workflow.name === "ticket") {
+    if (!sourceCwd) throw new Error("source repository checkout is unavailable");
+    return resolve(worktreeBaseDir, `${sourceRepositoryName(sourceCwd)}-${jiraWorktreeIdentity(workflow.input)}`);
+  }
+  return resolve(worktreeBaseDir, `pi-session-${sessionKey}`);
 }
 
 function captureApprovedPlan(
@@ -585,7 +644,7 @@ function captureApprovedPlan(
     throw new Error("gitlab-mr-review is read-only and cannot approve a code verification contract");
   }
   if (verification) {
-    const expectedCwd = expectedCanonicalCwd(workflow, runtime);
+    const expectedCwd = expectedCanonicalCwd(workflow, runtime, verification.cwd, cwd);
     if (verification.cwd !== expectedCwd) {
       throw new Error("Verification contract cwd does not match the stable session worktree identity");
     }
@@ -751,8 +810,10 @@ function parseActiveWorkflow(value: unknown): ActiveWorkflow | null {
     name: value.name,
     input: value.input,
     iteration: value.iteration,
+    canonicalCwd: typeof value.canonicalCwd === "string" ? value.canonicalCwd : undefined,
     pendingFollowUp: typeof value.pendingFollowUp === "string" ? value.pendingFollowUp : undefined,
     pendingImages: pendingImages?.length ? pendingImages : undefined,
+    pendingExecutionContinuation: value.pendingExecutionContinuation === true,
     approvedPlan: parseApprovedPlan(value.approvedPlan),
     executionGate: parseExecutionGate(value.executionGate),
     planningScoutGate: parsePlanningScoutGate(value.planningScoutGate),
@@ -809,6 +870,7 @@ function withQueuedFollowUp(
       ? `${workflow.pendingFollowUp}\n\n${followUp}`
       : followUp,
     pendingImages: [...(workflow.pendingImages ?? []), ...(images ?? [])],
+    pendingExecutionContinuation: undefined,
     approvedPlan: undefined,
     executionGate: undefined,
     planningScoutGate: undefined,
@@ -844,8 +906,7 @@ function sameApprovedPlan(left: ApprovedPlan, right: ApprovedPlan): boolean {
     left.cwd === right.cwd &&
     left.path === right.path &&
     left.sha256 === right.sha256 &&
-    left.kind === right.kind &&
-    left.repositorySha256 === right.repositorySha256
+    left.kind === right.kind
   );
 }
 
@@ -859,9 +920,6 @@ function codeTargetError(approvedPlan: ApprovedPlan, requestedCwd: unknown): str
   try {
     if (repositoryRoot(target) !== canonicalPath(target)) {
       return "Approved Verification contract cwd is not a Git repository root.";
-    }
-    if (repositoryCommonDirectory(target) !== repositoryCommonDirectory(approvedPlan.cwd)) {
-      return "Approved Verification contract cwd belongs to a different Git repository.";
     }
   } catch (error) {
     return `Approved repository cwd cannot be verified: ${error instanceof Error ? error.message : String(error)}`;
@@ -880,6 +938,27 @@ function isPlanMarkdownPath(input: Record<string, unknown>, cwd: string): boolea
   }
 }
 
+function isReadOnlyMcpOperation(toolName: string): boolean {
+  const operation = toolName.split("__").at(-1) ?? toolName;
+  const normalized = operation.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+  if (
+    /(?:^|_)(?:add|apply|approve|assign|close|commit|create|delete|deploy|edit|execute|install|merge|patch|post|publish|push|remove|reopen|reply|resolve|run|send|set|submit|transition|update|upload|write)(?:_|$)/.test(
+      normalized,
+    )
+  ) {
+    return false;
+  }
+  return /(?:^|_)(?:get|list|search|read|fetch|query|find|inspect|show|lookup|describe|view)(?:_|$)/.test(
+    normalized,
+  );
+}
+
+function isReadOnlyMcpProxyCall(input: Record<string, unknown>): boolean {
+  if (typeof input.tool === "string") return isReadOnlyMcpOperation(input.tool);
+  if (typeof input.action === "string") return input.action === "ui-messages";
+  return ["connect", "describe", "search", "server"].some((key) => typeof input[key] === "string");
+}
+
 function planningMutationError(
   toolName: string,
   input: Record<string, unknown>,
@@ -894,19 +973,12 @@ function planningMutationError(
   if (["bash", "edit", "write", "find"].includes(toolName)) {
     return "Planning is read-only except the markdown plan beneath .plannotator; use the fresh scout for repository commands.";
   }
-
-  const operation = toolName.split("__").at(-1) ?? toolName;
-  const normalized = operation.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
-  if (
-    /(?:^|_)(?:add|apply|approve|assign|close|commit|create|delete|deploy|edit|execute|install|merge|patch|post|publish|push|remove|reopen|reply|resolve|run|send|set|submit|transition|update|upload|write)(?:_|$)/.test(
-      normalized,
-    )
-  ) {
-    return `Tool ${toolName} may mutate state and is blocked until the current plan is approved.`;
+  if (toolName === "mcp") {
+    return isReadOnlyMcpProxyCall(input)
+      ? undefined
+      : "MCP operation is not explicitly classified as read-only and is blocked until the current plan is approved.";
   }
-  if (/^(?:get|list|search|read|fetch|query|find|inspect|show|lookup|describe|view)(?:_|$)/.test(normalized)) {
-    return undefined;
-  }
+  if (isReadOnlyMcpOperation(toolName)) return undefined;
   return `Tool ${toolName} is not explicitly classified as read-only and is blocked until the current plan is approved.`;
 }
 
@@ -1261,6 +1333,7 @@ export default function registerWorkflowCommands(
         ...queued,
         pendingFollowUp: undefined,
         pendingImages: undefined,
+        pendingExecutionContinuation: undefined,
         approvedPlan: undefined,
       });
       if (sendImmediately) {
@@ -1281,6 +1354,26 @@ export default function registerWorkflowCommands(
     }
   };
 
+  const dispatchApprovedExecution = async (context: ExtensionContext): Promise<void> => {
+    if (!activeWorkflow?.pendingExecutionContinuation || activeWorkflow.pendingFollowUp) return;
+
+    const transitionError = await transitionToIdle();
+    if (transitionError) {
+      context.ui.notify(
+        `Approved plan is waiting for Plannotator to exit planning: ${transitionError}`,
+        "error",
+      );
+      return;
+    }
+
+    const workflow = activeWorkflow;
+    setActiveWorkflow({ ...workflow, pendingExecutionContinuation: undefined });
+    sendWorkflowMessage(
+      pi,
+      "Continue with the approved plan. Launch exactly one compliant verified worker in the approved canonical cwd now; do not re-enter planning or revise the approved plan.",
+    );
+  };
+
   const restoreCurrentBranch = (context: ExtensionContext) => {
     const entries = context.sessionManager.getBranch();
     activeWorkflow = restoreWorkflow(entries);
@@ -1292,7 +1385,16 @@ export default function registerWorkflowCommands(
     restoreCurrentBranch(context);
     if (activeWorkflow?.pendingFollowUp) {
       context.ui.notify("Workflow follow-up preserved; run /workflow-retry when ready.", "warning");
+      return;
     }
+    if (
+      activeWorkflow?.approvedPlan?.kind === "code" &&
+      !activeWorkflow.executionGate &&
+      !activeWorkflow.pendingExecutionContinuation
+    ) {
+      setActiveWorkflow({ ...activeWorkflow, pendingExecutionContinuation: true });
+    }
+    await dispatchApprovedExecution(context);
   });
 
   pi.on("session_tree", async (_event, context) => {
@@ -1334,7 +1436,9 @@ export default function registerWorkflowCommands(
   pi.on("agent_settled", async (_event, context) => {
     if (activeWorkflow?.pendingFollowUp) {
       await dispatchPendingIteration(context, true);
+      return;
     }
+    await dispatchApprovedExecution(context);
   });
 
   pi.on("tool_result", async (event, context) => {
@@ -1381,10 +1485,26 @@ export default function registerWorkflowCommands(
         }
         setActiveWorkflow({
           ...activeWorkflow,
+          canonicalCwd: current.verification?.cwd ?? activeWorkflow.canonicalCwd,
           approvedPlan: submission.plan,
           executionGate: undefined,
           planSubmission: undefined,
+          pendingExecutionContinuation: Boolean(submission.plan.verification),
         });
+        if (submission.plan.verification) {
+          const transitionError = await transitionToIdle();
+          if (transitionError) {
+            context.ui.notify(
+              `Plan approved, but Plannotator could not exit planning: ${transitionError}. The worker continuation is preserved and will retry when the agent settles.`,
+              "error",
+            );
+            return;
+          }
+          context.ui.notify(
+            "Plan approved. Plannotator exited planning; worker continuation starts when the agent settles.",
+            "info",
+          );
+        }
       } catch (error) {
         setActiveWorkflow({
           ...activeWorkflow,
@@ -1592,9 +1712,12 @@ export default function registerWorkflowCommands(
       return mutationError ? { block: true, reason: mutationError } : undefined;
     }
 
-    if (phaseResponse.result.phase !== "executing") {
+    if (phaseResponse.result.phase !== "idle" && phaseResponse.result.phase !== "executing") {
       if (workerRequested || reviewerRequested) {
-        return { block: true, reason: "worker and reviewer may run only after the current plan is approved." };
+        return {
+          block: true,
+          reason: "worker and reviewer may run only after approval exits Plannotator planning.",
+        };
       }
       return;
     }
@@ -1765,6 +1888,10 @@ export default function registerWorkflowCommands(
         context.ui.notify("No active workflow loop.", "info");
         return;
       }
+      const phaseResponse = await requestPlanMode(pi, "status");
+      const phase = phaseResponse.status === "handled"
+        ? `; Plannotator=${phaseResponse.result.phase}`
+        : `; Plannotator=${responseError(phaseResponse)}`;
       const pending = activeWorkflow.pendingFollowUp ? "; follow-up pending" : "";
       const approved = activeWorkflow.approvedPlan
         ? `; approved ${activeWorkflow.approvedPlan.path} @${activeWorkflow.approvedPlan.sha256.slice(0, 8)}`
@@ -1779,7 +1906,7 @@ export default function registerWorkflowCommands(
         ? `; iteration-scout=${activeWorkflow.planningScoutGate.status}`
         : "";
       context.ui.notify(
-        `Workflow ${activeWorkflow.name}; iteration ${activeWorkflow.iteration}${pending}${approved}${contract}${gates}${scout}.`,
+        `Workflow ${activeWorkflow.name}; iteration ${activeWorkflow.iteration}${phase}${pending}${approved}${contract}${gates}${scout}.`,
         "info",
       );
     },

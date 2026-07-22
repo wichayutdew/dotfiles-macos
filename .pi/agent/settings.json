@@ -78,7 +78,7 @@
         "thinking": "medium",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": true,
+        "inheritSkills": false,
         "acceptanceRole": "read-only",
         "defaultContext": "fresh",
         "completionGuard": false,
@@ -96,7 +96,7 @@
         "thinking": "low",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": true,
+        "inheritSkills": false,
         "acceptanceRole": "read-only",
         "defaultContext": "fresh",
         "completionGuard": false,
@@ -112,7 +112,7 @@
         "thinking": "high",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": true,
+        "inheritSkills": false,
         "skills": [
           "test-driven-development",
           "verification-before-completion",
@@ -135,7 +135,7 @@
         "thinking": "high",
         "systemPromptMode": "replace",
         "inheritProjectContext": true,
-        "inheritSkills": true,
+        "inheritSkills": false,
         "skills": [
           "verification-before-completion"
         ],

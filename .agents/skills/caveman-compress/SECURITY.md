@@ -1,42 +1,32 @@
 # Security
 
-## Snyk High Risk Rating
+## Model-provider independence
 
-`caveman-compress` receives a Snyk High Risk rating due to static analysis heuristics. This document explains what the skill does and does not do.
+`caveman-compress` does not import model SDKs, invoke vendor CLIs, or make network requests. It only prepares requests, validates candidate files, creates backups, and atomically applies candidates.
 
-### What triggers the rating
+The active agent harness performs any model call. Follow that harness's consent, data-boundary, and credential policy. Before an agent passes source content to an external model provider, disclose the destination and obtain required consent.
 
-1. **subprocess usage**: The skill calls the `claude` CLI via `subprocess.run()` as a fallback when `ANTHROPIC_API_KEY` is not set. The subprocess call uses a fixed argument list — no shell interpolation occurs. User file content is passed via stdin, not as a shell argument.
+## Required preflight
 
-2. **File read/write**: The skill reads the file the user explicitly points it at, compresses it, and writes the result back to the same path. A `.original.md` backup is saved alongside it. No files outside the user-specified path are read or written.
+Before `prepare`:
 
-### Required preflight
+1. Confirm user-named file is in scope and is a supported natural-language file.
+2. Scan for likely secrets and sensitive personal data without printing values.
+3. Stop on a match and request a redacted copy.
+4. Explain any external transmission performed by the active harness.
 
-Before running the script, the agent must:
+## Local safety properties
 
-1. State that the complete file will be sent to Anthropic through the API or Claude CLI.
-2. Obtain explicit transmission consent unless already given in the same request.
-3. Scan for likely secrets and sensitive personal data without printing values.
-4. Stop on a match and request a redacted copy.
+- No subprocesses, shell interpolation, network requests, API-key reads, or vendor-specific dependencies.
+- `prepare` records source path and SHA-256 digest.
+- `apply` uses a cooperative exclusive sidecar lock.
+- `apply` rejects stale requests, validates protected content, preserves exact frontmatter, refuses existing backups, and uses a same-directory atomic replacement.
+- If apply fails after creating a new backup, it removes that new backup and leaves the source unchanged.
 
-The script itself does not provide a local/offline compression path. Do not describe it as local processing.
+## Concurrency boundary
 
-### What the skill does NOT do
+The sidecar lock prevents concurrent cooperating `apply` calls. It cannot force arbitrary editors or unrelated programs to honor the lock. `apply` rechecks the source digest before backup and replacement, but no portable cross-platform filesystem compare-and-swap can eliminate every non-cooperating-writer race.
 
-- Does not execute user file content as code
-- Does not make network requests except to Anthropic's API (via SDK or CLI)
-- Does not access files outside the path the user provides
-- Does not use shell=True or string interpolation in subprocess calls
-- Does not collect or transmit any data beyond the file being compressed
+## File limit
 
-### Auth behavior
-
-If `ANTHROPIC_API_KEY` is set, the skill uses the Anthropic Python SDK directly (no subprocess). If not set, it falls back to the `claude` CLI, which uses the user's existing Claude desktop authentication.
-
-### File size limit
-
-Files larger than 500KB are rejected before any API call is made.
-
-### Reporting a vulnerability
-
-If you believe you've found a genuine security issue, please open a GitHub issue with the label `security`.
+Files larger than 500 KB are rejected before candidate preparation.
