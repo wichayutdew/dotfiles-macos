@@ -47,7 +47,7 @@ alias t 'tmux'
 alias ci 'zi'
 alias c 'z'
 alias y 'yazi'
-alias cc 'pi --plan'
+alias cc 'pi'
 alias q 'pi -p --model big-pickle'
 
 # ---- Agoda Specific ----
