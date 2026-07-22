@@ -5,16 +5,20 @@
     "userMessages": "terminal"
   },
   "features": {
-    "copyFriendly": true
+    "copyFriendly": true,
+    "editor": true,
+    "statusLine": true
   },
   "fixedEditor": {
-    "enabled": true
+    "enabled": true,
+    "copyNotice": true,
+    "mouseScroll": true
   },
   "contextStyle": "text+gauge",
   "separator": "chevron",
   "pathDisplay": {
-    "mode": "basename",
-    "depth": 2
+    "mode": "full",
+    "depth": 5
   },
   "gitBranch": {
     "maxLength": "full"
@@ -40,10 +44,12 @@
   },
   "extensionStatuses": {
     "placements": {
-      "mcp": "middle"
+      "mcp": "middle",
+      "plannotator": "middle"
     },
     "colorModes": {
-      "mcp": "zentui"
+      "mcp": "zentui",
+      "plannotator": "zentui"
     }
   }
 }
