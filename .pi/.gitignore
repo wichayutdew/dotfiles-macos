@@ -4,3 +4,4 @@ context-mode/
 # local Hermes session and memory state
 /agent/.pi-hermes-locks.sqlite
 /agent/pi-hermes-memory/
+/agent/projects-memory/
