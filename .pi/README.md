@@ -35,8 +35,8 @@ Run in Pi TUI.
 |---|---|---|
 | `/work <task>` | Local requirement | Local implementation, bug fix, or read-only investigation. |
 | `/ticket <Jira key or URL> <rough description>` | Jira issue plus short description | Ticket-driven investigation or implementation. |
-| `/mr-review <GitLab MR URL>` | Merge request URL | Read-only review and, after approval, posting exact planned comments. |
-| `/mr-comments <GitLab MR URL>` | Merge request URL | Triage existing review discussions; may make approved comment replies or non-force push actions. |
+| `/mr-review <review URL>` | GitLab merge-request or trusted GitHub pull-request URL | Read-only review and, after approval, posting exact planned comments. |
+| `/mr-comments <review URL>` | GitLab merge-request or trusted GitHub pull-request URL | Triage existing review discussions; may make approved comment replies or non-force push actions. |
 
 Examples:
 
@@ -47,7 +47,7 @@ Examples:
 /mr-comments https://gitlab.example.com/group/project/-/merge_requests/42
 ```
 
-`/mr-review` and `/mr-comments` reject input is not HTTP(S) GitLab merge-request URL.
+`/mr-review` and `/mr-comments` accept HTTP(S) GitLab `/-/merge_requests/<id>` URLs, GitHub.com `/owner/repository/pull/<id>` URLs, and GitHub Enterprise pull-request URLs only when their host equals the current checkout's `origin` host.
 
 ## What happens after `/work`
 
@@ -143,7 +143,8 @@ Workflow extension rejects ad-hoc worker or reviewer delegation outside approved
 
 The approved `cwd` is not arbitrary. Extension derives and preserves one canonical worktree identity under configured `worktreeBaseDir` from `.pi/agent/extensions/subagent/config.json`.
 
-- Local work and merge-request workflows use `pi-session-<session-key>` identity.
+- Local work uses branch `<summary>` and worktree directory `<source-repository-name>-<summary>`. Before planning code work, use `caveman` at ultra intensity to extract a non-empty lowercase ASCII hyphen-separated main-idea summary from the user input, at most 20 characters. Search shared checkout to select source repository; user remains there while worker uses canonical worktree.
+- Merge-request workflows use `pi-session-<session-key>` identity.
 - Jira code workflows use `<source-repository-name>-<JIRA_TICKET_ID>_<rough-description>` for their canonical worktree directory. The branch uses `<JIRA_TICKET_ID>_<rough-description>`. The rough description is required after ticket ID or URL, normalized to lowercase ASCII hyphen-separated text.
 - Reuse canonical worktree across follow-up iterations.
 - Never create temporary fallback worktree.
@@ -165,7 +166,7 @@ The plan, worker launch, reviewer launch, and final gate must all refer to same 
 
 ### `/mr-review`
 
-This route is remote-read-only during planning. It fetches current merge-request metadata, source/target branches, head SHA, diff, pipelines, discussions, and changed-file context.
+This route is remote-read-only during planning. It fetches current merge-request or pull-request metadata, source/target branches, head SHA, diff, checks/pipelines, discussions, and changed-file context. It selects GitLab MCP then `glab` then trusted authenticated `curl` for GitLab; for GitHub/GitHub Enterprise it uses a connected GitHub MCP when capable, then `gh` (`--hostname <host>` for Enterprise), then trusted authenticated `curl`.
 
 After approval, it re-fetches head SHA and discussions. If evidence or anchors changed, it returns to planning. It may post exact approved comments. It cannot edit code, create worktree, approve, merge, or resolve discussions.
 

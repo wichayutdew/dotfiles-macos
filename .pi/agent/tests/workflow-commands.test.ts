@@ -462,7 +462,7 @@ test("approves a plan from a shared nested Git directory", async () => {
 test("permits a contract-bound canonical worktree outside the plan artifact repository", async () => {
   const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
   const planCwd = join(base, "plan-artifact");
-  const targetCwd = join(base, "pi-session-cross-repo");
+  const targetCwd = join(base, "plan-artifact-canonical-worktree");
   try {
     mkdirSync(planCwd);
     mkdirSync(targetCwd);
@@ -519,6 +519,47 @@ test("GitLab commands start their distinct workflows", async () => {
     assert.equal(sentMessages.length, 1);
     assert.match(sentMessages[0]!, new RegExp(`Workflow: ${workflowName}`));
     assert.match(sentMessages[0]!, /gitlab\.example\.test/);
+  }
+});
+
+test("GitHub public pull request URLs start both review workflows", async () => {
+  const pullRequestUrl = "https://github.com/octo-org/example/pull/42";
+
+  for (const commandName of ["mr-review", "mr-comments"] as const) {
+    const { commands, context, requestedModes, sentMessages } = createHarness();
+
+    await commands.get(commandName)!.handler(pullRequestUrl, context);
+
+    assert.deepEqual(requestedModes, ["status", "enter"]);
+    assert.equal(sentMessages.length, 1);
+    assert.match(sentMessages[0]!, /Remote platform: GitHub/);
+  }
+});
+
+test("GitHub Enterprise pull request URLs require the current origin host", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-ghe-"));
+  try {
+    execFileSync("git", ["init", "--quiet"], { cwd });
+    execFileSync("git", ["remote", "add", "origin", "https://github.example.test/org/repo.git"], { cwd });
+    const trusted = createHarness("idle", undefined, [], cwd);
+
+    await trusted.commands.get("mr-review")!.handler(
+      "https://github.example.test/org/repo/pull/42",
+      trusted.context,
+    );
+
+    assert.match(trusted.sentMessages[0]!, /Remote platform: GitHub Enterprise/);
+
+    const untrusted = createHarness("idle", undefined, [], cwd);
+    await untrusted.commands.get("mr-review")!.handler(
+      "https://untrusted.example.test/org/repo/pull/42",
+      untrusted.context,
+    );
+
+    assert.equal(untrusted.sentMessages.length, 0);
+    assert.match(untrusted.notices[0]!.message, /trusted GitHub pull request URL/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
   }
 });
 
@@ -665,7 +706,7 @@ test("blocks planning mutations except the plan file", async () => {
   }
 });
 
-test("fails closed on plan path escapes and missing workflow session identity", async () => {
+test("fails closed on plan path escapes", async () => {
   const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
   try {
     writeFileSync(join(cwd, "outside-plan.md"), readOnlyPlan("local-work"));
@@ -700,21 +741,6 @@ test("fails closed on plan path escapes and missing workflow session identity", 
     assert.equal(hardLinkedPlan?.block, true);
     assert.match(hardLinkedPlan?.reason ?? "", /hard links/i);
 
-    writePlan(cwd, "code-plan.md", codePlan(cwd));
-    const missingIdentity = createHarness(
-      "idle",
-      undefined,
-      [],
-      cwd,
-      { worktreeBaseDir: dirname(cwd) },
-    );
-    await missingIdentity.commands.get("work")!.handler("Implement safely", missingIdentity.context);
-    await runPlanningScout(missingIdentity);
-    const missingIdentityPlan = await missingIdentity.routeToolCall("plannotator_submit_plan", {
-      filePath: ".plannotator/code-plan.md",
-    });
-    assert.equal(missingIdentityPlan?.block, true);
-    assert.match(missingIdentityPlan?.reason ?? "", /PI_SUBAGENT_PARENT_SESSION key is unavailable/i);
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
@@ -1056,6 +1082,17 @@ test("preserves an image-only workflow follow-up", async () => {
   assert.deepEqual(harness.sentUserContents.at(-1)?.at(-1), image);
 });
 
+test("blocks subagent_wait during an active workflow so supervisor requests reach the user", async () => {
+  const harness = createHarness();
+  await harness.commands.get("ticket")!.handler("ABC-123", harness.context);
+
+  const blocked = await harness.routeToolCall("subagent_wait", { id: "worker-run" });
+
+  assert.equal(blocked?.block, true);
+  assert.match(blocked?.reason ?? "", /must not block on subagent_wait/i);
+  assert.match(blocked?.reason ?? "", /supervisor decision/i);
+});
+
 test("blocks extension-generated execution continuation before approval", async () => {
   const { commands, context, requestedModes, routeInput } = createHarness();
 
@@ -1103,14 +1140,14 @@ test("workflow-done exits Plannotator and disables follow-up routing", async () 
   }
 });
 
-test("requires a GitLab merge request URL", async () => {
+test("requires a supported review URL", async () => {
   const { commands, context, notices, requestedModes, sentMessages } = createHarness();
 
   await commands.get("mr-review")!.handler("not-a-url", context);
 
   assert.deepEqual(requestedModes, []);
   assert.equal(sentMessages.length, 0);
-  assert.match(notices[0]!.message, /GitLab merge request URL/);
+  assert.match(notices[0]!.message, /trusted GitHub pull request URL/);
 });
 
 test("blocks ad-hoc reviewers without an approved workflow contract", async () => {
@@ -1561,6 +1598,34 @@ test("Jira workflow defines ordered multi-repository sessions", () => {
   assert.doesNotMatch(template, /MR URL/i);
 });
 
+test("review workflows select tools by remote platform", () => {
+  const review = readFileSync(new URL("../workflows/gitlab-mr-review.md", import.meta.url), "utf8");
+  const comments = readFileSync(new URL("../workflows/gitlab-mr-comments.md", import.meta.url), "utf8");
+  const config = JSON.parse(readFileSync(new URL("../plannotator.json", import.meta.url), "utf8"));
+  const executionPrompt = config.phases.executing.systemPrompt as string;
+
+  for (const content of [review, comments, executionPrompt]) {
+    assert.match(content, /GitLab MCP/);
+    assert.match(content, /glab/);
+    assert.match(content, /GitHub MCP/);
+    assert.match(content, /gh/);
+    assert.match(content, /trusted.*curl/i);
+    assert.match(content, /Never cross platform|never cross platform/i);
+  }
+});
+
+test("local-work defines short summary worktree selection from the shared checkout", () => {
+  const template = readFileSync(new URL("../workflows/local-work.md", import.meta.url), "utf8");
+  const contract = readFileSync(new URL("../AGENTS.md", import.meta.url), "utf8");
+
+  assert.match(template, /use `caveman` at ultra intensity to extract/i);
+  assert.match(template, /at most 20 characters/i);
+  assert.match(template, /branch `<summary>` and directory `<source-repository-name>-<summary>`/i);
+  assert.match(template, /shared invoking checkout/i);
+  assert.match(contract, /For local-work, use `caveman` at ultra intensity/i);
+  assert.match(contract, /user stays in the shared checkout/i);
+});
+
 test("Plannotator plan contract persists route and executable checklist", () => {
   const config = JSON.parse(readFileSync(new URL("../plannotator.json", import.meta.url), "utf8"));
   const planningPrompt = config.phases.planning.systemPrompt as string;
@@ -1586,6 +1651,13 @@ test("Plannotator plan contract persists route and executable checklist", () => 
   assert.match(planningPrompt, /every user-authored follow-up is a new planning iteration/);
   assert.match(planningPrompt, /reuse the exact same plan file/);
   assert.match(planningPrompt, /submit it for another approval/);
+  assert.match(executionPrompt, /Jira code work requires `\/ticket <Jira-ticket-ID-or-URL> <rough description>`/);
+  assert.match(executionPrompt, /branch `<Jira-ticket-ID>_<rough-description>`/);
+  assert.match(executionPrompt, /directory `<source-repository-name>-<Jira-ticket-ID>_<rough-description>`/);
+  assert.match(executionPrompt, /For local-work code, use caveman at ultra intensity/i);
+  assert.match(executionPrompt, /main-idea summary.*at most 20 characters/i);
+  assert.match(executionPrompt, /directory `<source-repository-name>-<summary>`/);
+  assert.match(executionPrompt, /shared invoking checkout/i);
   assert.match(executionPrompt, /Workflow: general follows the approved plan/);
   assert.match(executionPrompt, /remain active across execution passes until successful \/workflow-done/);
   assert.match(executionPrompt, /has no authorization from the current plan/);
@@ -1691,6 +1763,65 @@ test("uses source repository, Jira ticket ID, and rough description for the cano
     await approvePlan(harness);
 
     assert.match(harness.notices.at(-1)!.message, /Plan approved/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("uses a source repository and at-most-20-character local summary for the canonical worktree", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "plan-artifact-fix-cache-stale-data");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "plan.md", codePlan(targetCwd));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { sessionKey: "ignored-session-key", worktreeBaseDir: base },
+    );
+
+    await harness.commands.get("work")!.handler(
+      "Fix stale cache data after booking cancellation",
+      harness.context,
+    );
+    await approvePlan(harness);
+
+    assert.match(harness.notices.at(-1)!.message, /Plan approved/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("rejects legacy pi-session local-work worktree names", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "pi-session-legacy");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "plan.md", codePlan(targetCwd));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { sessionKey: "legacy", worktreeBaseDir: base },
+    );
+
+    await harness.commands.get("work")!.handler("Fix stale cache data", harness.context);
+    await runPlanningScout(harness);
+    const result = await harness.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/plan.md",
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /local-work canonical directory/i);
   } finally {
     rmSync(base, { recursive: true, force: true });
   }

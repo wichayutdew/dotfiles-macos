@@ -33,8 +33,10 @@ type WorkflowSpec = {
   inputLabel: string;
   marker: string;
   template: string;
-  validate?: (input: string) => boolean;
+  validate?: (input: string, cwd: string) => boolean;
 };
+
+type ReviewPlatform = "gitlab" | "github" | "github-enterprise";
 
 type VerificationCommand = {
   id: string;
@@ -121,23 +123,23 @@ const workflows: Record<WorkflowName, WorkflowSpec> = {
   },
   ticket: {
     description: "Plan and implement or investigate a Jira ticket",
-    inputLabel: "Jira issue ID or URL",
+    inputLabel: "Jira issue ID or URL plus rough description for code work",
     marker: "jira-ticket",
     template: "jira-ticket.md",
   },
   "mr-review": {
-    description: "Review a GitLab merge request, approve comments, then post",
-    inputLabel: "GitLab merge request URL",
+    description: "Review a GitLab merge request or trusted GitHub pull request",
+    inputLabel: "GitLab merge request or trusted GitHub pull request URL",
     marker: "gitlab-mr-review",
     template: "gitlab-mr-review.md",
-    validate: isGitLabMergeRequestUrl,
+    validate: isSupportedReviewUrl,
   },
   "mr-comments": {
-    description: "Triage unresolved GitLab review comments, then fix or reply",
-    inputLabel: "GitLab merge request URL",
+    description: "Triage unresolved GitLab or trusted GitHub review comments",
+    inputLabel: "GitLab merge request or trusted GitHub pull request URL",
     marker: "gitlab-mr-comments",
     template: "gitlab-mr-comments.md",
-    validate: isGitLabMergeRequestUrl,
+    validate: isSupportedReviewUrl,
   },
 };
 
@@ -149,16 +151,46 @@ function isWorkflowName(value: unknown): value is WorkflowName {
   return typeof value === "string" && Object.hasOwn(workflows, value);
 }
 
-function isGitLabMergeRequestUrl(input: string): boolean {
+function originHostname(cwd: string): string | undefined {
+  const origin = optionalGitOutput(cwd, ["remote", "get-url", "origin"], "")
+    .toString("utf8")
+    .trim();
+  if (!origin) return undefined;
+
+  try {
+    return new URL(origin).hostname.toLowerCase();
+  } catch {
+    const match = origin.match(/^[^@\s]+@([^:/\s]+)(?::\d+)?[:/]/);
+    return match?.[1]?.toLowerCase();
+  }
+}
+
+function reviewPlatform(input: string, cwd: string): ReviewPlatform | undefined {
   try {
     const url = new URL(input);
-    return (
+    if (
       (url.protocol === "https:" || url.protocol === "http:") &&
       /\/-\/merge_requests\/\d+(?:\/|$)/.test(url.pathname)
-    );
+    ) {
+      return "gitlab";
+    }
+    if (url.protocol !== "https:" || !/^\/[^/]+\/[^/]+\/pull\/\d+\/?$/.test(url.pathname)) {
+      return undefined;
+    }
+    if (url.hostname.toLowerCase() === "github.com") return "github";
+    return url.hostname.toLowerCase() === originHostname(cwd) ? "github-enterprise" : undefined;
   } catch {
-    return false;
+    return undefined;
   }
+}
+
+function isSupportedReviewUrl(input: string, cwd: string): boolean {
+  return reviewPlatform(input, cwd) !== undefined;
+}
+
+function reviewPlatformLabel(platform: ReviewPlatform): string {
+  if (platform === "github-enterprise") return "GitHub Enterprise";
+  return platform === "github" ? "GitHub" : "GitLab";
 }
 
 function loadWorkflowMessage(workflow: ActiveWorkflow, cwd?: string): string {
@@ -176,7 +208,11 @@ function loadWorkflowMessage(workflow: ActiveWorkflow, cwd?: string): string {
     const templateUrl = new URL(`../workflows/${spec.template}`, import.meta.url);
     template = readFileSync(templateUrl, "utf8");
   }
-  return `${template.trim()}\n\nWorkflow input:\n${workflow.input}`;
+  const platform = cwd && (workflow.name === "mr-review" || workflow.name === "mr-comments")
+    ? reviewPlatform(workflow.input, cwd)
+    : undefined;
+  const platformContext = platform ? `\n\nRemote platform: ${reviewPlatformLabel(platform)}` : "";
+  return `${template.trim()}${platformContext}\n\nWorkflow input:\n${workflow.input}`;
 }
 
 function loadWorkflowIterationMessage(workflow: ActiveWorkflow, followUp: string, cwd?: string): string {
@@ -567,9 +603,48 @@ function sourceRepositoryName(cwd: string): string {
   return normalized;
 }
 
+const MAX_LOCAL_WORK_SUMMARY_LENGTH = 20;
+
+function isLocalWorktreeSummary(value: string): boolean {
+  return (
+    value.length > 0 &&
+    value.length <= MAX_LOCAL_WORK_SUMMARY_LENGTH &&
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+  );
+}
+
+function localWorktreeCwd(
+  worktreeBaseDir: string,
+  sourceCwd: string,
+  candidateCwd: string,
+): string {
+  const candidate = resolve(candidateCwd);
+  const candidateName = relative(worktreeBaseDir, candidate);
+  const sourceName = sourceRepositoryName(sourceCwd);
+  const prefix = `${sourceName}-`;
+  if (
+    !candidateName ||
+    candidateName === ".." ||
+    candidateName.startsWith(`..${sep}`) ||
+    isAbsolute(candidateName) ||
+    candidateName.includes(sep) ||
+    !candidateName.startsWith(prefix) ||
+    !isLocalWorktreeSummary(candidateName.slice(prefix.length))
+  ) {
+    throw new Error(
+      `local-work canonical directory must be ${sourceName}-<lowercase-hyphen-summary> with a summary of at most ${MAX_LOCAL_WORK_SUMMARY_LENGTH} characters`,
+    );
+  }
+  return candidate;
+}
+
 function isCanonicalWorktreeName(workflow: ActiveWorkflow, name: string): boolean {
+  if (workflow.name === "work") {
+    return name.startsWith("pi-session-") || /^[A-Za-z0-9._-]+-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(name);
+  }
   if (workflow.name !== "ticket") return name.startsWith("pi-session-");
-  return /^[A-Za-z0-9._-]+-[A-Za-z][A-Za-z0-9]+-\d+_[a-z0-9-]+$/.test(name);
+  // A persisted pre-convention ticket worktree may be recovered only during a later iteration.
+  return name.startsWith("pi-session-") || /^[A-Za-z0-9._-]+-[A-Za-z][A-Za-z0-9]+-\d+_[a-z0-9-]+$/.test(name);
 }
 
 function expectedCanonicalCwd(
@@ -578,14 +653,6 @@ function expectedCanonicalCwd(
   recoveryCwd?: string,
   sourceCwd?: string,
 ): string {
-  const sessionKey = runtime ? runtime.sessionKey : process.env.PI_SUBAGENT_PARENT_SESSION;
-  if (sessionKey === undefined) {
-    throw new Error("stable PI_SUBAGENT_PARENT_SESSION key is unavailable");
-  }
-  if (!/^[A-Za-z0-9._-]+$/.test(sessionKey)) {
-    throw new Error("stable Pi subagent session key is invalid");
-  }
-
   let configuredBaseDir = runtime?.worktreeBaseDir;
   if (configuredBaseDir === undefined) {
     const config = JSON.parse(
@@ -601,8 +668,9 @@ function expectedCanonicalCwd(
     throw new Error("subagent worktreeBaseDir must be absolute");
   }
 
-  const persistedOrRecoveredCwd =
-    workflow.canonicalCwd ?? (workflow.iteration > 1 ? recoveryCwd : undefined);
+  const persistedOrRecoveredCwd = workflow.canonicalCwd ?? (
+    workflow.name === "work" || workflow.iteration > 1 ? recoveryCwd : undefined
+  );
   if (persistedOrRecoveredCwd) {
     const persistedCwd = resolve(persistedOrRecoveredCwd);
     const persistedRelativePath = relative(worktreeBaseDir, persistedCwd);
@@ -616,6 +684,20 @@ function expectedCanonicalCwd(
     ) {
       throw new Error("persisted canonical worktree is outside configured worktreeBaseDir");
     }
+    if (workflow.name === "work") {
+      if (!sourceCwd) throw new Error("source repository checkout is unavailable");
+      // Preserve a workflow that began in a pre-convention pi-session worktree.
+      if (
+        persistedRelativePath.startsWith("pi-session-") &&
+        canonicalPath(repositoryRoot(sourceCwd)) === canonicalPath(persistedCwd)
+      ) {
+        captureRepositorySnapshot(persistedCwd);
+        return persistedCwd;
+      }
+      const canonicalCwd = localWorktreeCwd(worktreeBaseDir, sourceCwd, persistedCwd);
+      if (workflow.canonicalCwd || workflow.iteration > 1) captureRepositorySnapshot(canonicalCwd);
+      return canonicalCwd;
+    }
     captureRepositorySnapshot(persistedCwd);
     return persistedCwd;
   }
@@ -623,6 +705,13 @@ function expectedCanonicalCwd(
   if (workflow.name === "ticket") {
     if (!sourceCwd) throw new Error("source repository checkout is unavailable");
     return resolve(worktreeBaseDir, `${sourceRepositoryName(sourceCwd)}-${jiraWorktreeIdentity(workflow.input)}`);
+  }
+  const sessionKey = runtime ? runtime.sessionKey : process.env.PI_SUBAGENT_PARENT_SESSION;
+  if (sessionKey === undefined) {
+    throw new Error("stable PI_SUBAGENT_PARENT_SESSION key is unavailable");
+  }
+  if (!/^[A-Za-z0-9._-]+$/.test(sessionKey)) {
+    throw new Error("stable Pi subagent session key is invalid");
   }
   return resolve(worktreeBaseDir, `pi-session-${sessionKey}`);
 }
@@ -1622,6 +1711,13 @@ export default function registerWorkflowCommands(
 
   pi.on("tool_call", async (event, context) => {
     const input = isRecord(event.input) ? event.input : {};
+    if (activeWorkflow && event.toolName === "subagent_wait") {
+      return {
+        block: true,
+        reason:
+          "Workflow execution must not block on subagent_wait. Return control so a supervisor decision can be shown to the user; inspect the run with subagent status, then reply through subagent_supervisor before resuming or retrying the worker.",
+      };
+    }
     const reviewerRequested = event.toolName === "subagent" && containsAgent(input, "reviewer");
     const workerRequested = event.toolName === "subagent" && containsAgent(input, "worker");
     const scoutRequested = event.toolName === "subagent" && containsAgent(input, "scout");
@@ -1819,7 +1915,7 @@ export default function registerWorkflowCommands(
       description: spec.description,
       handler: async (rawInput, context) => {
         const input = rawInput.trim();
-        if (!input || (spec.validate && !spec.validate(input))) {
+        if (!input || (spec.validate && !spec.validate(input, context.cwd))) {
           context.ui.notify(`Usage: /${name} <${spec.inputLabel}>`, "warning");
           return;
         }
