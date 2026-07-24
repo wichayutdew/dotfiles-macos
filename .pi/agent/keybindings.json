@@ -1,6 +1,6 @@
 {
   "tui.input.newLine": ["enter"],
   "tui.input.submit": ["shift+enter"],
-  "app.interrupt": [],
+  "app.interrupt": ["ctrl+c"],
   "app.editor.external": ["ctrl+x"]
 }
