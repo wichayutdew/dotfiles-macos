@@ -1,0 +1,232 @@
+# yaml-language-server: $schema=/Users/wphongphanpa/repositories/personal/pi-workflows/schemas/workflow.schema.json
+version: 1
+id: mr-comment
+command: mr-comment
+description: Triage unresolved GitLab MR comments, implement fixes, verify, and optionally publish
+start: plan
+maxStepVisits: 10
+summaryMaxChars: 30000
+steps:
+  plan:
+    title: Triage unresolved review comments
+    prompt:
+      file: steps/mr-comment/plan.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      model: openai-gateway/gpt-5.6-sol
+      timeoutMs: 1800000
+      turnBudget:
+        maxTurns: 45
+        graceTurns: 3
+      toolBudget:
+        soft: 120
+        hard: 200
+        block: "*"
+    permissions:
+      tools: [ read, ls, bash, mcp ]
+      mcp:
+        - gitlab/get_merge_request
+        - gitlab/get_merge_request_commits
+        - gitlab/get_merge_request_diffs
+        - gitlab/get_merge_request_pipelines
+        - gitlab/get_pipeline_jobs
+        - gitlab/get_merge_request_conflicts
+        - gitlab/search
+        - context7/resolve-library-id
+        - context7/query-docs
+        - sourcegraph/code_finder
+        - sourcegraph/commit_search
+        - sourcegraph/diff_search
+        - sourcegraph/keyword_search
+        - sourcegraph/list_files
+        - sourcegraph/list_repos
+        - sourcegraph/nls_search
+        - sourcegraph/read_file
+        - gh_grep/searchGitHub
+      extensions: [ plannotator, pi-web-tools ]
+      skills: [ caveman, receiving-code-review, coding-standards, brainstorming, writing-plans ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: rg
+          - executable: ls
+          - executable: pwd
+          - executable: git
+            argsPrefixes: [ [ status ], [ diff ], [ log ], [ show ], [ rev-parse ], [ ls-files ], [ branch, --show-current ], [ worktree, list ], [ remote, -v ], [ blame ], [ show-ref ], [ cat-file ] ]
+          - executable: glab
+            argsPrefixes: [ [ mr, view ], [ mr, diff ], [ api ] ]
+    requires:
+      tools: [ read, ls, bash, mcp ]
+      extensions: [ plannotator, pi-web-tools ]
+      skills: [ caveman, receiving-code-review, coding-standards, brainstorming, writing-plans ]
+    gate:
+      provider: plannotator
+      submitOutcome: submit
+      approvedOutcome: approved
+      rejectedOutcome: changes-requested
+      timeoutMs: 10000
+    transitions:
+      approved: implement
+      changes-requested: plan
+      blocked: $pause
+  implement:
+    title: Implement approved review-comment fixes
+    prompt:
+      file: steps/mr-comment/implement.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      timeoutMs: 7200000
+      artifacts: true
+    permissions:
+      tools: [ read, ls, bash, edit, write, mcp ]
+      mcp:
+        - gitlab/get_merge_request
+        - gitlab/get_merge_request_commits
+        - gitlab/get_merge_request_diffs
+        - gitlab/get_merge_request_pipelines
+        - gitlab/get_pipeline_jobs
+        - gitlab/get_merge_request_conflicts
+        - gitlab/search
+        - context7/resolve-library-id
+        - context7/query-docs
+        - sourcegraph/code_finder
+        - sourcegraph/commit_search
+        - sourcegraph/diff_search
+        - sourcegraph/keyword_search
+        - sourcegraph/list_files
+        - sourcegraph/list_repos
+        - sourcegraph/nls_search
+        - sourcegraph/read_file
+        - gh_grep/searchGitHub
+      skills: [ caveman, receiving-code-review, coding-standards, executing-plans, systematic-debugging, test-driven-development, verification-before-completion ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: rg
+          - executable: ls
+          - executable: pwd
+          - executable: git
+            argsPrefixes: [ [ status ], [ diff ], [ log ], [ show ], [ rev-parse ], [ ls-files ], [ branch, --show-current ], [ worktree, list ], [ remote, -v ], [ blame ], [ show-ref ], [ cat-file ] ]
+          - executable: glab
+            argsPrefix: [ api ]
+        approvedSources: [ verification-worker ]
+    requires:
+      tools: [ read, ls, bash, edit, write, mcp ]
+      skills: [ receiving-code-review, coding-standards, executing-plans, systematic-debugging, test-driven-development, verification-before-completion ]
+    transitions:
+      ready: verify
+      blocked: $pause
+  verify:
+    title: Independently verify review-comment handling
+    prompt:
+      file: steps/mr-comment/verify.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      model: openai-gateway/gpt-5.6-sol
+      timeoutMs: 3600000
+      turnBudget:
+        maxTurns: 45
+        graceTurns: 3
+      toolBudget:
+        soft: 140
+        hard: 240
+        block: "*"
+    permissions:
+      tools: [ read, ls, bash, mcp ]
+      mcp:
+        - gitlab/get_merge_request
+        - gitlab/get_merge_request_commits
+        - gitlab/get_merge_request_diffs
+        - gitlab/get_merge_request_pipelines
+        - gitlab/get_pipeline_jobs
+        - gitlab/get_merge_request_conflicts
+        - gitlab/search
+        - context7/resolve-library-id
+        - context7/query-docs
+        - sourcegraph/code_finder
+        - sourcegraph/commit_search
+        - sourcegraph/diff_search
+        - sourcegraph/keyword_search
+        - sourcegraph/list_files
+        - sourcegraph/list_repos
+        - sourcegraph/nls_search
+        - sourcegraph/read_file
+        - gh_grep/searchGitHub
+      skills: [ caveman, receiving-code-review, coding-standards, caveman-review, systematic-debugging, verification-before-completion, requesting-code-review ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: rg
+          - executable: ls
+          - executable: pwd
+          - executable: git
+            argsPrefixes: [ [ status ], [ diff ], [ log ], [ show ], [ rev-parse ], [ ls-files ], [ branch, --show-current ], [ worktree, list ], [ remote, -v ], [ blame ], [ show-ref ], [ cat-file ] ]
+          - executable: glab
+            argsPrefix: [ api ]
+        approvedSources: [ verification-reviewer ]
+    requires:
+      tools: [ read, ls, bash, mcp ]
+      skills: [ receiving-code-review, coding-standards, caveman-review, systematic-debugging, verification-before-completion, requesting-code-review ]
+    transitions:
+      ready: confirm
+      no-actions: $done
+      failed: implement
+      blocked: $pause
+  confirm:
+    title: Confirm exact push and reply actions
+    prompt:
+      file: steps/mr-comment/confirm.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      timeoutMs: 300000
+      turnBudget:
+        maxTurns: 6
+        graceTurns: 1
+      toolBudget:
+        soft: 4
+        hard: 8
+        block: "*"
+    permissions:
+      extensions: [ plannotator ]
+    requires:
+      extensions: [ plannotator ]
+    gate:
+      provider: plannotator
+      submitOutcome: submit
+      approvedOutcome: publish-approved
+      rejectedOutcome: skip-publishing
+      timeoutMs: 10000
+    transitions:
+      publish-approved: publish
+      skip-publishing: $done
+      no-actions: $done
+      blocked: $pause
+  publish:
+    title: Run explicitly approved push and reply actions
+    prompt:
+      file: steps/shared/publish-remote.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      timeoutMs: 1800000
+    permissions:
+      tools: [ bash ]
+      skills: [ receiving-code-review ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: git
+            argsPrefixes: [ [ status ], [ rev-parse ] ]
+          - executable: glab
+            argsPrefixes: [ [ mr, view ], [ api ] ]
+        approvedSources: [ remote-actions ]
+    requires:
+      tools: [ bash ]
+      skills: [ receiving-code-review ]
+    transitions:
+      published: $done
+      blocked: $pause

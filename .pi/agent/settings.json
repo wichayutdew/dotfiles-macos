@@ -11,11 +11,16 @@
       "skills": []
     },
     "npm:pi-subagents",
+    "/Users/wphongphanpa/repositories/personal/pi-workflows",
     {
       "source": "git:github.com/obra/superpowers",
       "extensions": [],
       "skills": [
         "brainstorming",
+        "executing-plans",
+        "requesting-code-review",
+        "using-git-worktrees",
+        "writing-plans",
         "systematic-debugging",
         "test-driven-development",
         "verification-before-completion",
@@ -27,6 +32,9 @@
     "npm:context-mode",
     "npm:@llttlltt/poimandres-pi",
     "npm:pi-zentui"
+  ],
+  "extensions": [
+    "-extensions/workflow-commands.ts"
   ],
   "theme": "poimandres white/poimandres storm",
   "terminal": {

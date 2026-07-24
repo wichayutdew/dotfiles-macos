@@ -1,0 +1,3 @@
+# yaml-language-server: $schema=/Users/wphongphanpa/repositories/personal/pi-workflows/schemas/settings.schema.json
+version: 1
+allowProjectWorkflows: false

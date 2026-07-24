@@ -1,0 +1,188 @@
+# yaml-language-server: $schema=/Users/wphongphanpa/repositories/personal/pi-workflows/schemas/workflow.schema.json
+version: 1
+id: mr-review
+command: mr-review
+description: Plan and perform a hosted merge-request or pull-request review
+start: plan
+maxStepVisits: 10
+summaryMaxChars: 30000
+steps:
+  plan:
+    title: Gather hosted-review evidence and plan
+    prompt:
+      file: steps/mr-review/plan.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      model: openai-gateway/gpt-5.6-sol
+      timeoutMs: 1800000
+      turnBudget:
+        maxTurns: 40
+        graceTurns: 3
+      toolBudget:
+        soft: 100
+        hard: 180
+        block: "*"
+    permissions:
+      tools: [ read, ls, bash, mcp ]
+      mcp:
+        - gitlab/get_merge_request
+        - gitlab/get_merge_request_commits
+        - gitlab/get_merge_request_diffs
+        - gitlab/get_merge_request_pipelines
+        - gitlab/get_pipeline_jobs
+        - gitlab/get_merge_request_conflicts
+        - gitlab/search
+        - context7/resolve-library-id
+        - context7/query-docs
+        - sourcegraph/code_finder
+        - sourcegraph/commit_search
+        - sourcegraph/diff_search
+        - sourcegraph/keyword_search
+        - sourcegraph/list_files
+        - sourcegraph/list_repos
+        - sourcegraph/nls_search
+        - sourcegraph/read_file
+        - gh_grep/searchGitHub
+      extensions: [ plannotator, pi-web-tools ]
+      skills: [ caveman, coding-standards, caveman-review, brainstorming, writing-plans ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: rg
+          - executable: ls
+          - executable: pwd
+          - executable: git
+            argsPrefixes: [ [ status ], [ diff ], [ log ], [ show ], [ rev-parse ], [ ls-files ], [ branch, --show-current ], [ worktree, list ], [ remote, -v ], [ blame ], [ show-ref ], [ cat-file ] ]
+          - executable: gh
+            argsPrefixes: [ [ pr, view ], [ pr, diff ], [ pr, checks ], [ api ] ]
+          - executable: glab
+            argsPrefixes: [ [ mr, view ], [ mr, diff ], [ api ] ]
+    requires:
+      tools: [ read, ls, bash, mcp ]
+      extensions: [ plannotator, pi-web-tools ]
+      skills: [ caveman, coding-standards, caveman-review, brainstorming, writing-plans ]
+    gate:
+      provider: plannotator
+      submitOutcome: submit
+      approvedOutcome: approved
+      rejectedOutcome: changes-requested
+      timeoutMs: 10000
+    transitions:
+      approved: review
+      changes-requested: plan
+      blocked: $pause
+  review:
+    title: Perform independent hosted review
+    prompt:
+      file: steps/mr-review/review.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      model: openai-gateway/gpt-5.6-sol
+      timeoutMs: 1800000
+      turnBudget:
+        maxTurns: 40
+        graceTurns: 3
+      toolBudget:
+        soft: 100
+        hard: 180
+        block: "*"
+    permissions:
+      tools: [ read, ls, bash, mcp ]
+      mcp:
+        - gitlab/get_merge_request
+        - gitlab/get_merge_request_commits
+        - gitlab/get_merge_request_diffs
+        - gitlab/get_merge_request_pipelines
+        - gitlab/get_pipeline_jobs
+        - gitlab/get_merge_request_conflicts
+        - gitlab/search
+        - context7/resolve-library-id
+        - context7/query-docs
+        - sourcegraph/code_finder
+        - sourcegraph/commit_search
+        - sourcegraph/diff_search
+        - sourcegraph/keyword_search
+        - sourcegraph/list_files
+        - sourcegraph/list_repos
+        - sourcegraph/nls_search
+        - sourcegraph/read_file
+        - gh_grep/searchGitHub
+      extensions: [ pi-web-tools ]
+      skills: [ caveman, coding-standards, caveman-review, systematic-debugging, verification-before-completion, requesting-code-review ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: rg
+          - executable: ls
+          - executable: pwd
+          - executable: git
+            argsPrefixes: [ [ status ], [ diff ], [ log ], [ show ], [ rev-parse ], [ ls-files ], [ branch, --show-current ], [ worktree, list ], [ remote, -v ], [ blame ], [ show-ref ], [ cat-file ] ]
+          - executable: gh
+            argsPrefixes: [ [ pr, view ], [ pr, diff ], [ pr, checks ], [ api ] ]
+          - executable: glab
+            argsPrefixes: [ [ mr, view ], [ mr, diff ], [ api ] ]
+    requires:
+      tools: [ read, ls, bash, mcp ]
+      extensions: [ pi-web-tools ]
+      skills: [ caveman, coding-standards, caveman-review, systematic-debugging, verification-before-completion, requesting-code-review ]
+    transitions:
+      clean: $done
+      comments: confirm
+      blocked: $pause
+  confirm:
+    title: Confirm exact review comments
+    prompt:
+      file: steps/mr-review/confirm.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      timeoutMs: 300000
+      turnBudget:
+        maxTurns: 6
+        graceTurns: 1
+      toolBudget:
+        soft: 4
+        hard: 8
+        block: "*"
+    permissions:
+      extensions: [ plannotator ]
+    requires:
+      extensions: [ plannotator ]
+    gate:
+      provider: plannotator
+      submitOutcome: submit
+      approvedOutcome: publish-approved
+      rejectedOutcome: skip-publishing
+      timeoutMs: 10000
+    transitions:
+      publish-approved: publish
+      skip-publishing: $done
+      no-actions: $done
+      blocked: $pause
+  publish:
+    title: Post explicitly approved review comments
+    prompt:
+      file: steps/shared/publish-remote.md
+    subagent:
+      agent: pi-workflows.step
+      context: fresh
+      timeoutMs: 900000
+    permissions:
+      tools: [ bash ]
+      skills: [ caveman-review ]
+      bash:
+        mode: allow-list
+        allow:
+          - executable: gh
+            argsPrefixes: [ [ pr, view ], [ api ] ]
+          - executable: glab
+            argsPrefixes: [ [ mr, view ], [ api ] ]
+        approvedSources: [ remote-actions ]
+    requires:
+      tools: [ bash ]
+      skills: [ caveman-review ]
+    transitions:
+      published: $done
+      blocked: $pause
