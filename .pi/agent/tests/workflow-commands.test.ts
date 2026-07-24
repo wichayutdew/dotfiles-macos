@@ -80,24 +80,203 @@ const reviewerVerification = [
 function codePlan(cwd = process.cwd(), marker = "local-work"): string {
   return `Workflow: ${marker}
 
+## Goal
+Implement the requested behavior.
+
+## In scope
+- Requested behavior.
+
+## Out of scope
+- Unrelated changes.
+
+## Evidence
+- Repository evidence was inspected.
+
+## Things to implement
+- Requested implementation.
+
 ## Implementation plan
 - [ ] Implement
+
+## Requirement-to-test mapping
+- Requested behavior: focused and full verification.
+
+## Done when
+- [ ] Requested behavior is implemented and verified.
 
 ## Verification contract
 \`\`\`json
 ${JSON.stringify({ cwd, worker: workerVerification, reviewer: reviewerVerification }, null, 2)}
 \`\`\`
+
+## Skill recommendation
+- coding-standards
+
+## Open questions
+- None.
+
+## Risks
+- Regression risk is covered by verification.
 `;
 }
 
-function readOnlyPlan(marker: string): string {
+function readOnlyPlan(
+  marker: string,
+  actions: Array<{ id: string; toolName: string; input: Record<string, unknown> }> = [{
+    id: "approved-comment",
+    toolName: "gitlab_create_merge_request_note",
+    input: {
+      project_id: "group/project",
+      merge_request_iid: 42,
+      body: "Approved comment",
+    },
+  }],
+): string {
+  const remoteActionContract = marker === "gitlab-mr-review" ||
+      marker === "gitlab-mr-comments"
+    ? `
+## Remote action contract
+\`\`\`json
+${JSON.stringify({
+      actions,
+    }, null, 2)}
+\`\`\`
+`
+    : "";
   return `Workflow: ${marker}
+
+## Goal
+Revalidate and report findings.
+
+## In scope
+- Read-only investigation.
+
+## Out of scope
+- Repository mutation.
+
+## Evidence
+- Repository evidence was inspected.
+
+## Things to implement
+- Produce the approved report.
 
 ## Implementation plan
 - [ ] Revalidate and report
 
+## Requirement-to-test mapping
+- Findings: revalidate repository state.
+
+## Done when
+- [ ] Findings are revalidated and reported.
+
 ## Verification contract
 Not applicable - read-only plan.
+${remoteActionContract}
+
+## Skill recommendation
+- coding-standards
+
+## Open questions
+- None.
+
+## Risks
+- Evidence may become stale.
+`;
+}
+
+function multiRepositoryCodePlan(
+  repositories: Array<{
+    cwd: string;
+    sourceCwd?: string;
+    baseHead?: string;
+    branch: string;
+    commitTitle: string;
+  }>,
+  marker = "local-work",
+  actions: Array<{ id: string; toolName: string; input: Record<string, unknown> }> = [{
+    id: "approved-comment",
+    toolName: "gitlab_create_merge_request_note",
+    input: {
+      project_id: "group/project",
+      merge_request_iid: 42,
+      body: "Approved comment",
+    },
+  }],
+): string {
+  const remoteActionContract = marker === "gitlab-mr-review" ||
+      marker === "gitlab-mr-comments"
+    ? `
+## Remote action contract
+\`\`\`json
+${JSON.stringify({
+      actions,
+    }, null, 2)}
+\`\`\`
+`
+    : "";
+  return `Workflow: ${marker}
+
+## Goal
+Implement cross-repository behavior.
+
+## In scope
+- Approved repository slices.
+
+## Out of scope
+- Unrelated repositories.
+
+## Evidence
+- Every repository was explored.
+
+## Things to implement
+- Cross-repository behavior.
+
+## Implementation plan
+- [ ] Implement each repository slice in parallel.
+
+## Requirement-to-test mapping
+- Cross-repository behavior: focused and complete verification.
+
+## Done when
+- [ ] Cross-repository behavior is implemented.
+- [ ] Every repository passes focused and complete verification.
+
+## Verification contract
+\`\`\`json
+${JSON.stringify({
+    repositories: repositories.map((repository) => ({
+      ...repository,
+      sourceCwd: repository.sourceCwd ?? repository.cwd,
+      baseHead: repository.baseHead ?? (() => {
+        try {
+          return execFileSync("git", ["rev-parse", "--verify", "HEAD"], {
+            cwd: repository.sourceCwd ?? repository.cwd,
+            encoding: "utf8",
+            stdio: ["ignore", "pipe", "ignore"],
+          }).trim();
+        } catch {
+          return "UNBORN";
+        }
+      })(),
+      acceptanceCriteria: [
+        "Cross-repository behavior is implemented.",
+        "Every repository passes focused and complete verification.",
+      ],
+      worker: workerVerification,
+      reviewer: reviewerVerification,
+    })),
+  }, null, 2)}
+\`\`\`
+${remoteActionContract}
+
+## Skill recommendation
+- coding-standards
+
+## Open questions
+- None.
+
+## Risks
+- Repository contracts may drift.
 `;
 }
 
@@ -119,7 +298,31 @@ function verifiedResult(
   role: "worker" | "reviewer",
   verify: typeof workerVerification | typeof reviewerVerification,
   reviewFindings: string[] = [],
+  criteriaCount = 1,
 ) {
+  const criteria = criteriaCount === 2
+    ? [
+      "Cross-repository behavior is implemented.",
+      "Every repository passes focused and complete verification.",
+    ]
+    : ["Requested behavior is implemented and verified."];
+  const childReport = {
+    criteriaSatisfied: criteria.map((criterion, index) => ({
+      id: `criterion-${index + 1}`,
+      criterion,
+      status: "satisfied",
+      evidence: `Verified criterion ${index + 1}.`,
+    })),
+    ...(role === "worker"
+      ? {
+        testsAddedOrUpdated: ["focused.test.ts"],
+        commandsRun: [
+          { command: "node --test focused.test.ts", result: "failed", summary: "RED failed as expected." },
+          { command: "node --test focused.test.ts", result: "passed", summary: "GREEN passed." },
+        ],
+      }
+      : { reviewFindings }),
+  };
   return {
     mode: "single",
     results: [
@@ -135,10 +338,23 @@ function verifiedResult(
             exitCode: 0,
             durationMs: 1,
           })),
-          childReport: role === "reviewer" ? { reviewFindings } : {},
+          childReport,
         },
       },
     ],
+  };
+}
+
+function parallelVerifiedResult(
+  role: "worker" | "reviewer",
+  count: number,
+  verify: typeof workerVerification | typeof reviewerVerification,
+  criteriaCount = 2,
+) {
+  return {
+    mode: "parallel",
+    results: Array.from({ length: count }, () =>
+      verifiedResult(role, verify, [], criteriaCount).results[0]),
   };
 }
 
@@ -162,7 +378,11 @@ function createHarness(
   initialFailingMode?: PlannotatorMode,
   initialEntries: SessionEntry[] = [],
   cwd = process.cwd(),
-  runtime?: { sessionKey?: string; worktreeBaseDir?: string },
+  runtime?: {
+    sessionKey?: string;
+    worktreeBaseDir?: string;
+    allowLegacyVerificationContracts?: boolean;
+  },
 ) {
   try {
     execFileSync("git", ["rev-parse", "--show-toplevel"], {
@@ -235,7 +455,11 @@ function createHarness(
   const derivedRuntime = cwdName.startsWith("pi-session-")
     ? { sessionKey: cwdName.slice("pi-session-".length), worktreeBaseDir: dirname(cwd) }
     : undefined;
-  registerWorkflowCommands(pi as never, runtime ?? derivedRuntime);
+  registerWorkflowCommands(pi as never, {
+    ...(derivedRuntime ?? {}),
+    ...(runtime ?? {}),
+    allowLegacyVerificationContracts: runtime?.allowLegacyVerificationContracts ?? true,
+  });
 
   const context: TestContext = {
     cwd,
@@ -324,6 +548,40 @@ async function runPlanningScout(harness: ReturnType<typeof createHarness>) {
   };
   assert.equal(await harness.routeToolCall("subagent", input), undefined);
   await harness.routeToolResult("subagent", input, scoutResult());
+}
+
+async function passReadOnlyExecutionGate(harness: ReturnType<typeof createHarness>) {
+  const criteria = ["Findings are revalidated and reported."];
+  const input = {
+    agent: "scout",
+    task: "Execute the approved read-only plan and return structured criterion evidence",
+    context: "fresh",
+    cwd: harness.context.cwd,
+    acceptance: {
+      level: "attested",
+      criteria,
+    },
+  };
+  assert.equal(await harness.routeToolCall("subagent", input), undefined);
+  await harness.routeToolResult("subagent", input, {
+    mode: "single",
+    results: [{
+      agent: "scout",
+      exitCode: 0,
+      acceptance: {
+        status: "attested",
+        childReport: {
+          criteriaSatisfied: criteria.map((criterion, index) => ({
+            id: `criterion-${index + 1}`,
+            criterion,
+            status: "satisfied",
+            evidence: `Revalidated: ${criterion}`,
+          })),
+          manualNotes: "Revalidated evidence and reported the approved findings.",
+        },
+      },
+    }],
+  });
 }
 
 async function approvePlan(
@@ -433,7 +691,7 @@ test("exits Plannotator planning before dispatching approved code execution", as
     assert.equal(harness.sentMessages.length, 2);
     assert.match(
       harness.sentMessages.at(-1)!,
-      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+      /launch one compliant verified worker/i,
     );
   } finally {
     rmSync(cwd, { recursive: true, force: true });
@@ -501,7 +759,22 @@ test("ticket enters Plannotator before starting workflow", async () => {
   assert.equal(sentMessages.length, 1);
   assert.match(sentMessages[0]!, /Workflow: jira-ticket/);
   assert.match(sentMessages[0]!, /ABC-123/);
-  assert.match(sentMessages[0]!, /\/workflow-done/);
+  assert.match(sentMessages[0]!, /extra information.*optional/i);
+});
+
+test("ticket requires a Jira issue ID while allowing optional context", async () => {
+  const invalid = createHarness();
+  await invalid.commands.get("ticket")!.handler("Fix the cache", invalid.context);
+  assert.equal(invalid.sentMessages.length, 0);
+  assert.match(invalid.notices.at(-1)!.message, /Usage: \/ticket/i);
+
+  const valid = createHarness();
+  await valid.commands.get("ticket")!.handler(
+    "https://jira.example.test/browse/ABC-123 cache context",
+    valid.context,
+  );
+  assert.equal(valid.sentMessages.length, 1);
+  assert.match(valid.sentMessages[0]!, /ABC-123 cache context/);
 });
 
 test("GitLab commands start their distinct workflows", async () => {
@@ -536,7 +809,24 @@ test("GitHub public pull request URLs start both review workflows", async () => 
   }
 });
 
-test("GitHub Enterprise pull request URLs require the current origin host", async () => {
+test("review workflows accept user context and generic HTTPS code-review URLs", async () => {
+  const cases = [
+    "https://github.com/octo-org/example/pull/42 focus on retry safety",
+    "https://codeberg.example.test/team/project/pulls/42 compare the API contract",
+  ];
+
+  for (const input of cases) {
+    const harness = createHarness();
+
+    await harness.commands.get("mr-review")!.handler(input, harness.context);
+
+    assert.equal(harness.sentMessages.length, 1);
+    assert.match(harness.sentMessages[0]!, /focus on retry safety|compare the API contract/);
+    assert.match(harness.sentMessages[0]!, /Remote platform:/);
+  }
+});
+
+test("GitHub Enterprise pull request URLs do not require a matching local origin", async () => {
   const cwd = mkdtempSync(join(tmpdir(), "pi-ghe-"));
   try {
     execFileSync("git", ["init", "--quiet"], { cwd });
@@ -556,8 +846,8 @@ test("GitHub Enterprise pull request URLs require the current origin host", asyn
       untrusted.context,
     );
 
-    assert.equal(untrusted.sentMessages.length, 0);
-    assert.match(untrusted.notices[0]!.message, /trusted GitHub pull request URL/i);
+    assert.equal(untrusted.sentMessages.length, 1);
+    assert.match(untrusted.sentMessages[0]!, /Remote platform: GitHub Enterprise/);
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
@@ -641,7 +931,6 @@ test("blocks planning mutations except the plan file", async () => {
       }),
       undefined,
     );
-
     writeFileSync(join(cwd, "outside.md"), "outside\n");
     mkdirSync(join(cwd, ".plannotator"), { recursive: true });
     symlinkSync(join(cwd, "outside.md"), join(cwd, ".plannotator", "escape.md"));
@@ -652,9 +941,29 @@ test("blocks planning mutations except the plan file", async () => {
     assert.equal(symlinkWrite?.block, true);
     assert.match(symlinkWrite?.reason ?? "", /planning is read-only/i);
 
-    const bash = await harness.routeToolCall("bash", { command: "git status --short" });
-    assert.equal(bash?.block, true);
-    assert.match(bash?.reason ?? "", /use the fresh scout/i);
+    for (const command of [
+      "git status --short",
+      "rg -n 'workflow' agent",
+      "ast-grep --pattern '$A' --lang ts agent",
+    ]) {
+      assert.equal(await harness.routeToolCall("bash", { command }), undefined);
+    }
+
+    for (const command of [
+      "git commit -am mutation",
+      "git diff --output=leak.patch",
+      "git branch --edit-description",
+      "sort -o sorted.txt input.txt",
+      "uniq input.txt output.txt",
+      "yq -i '.enabled = true' config.yml",
+      "tree -o tree.txt",
+      "sed -i mutation src/file.ts",
+      "rm src/file.ts",
+    ]) {
+      const blocked = await harness.routeToolCall("bash", { command });
+      assert.equal(blocked?.block, true);
+      assert.match(blocked?.reason ?? "", /planning is read-only/i);
+    }
 
     for (const toolName of [
       "mcp__tracker__create_issue",
@@ -703,6 +1012,53 @@ test("blocks planning mutations except the plan file", async () => {
     );
   } finally {
     rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("permits review-platform retrieval during planning without permitting mutations", async () => {
+  const cases = [
+    {
+      commandName: "mr-review" as const,
+      url: "https://gitlab.example.test/group/project/-/merge_requests/42",
+      readTool: "gitlab_get_merge_request",
+      readCli: "glab mr view 42 --output json",
+      readCurl: "curl --request GET https://gitlab.example.test/api/v4/projects/group%2Fproject/merge_requests/42",
+    },
+    {
+      commandName: "mr-comments" as const,
+      url: "https://github.example.test/example/project/pull/42",
+      readTool: "github_get_pull_request",
+      readCli: "gh pr view 42 --hostname github.example.test --json number,title",
+      readCurl: "curl --head https://github.example.test/api/v3/repos/example/project/pulls/42",
+    },
+  ];
+
+  for (const { commandName, url, readTool, readCli, readCurl } of cases) {
+    const harness = createHarness();
+    await harness.commands.get(commandName)!.handler(url, harness.context);
+
+    assert.equal(await harness.routeToolCall(readTool, {}), undefined);
+    assert.equal(await harness.routeToolCall("mcp", { tool: readTool, args: "{}" }), undefined);
+    assert.equal(await harness.routeToolCall("bash", { command: readCli }), undefined);
+    assert.equal(await harness.routeToolCall("bash", { command: readCurl }), undefined);
+
+    const mutationTool = commandName === "mr-review" ? "gitlab_create_merge_request" : "github_create_pull_request";
+    assert.equal((await harness.routeToolCall(mutationTool, {}))?.block, true);
+    assert.equal((await harness.routeToolCall("mcp", { tool: mutationTool, args: "{}" }))?.block, true);
+
+    for (const command of [
+      "glab mr note 42 --message mutation",
+      "gh pr comment 42 --body mutation",
+      "curl --request POST https://api.github.com/repos/example/project/issues/42/comments",
+      "curl --data payload https://api.github.com/repos/example/project/issues/42/comments",
+      "curl https://attacker.example.test/api",
+      "curl https://api.github.com:8443/repos/example/project/pulls/42",
+      "gh pr view 42 --repo attacker/example",
+      "glab mr view 42 --output json && glab mr note 42 --message mutation",
+    ]) {
+      const blocked = await harness.routeToolCall("bash", { command });
+      assert.equal(blocked?.block, true);
+    }
   }
 });
 
@@ -890,6 +1246,364 @@ test("binds approval to the submitted plan snapshot and rejects approval feedbac
   }
 });
 
+test("approved read-only review asks for confirmation without reopening planning", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    const reviewTarget = {
+      project_id: "group/project",
+      merge_request_iid: 42,
+    };
+    writePlan(cwd, "review.md", readOnlyPlan("gitlab-mr-review"));
+    const harness = createHarness("idle", undefined, [], cwd);
+    await harness.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      harness.context,
+    );
+    await approvePlan(harness, ".plannotator/review.md");
+    await harness.settleAgent();
+    const pendingScoutState = (
+      harness.sessionEntries.at(-1)?.data as { active?: { awaitingRemoteConfirmation?: string } }
+    )?.active;
+    assert.equal(pendingScoutState?.awaitingRemoteConfirmation, undefined);
+    await passReadOnlyExecutionGate(harness);
+    const verifiedScoutState = (
+      harness.sessionEntries.at(-1)?.data as { active?: { awaitingRemoteConfirmation?: string } }
+    )?.active;
+    assert.equal(verifiedScoutState?.awaitingRemoteConfirmation, "review-comments");
+
+    assert.ok(harness.requestedModes.includes("exit"));
+    assert.match(
+      harness.sentMessages.at(-1)!,
+      /ask the user whether to execute every exact Remote action contract entry/i,
+    );
+    const blockedBeforeConfirmation = await harness.routeToolCall(
+      "gitlab_create_merge_request_note",
+      { ...reviewTarget, body: "Approved comment" },
+    );
+    assert.equal(blockedBeforeConfirmation?.block, true);
+    assert.match(blockedBeforeConfirmation?.reason ?? "", /explicit user confirmation/i);
+    const blockedEdit = await harness.routeToolCall("write", {
+      path: "review-output.txt",
+      content: "mutation",
+    });
+    assert.equal(blockedEdit?.block, true);
+    assert.match(blockedEdit?.reason ?? "", /read-only execution/i);
+    const blockedCommit = await harness.routeToolCall("bash", {
+      command: "git commit -am mutation",
+    });
+    assert.equal(blockedCommit?.block, true);
+    assert.match(blockedCommit?.reason ?? "", /read-only shell/i);
+
+    const requestedModes = [...harness.requestedModes];
+    const decision = await harness.routeInput("Yes, post the approved comments.");
+    assert.equal(decision.action, "transform");
+    if (decision.action !== "transform") assert.fail("confirmation was not transformed");
+    assert.match(decision.text, /user confirmed the approved remote action/i);
+    assert.deepEqual(harness.requestedModes, requestedModes);
+    const forbiddenMerge = await harness.routeToolCall(
+      "github_merge_pull_request",
+      { method: "merge" },
+    );
+    assert.equal(forbiddenMerge?.block, true);
+    assert.match(forbiddenMerge?.reason ?? "", /never authorizes merge/i);
+    const forbiddenApproval = await harness.routeToolCall(
+      "github_create_pull_request_review",
+      { event: "APPROVE", body: "Looks good" },
+    );
+    assert.equal(forbiddenApproval?.block, true);
+    assert.match(forbiddenApproval?.reason ?? "", /never authorizes.*approval/i);
+    const unapprovedComment = await harness.routeToolCall(
+      "gitlab_create_merge_request_note",
+      { ...reviewTarget, body: "A different unapproved comment" },
+    );
+    assert.equal(unapprovedComment?.block, true);
+    assert.match(unapprovedComment?.reason ?? "", /exactly match.*approved remote action/i);
+    const commentInput = { ...reviewTarget, body: "Approved comment" };
+    assert.equal(
+      await harness.routeToolCall("gitlab_create_merge_request_note", commentInput),
+      undefined,
+    );
+    await harness.commands.get("workflow-done")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /correlated tool result/i);
+    await harness.routeToolResult(
+      "gitlab_create_merge_request_note",
+      commentInput,
+      { success: true },
+    );
+
+    const declined = createHarness("idle", undefined, [], cwd);
+    await declined.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      declined.context,
+    );
+    await approvePlan(declined, ".plannotator/review.md");
+    await declined.settleAgent();
+    await passReadOnlyExecutionGate(declined);
+    const noDecision = await declined.routeInput("No, do not post anything.");
+    assert.equal(noDecision.action, "transform");
+    const blockedAfterNo = await declined.routeToolCall(
+      "gitlab_create_merge_request_note",
+      { ...reviewTarget, body: "Must stay local" },
+    );
+    assert.equal(blockedAfterNo?.block, true);
+    assert.match(blockedAfterNo?.reason ?? "", /explicit user confirmation/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("hosted review actions are bound to the review platform and target", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    const githubAction = [{
+      id: "wrong-platform",
+      toolName: "github_create_pull_request_review_comment",
+      input: {
+        owner: "group",
+        repo: "project",
+        pull_number: 42,
+        body: "Wrong platform",
+      },
+    }];
+    writePlan(cwd, "wrong-platform.md", readOnlyPlan("gitlab-mr-review", githubAction));
+    const wrongPlatform = createHarness("idle", undefined, [], cwd);
+    await wrongPlatform.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      wrongPlatform.context,
+    );
+    await runPlanningScout(wrongPlatform);
+    const wrongPlatformResult = await wrongPlatform.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/wrong-platform.md",
+    });
+    assert.equal(wrongPlatformResult?.block, true);
+    assert.match(wrongPlatformResult?.reason ?? "", /review platform/i);
+
+    const wrongTargetAction = [{
+      id: "wrong-target",
+      toolName: "gitlab_create_merge_request_note",
+      input: {
+        project_id: "other/project",
+        merge_request_iid: 99,
+        body: "Wrong target",
+      },
+    }];
+    writePlan(cwd, "wrong-target.md", readOnlyPlan("gitlab-mr-review", wrongTargetAction));
+    const wrongTarget = createHarness("idle", undefined, [], cwd);
+    await wrongTarget.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      wrongTarget.context,
+    );
+    await runPlanningScout(wrongTarget);
+    const wrongTargetResult = await wrongTarget.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/wrong-target.md",
+    });
+    assert.equal(wrongTargetResult?.block, true);
+    assert.match(wrongTargetResult?.reason ?? "", /review URL target/i);
+
+    const contradictoryTargetAction = [{
+      id: "contradictory-target",
+      toolName: "gitlab_create_merge_request_note",
+      input: {
+        review_url: "https://gitlab.example.test/group/project/-/merge_requests/42",
+        project_id: "other/project",
+        merge_request_iid: 99,
+        body: "Contradictory target",
+      },
+    }];
+    writePlan(
+      cwd,
+      "contradictory-target.md",
+      readOnlyPlan("gitlab-mr-review", contradictoryTargetAction),
+    );
+    const contradictoryTarget = createHarness("idle", undefined, [], cwd);
+    await contradictoryTarget.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      contradictoryTarget.context,
+    );
+    await runPlanningScout(contradictoryTarget);
+    const contradictoryTargetResult = await contradictoryTarget.routeToolCall(
+      "plannotator_submit_plan",
+      { filePath: ".plannotator/contradictory-target.md" },
+    );
+    assert.equal(contradictoryTargetResult?.block, true);
+    assert.match(contradictoryTargetResult?.reason ?? "", /review URL target/i);
+
+    for (const [name, command] of [
+      [
+        "wrong-cli-number",
+        "glab mr note 99 --repo group/project --message 42",
+      ],
+      [
+        "wrong-curl-project",
+        "curl --request POST https://gitlab.example.test/api/v4/projects/other%2Fproject/merge_requests/42/notes",
+      ],
+      [
+        "containing-curl-project",
+        "curl --request POST https://gitlab.example.test/api/v4/projects/other%2Fgroup%2Fproject/merge_requests/42/notes",
+      ],
+    ] as const) {
+      writePlan(
+        cwd,
+        `${name}.md`,
+        readOnlyPlan("gitlab-mr-review", [{
+          id: name,
+          toolName: "bash",
+          input: { command },
+        }]),
+      );
+      const mismatched = createHarness("idle", undefined, [], cwd);
+      await mismatched.commands.get("mr-review")!.handler(
+        "https://gitlab.example.test/group/project/-/merge_requests/42",
+        mismatched.context,
+      );
+      await runPlanningScout(mismatched);
+      const result = await mismatched.routeToolCall("plannotator_submit_plan", {
+        filePath: `.plannotator/${name}.md`,
+      });
+      assert.equal(result?.block, true);
+      assert.match(result?.reason ?? "", /review URL target/i);
+    }
+
+    const mixedTargetAction = [{
+      id: "mixed-targets",
+      toolName: "gitlab_create_merge_request_note",
+      input: {
+        project_id: "group/project",
+        merge_request_iid: 42,
+        nested: {
+          project_id: "other/project",
+          merge_request_iid: 99,
+        },
+        body: "One correct target must not mask a wrong one.",
+      },
+    }];
+    writePlan(cwd, "mixed-targets.md", readOnlyPlan("gitlab-mr-review", mixedTargetAction));
+    const mixedTargets = createHarness("idle", undefined, [], cwd);
+    await mixedTargets.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      mixedTargets.context,
+    );
+    await runPlanningScout(mixedTargets);
+    const mixedTargetResult = await mixedTargets.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/mixed-targets.md",
+    });
+    assert.equal(mixedTargetResult?.block, true);
+    assert.match(mixedTargetResult?.reason ?? "", /review URL target/i);
+
+    const gheAction = [{
+      id: "ghe-without-host",
+      toolName: "github_create_pull_request_review_comment",
+      input: {
+        owner: "group",
+        repo: "project",
+        pull_number: 42,
+        body: "https://github.example.test/group/project/pull/42",
+      },
+    }];
+    writePlan(cwd, "ghe-without-host.md", readOnlyPlan("gitlab-mr-review", gheAction));
+    const ghe = createHarness("idle", undefined, [], cwd);
+    await ghe.commands.get("mr-review")!.handler(
+      "https://github.example.test/group/project/pull/42",
+      ghe.context,
+    );
+    await runPlanningScout(ghe);
+    const gheResult = await ghe.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/ghe-without-host.md",
+    });
+    assert.equal(gheResult?.block, true);
+    assert.match(gheResult?.reason ?? "", /review URL target/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("clean hosted reviews complete without a remote-action confirmation", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(cwd, "clean-review.md", readOnlyPlan("gitlab-mr-review", []));
+    const harness = createHarness("idle", undefined, [], cwd);
+    await harness.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      harness.context,
+    );
+    await approvePlan(harness, ".plannotator/clean-review.md");
+    await harness.settleAgent();
+    await passReadOnlyExecutionGate(harness);
+    const state = (
+      harness.sessionEntries.at(-1)?.data as { active?: { awaitingRemoteConfirmation?: string } }
+    )?.active;
+    assert.equal(state?.awaitingRemoteConfirmation, undefined);
+
+    await harness.commands.get("workflow-done")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /workflow loop finished/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("remote push contracts reject force refspecs", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const repositoryCwd = join(base, "review-session");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(repositoryCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: repositoryCwd });
+    execFileSync("git", ["switch", "--quiet", "-c", "review-session"], {
+      cwd: repositoryCwd,
+    });
+    execFileSync(
+      "git",
+      ["remote", "add", "origin", "https://gitlab.example.test/group/project.git"],
+      { cwd: repositoryCwd },
+    );
+    for (const [name, command] of [
+      ["force-refspec", "git push origin +HEAD:review-session"],
+      ["delete-short", "git push -d origin review-session"],
+      ["force-cluster", "git push -fu origin HEAD:review-session"],
+      ["force-includes", "git push --force-if-includes origin HEAD:review-session"],
+    ] as const) {
+      writePlan(
+        planCwd,
+        `${name}.md`,
+        multiRepositoryCodePlan(
+          [{
+            cwd: repositoryCwd,
+            branch: "review-session",
+            commitTitle: "fix(review): address feedback",
+          }],
+          "gitlab-mr-comments",
+          [{
+            id: name,
+            toolName: "bash",
+            input: { cwd: repositoryCwd, command },
+          }],
+        ),
+      );
+      const harness = createHarness(
+        "idle",
+        undefined,
+        [],
+        planCwd,
+        { sessionKey: "review-session", worktreeBaseDir: base },
+      );
+      await harness.commands.get("mr-comments")!.handler(
+        "https://gitlab.example.test/group/project/-/merge_requests/42",
+        harness.context,
+      );
+      await runPlanningScout(harness);
+      const result = await harness.routeToolCall("plannotator_submit_plan", {
+        filePath: `.plannotator/${name}.md`,
+      });
+
+      assert.equal(result?.block, true);
+      assert.match(result?.reason ?? "", /force push|deletion/i);
+    }
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
 test("read-only completion proves the approved repository stayed unchanged", async () => {
   const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
   try {
@@ -897,12 +1611,33 @@ test("read-only completion proves the approved repository stayed unchanged", asy
     const harness = createHarness("idle", undefined, [], cwd);
     await harness.commands.get("work")!.handler("Investigate the task", harness.context);
     await approvePlan(harness);
-    harness.setPhase("executing");
+    await harness.settleAgent();
+    await passReadOnlyExecutionGate(harness);
     writeFileSync(join(cwd, "unexpected.txt"), "mutation after approval\n");
 
     await harness.commands.get("workflow-done")!.handler("", harness.context);
 
     assert.match(harness.notices.at(-1)!.message, /repository changed after read-only plan approval/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("read-only completion requires the approved execution and report turn", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(cwd, "plan.md", readOnlyPlan("local-work"));
+    const harness = createHarness("idle", undefined, [], cwd);
+    await harness.commands.get("work")!.handler("Investigate the task", harness.context);
+    await approvePlan(harness);
+
+    await harness.commands.get("workflow-done")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /read-only plan has not completed/i);
+
+    await harness.settleAgent();
+    await passReadOnlyExecutionGate(harness);
+    await harness.commands.get("workflow-done")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /workflow loop finished/i);
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
@@ -951,7 +1686,7 @@ test("resumes a pending approved continuation after extension reload", async () 
     assert.equal(restored.requestedModes.at(-1), "exit");
     assert.match(
       restored.sentMessages.at(-1)!,
-      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+      /launch one compliant verified worker/i,
     );
   } finally {
     rmSync(cwd, { recursive: true, force: true });
@@ -972,10 +1707,87 @@ test("re-dispatches an approved code plan after a reload without a pending conti
 
     assert.match(
       restored.sentMessages.at(-1)!,
-      /Launch exactly one compliant verified worker in the approved canonical cwd now/,
+      /launch one compliant verified worker/i,
     );
   } finally {
     rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("reload releases interrupted worker and remote-action calls", async () => {
+  const codeCwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  const reviewCwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(codeCwd, "plan.md", codePlan(codeCwd));
+    const firstCode = createHarness("idle", undefined, [], codeCwd);
+    await firstCode.commands.get("work")!.handler("Implement safely", firstCode.context);
+    await approvePlan(firstCode);
+    firstCode.setPhase("executing");
+    const workerInput = {
+      agent: "worker",
+      task: "Implement the approved change",
+      context: "fresh",
+      cwd: codeCwd,
+      acceptance: verifiedAcceptance(workerVerification),
+    };
+    assert.equal(await firstCode.routeToolCall("subagent", workerInput), undefined);
+
+    const restoredCode = createHarness(
+      "executing",
+      undefined,
+      firstCode.sessionEntries,
+      codeCwd,
+    );
+    await restoredCode.startSession();
+    assert.equal(await restoredCode.routeToolCall("subagent", workerInput), undefined);
+
+    writePlan(reviewCwd, "review.md", readOnlyPlan("gitlab-mr-review"));
+    const firstReview = createHarness("idle", undefined, [], reviewCwd);
+    await firstReview.commands.get("mr-review")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      firstReview.context,
+    );
+    await approvePlan(firstReview, ".plannotator/review.md");
+    await firstReview.settleAgent();
+    await passReadOnlyExecutionGate(firstReview);
+    await firstReview.routeInput("Yes, post the approved comment.");
+    const commentInput = {
+      project_id: "group/project",
+      merge_request_iid: 42,
+      body: "Approved comment",
+    };
+    assert.equal(
+      await firstReview.routeToolCall("gitlab_create_merge_request_note", commentInput),
+      undefined,
+    );
+
+    const restoredReview = createHarness(
+      "idle",
+      undefined,
+      firstReview.sessionEntries,
+      reviewCwd,
+    );
+    await restoredReview.startSession();
+    const restoredRemoteState = (
+      restoredReview.sessionEntries.at(-1)?.data as {
+        active?: { approvedPlan?: unknown; awaitingRemoteConfirmation?: string };
+      }
+    )?.active;
+    assert.ok(restoredRemoteState?.approvedPlan);
+    assert.equal(restoredRemoteState?.awaitingRemoteConfirmation, "review-comments");
+    const decline = await restoredReview.routeInput("No, do not retry the interrupted action.");
+    assert.equal(decline.action, "transform");
+    if (decline.action !== "transform") assert.fail("restored decision was not transformed");
+    assert.match(decline.text, /not authorized/i);
+    const declinedRemoteState = (
+      restoredReview.sessionEntries.at(-1)?.data as { active?: { approvedPlan?: unknown } }
+    )?.active;
+    assert.ok(declinedRemoteState?.approvedPlan);
+    await restoredReview.commands.get("workflow-done")!.handler("", restoredReview.context);
+    assert.match(restoredReview.notices.at(-1)!.message, /workflow loop finished/i);
+  } finally {
+    rmSync(codeCwd, { recursive: true, force: true });
+    rmSync(reviewCwd, { recursive: true, force: true });
   }
 });
 
@@ -1082,6 +1894,19 @@ test("preserves an image-only workflow follow-up", async () => {
   assert.deepEqual(harness.sentUserContents.at(-1)?.at(-1), image);
 });
 
+test("allows supervisor replies during an active workflow", async () => {
+  const harness = createHarness();
+  await harness.commands.get("ticket")!.handler("ABC-123", harness.context);
+
+  const result = await harness.routeToolCall("subagent_supervisor", {
+    action: "reply",
+    replyTo: "request-1",
+    message: "Continue with the approved scope.",
+  });
+
+  assert.equal(result, undefined);
+});
+
 test("blocks subagent_wait during an active workflow so supervisor requests reach the user", async () => {
   const harness = createHarness();
   await harness.commands.get("ticket")!.handler("ABC-123", harness.context);
@@ -1112,29 +1937,17 @@ test("workflow-done exits Plannotator and disables follow-up routing", async () 
     const harness = createHarness("idle", undefined, [], cwd);
     await harness.commands.get("ticket")!.handler("ABC-123", harness.context);
     await approvePlan(harness);
-    harness.setPhase("executing");
+    await harness.settleAgent();
+    await passReadOnlyExecutionGate(harness);
     await harness.commands.get("workflow-done")!.handler("", harness.context);
 
-    assert.deepEqual(harness.requestedModes, [
-      "status",
-      "enter",
-      "status",
-      "status",
-      "status",
-      "exit",
-    ]);
+    assert.ok(harness.requestedModes.includes("exit"));
     assert.match(harness.notices.at(-1)!.message, /workflow loop finished/i);
+    const requestedModes = [...harness.requestedModes];
     assert.deepEqual(await harness.routeInput("Unrelated request after completion."), {
       action: "continue",
     });
-    assert.deepEqual(harness.requestedModes, [
-      "status",
-      "enter",
-      "status",
-      "status",
-      "status",
-      "exit",
-    ]);
+    assert.deepEqual(harness.requestedModes, requestedModes);
   } finally {
     rmSync(cwd, { recursive: true, force: true });
   }
@@ -1147,7 +1960,7 @@ test("requires a supported review URL", async () => {
 
   assert.deepEqual(requestedModes, []);
   assert.equal(sentMessages.length, 0);
-  assert.match(notices[0]!.message, /trusted GitHub pull request URL/);
+  assert.match(notices[0]!.message, /hosted merge-request or pull-request URL/);
 });
 
 test("blocks ad-hoc reviewers without an approved workflow contract", async () => {
@@ -1296,7 +2109,55 @@ test("requires the approved workflow marker and a code verification contract", a
     assert.equal(placeholderPlan?.block, true);
     assert.match(placeholderPlan?.reason ?? "", /placeholder success command/i);
 
-    writePlan(cwd, "missing-contract.md", "Workflow: local-work\n\n- [ ] Implement\n");
+    writePlan(cwd, "legacy-contract.md", codePlan(cwd));
+    const legacy = createHarness(
+      "idle",
+      undefined,
+      [],
+      cwd,
+      { allowLegacyVerificationContracts: false },
+    );
+    await legacy.commands.get("work")!.handler("Implement the plan", legacy.context);
+    await runPlanningScout(legacy);
+    const legacyPlan = await legacy.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/legacy-contract.md",
+    });
+    assert.equal(legacyPlan?.block, true);
+    assert.match(legacyPlan?.reason ?? "", /must use the repositories array/i);
+
+    const wrappedLegacyContract = {
+      repositories: [{
+        cwd,
+        worker: workerVerification,
+        reviewer: reviewerVerification,
+      }],
+    };
+    writePlan(
+      cwd,
+      "wrapped-legacy-contract.md",
+      codePlan(cwd).replace(
+        JSON.stringify(
+          { cwd, worker: workerVerification, reviewer: reviewerVerification },
+          null,
+          2,
+        ),
+        JSON.stringify(wrappedLegacyContract, null, 2),
+      ),
+    );
+    const wrappedLegacyPlan = await legacy.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/wrapped-legacy-contract.md",
+    });
+    assert.equal(wrappedLegacyPlan?.block, true);
+    assert.match(
+      wrappedLegacyPlan?.reason ?? "",
+      /entries must include branch, commitTitle, and acceptanceCriteria/i,
+    );
+
+    writePlan(
+      cwd,
+      "missing-contract.md",
+      "Workflow: local-work\n\n## Implementation plan\n- [ ] Implement\n\n## Done when\n- [ ] Implemented.\n",
+    );
     const missingContract = createHarness("idle", undefined, [], cwd);
     await missingContract.commands.get("work")!.handler("Implement the plan", missingContract.context);
     await runPlanningScout(missingContract);
@@ -1309,7 +2170,10 @@ test("requires the approved workflow marker and a code verification contract", a
     writePlan(
       cwd,
       "mixed-contract.md",
-      `${readOnlyPlan("local-work").trim()}\nExtra verification text\n`,
+      readOnlyPlan("local-work").replace(
+        "Not applicable - read-only plan.",
+        "Not applicable - read-only plan.\nExtra verification text",
+      ),
     );
     const mixedContract = createHarness("idle", undefined, [], cwd);
     await mixedContract.commands.get("work")!.handler("Implement the plan", mixedContract.context);
@@ -1319,6 +2183,20 @@ test("requires the approved workflow marker and a code verification contract", a
     });
     assert.equal(mixedPlan?.block, true);
     assert.match(mixedPlan?.reason ?? "", /body must be exactly/i);
+
+    writePlan(
+      cwd,
+      "missing-heading.md",
+      readOnlyPlan("local-work").replace("## Risks\n", "## Missing risks\n"),
+    );
+    const missingHeading = createHarness("idle", undefined, [], cwd);
+    await missingHeading.commands.get("work")!.handler("Investigate safely", missingHeading.context);
+    await runPlanningScout(missingHeading);
+    const missingHeadingPlan = await missingHeading.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/missing-heading.md",
+    });
+    assert.equal(missingHeadingPlan?.block, true);
+    assert.match(missingHeadingPlan?.reason ?? "", /missing required.*Risks/i);
 
     writePlan(cwd, "readonly.md", readOnlyPlan("local-work"));
     const noContract = createHarness("idle", undefined, [], cwd);
@@ -1336,6 +2214,569 @@ test("requires the approved workflow marker and a code verification contract", a
     assert.match(blocked?.reason ?? "", /requires an exact ## Verification contract/i);
   } finally {
     rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("rejects plans without explicit done-when acceptance criteria", async () => {
+  const cwd = mkdtempSync(join(tmpdir(), "pi-session-"));
+  try {
+    writePlan(
+      cwd,
+      "missing-done-when.md",
+      "Workflow: local-work\n\n## Implementation plan\n- [ ] Implement\n\n## Verification contract\nNot applicable - read-only plan.\n",
+    );
+    const harness = createHarness("idle", undefined, [], cwd);
+    await harness.commands.get("work")!.handler("Implement safely", harness.context);
+    await runPlanningScout(harness);
+
+    const result = await harness.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/missing-done-when.md",
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /Done when/i);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test("requires the execution contract to cover exactly the plan acceptance criteria", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "api-fix-cache");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    const mismatchedPlan = multiRepositoryCodePlan([
+      {
+        cwd: targetCwd,
+        branch: "fix-cache",
+        commitTitle: "fix(api): prevent stale cache",
+      },
+    ]).replace(
+      '"Every repository passes focused and complete verification."',
+      '"An unapproved criterion replaces the planned criterion."',
+    );
+    writePlan(planCwd, "mismatched-criteria.md", mismatchedPlan);
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await harness.commands.get("work")!.handler("Fix cache behavior", harness.context);
+    await runPlanningScout(harness);
+
+    const result = await harness.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/mismatched-criteria.md",
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /acceptance criteria.*Done when/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("requires each approved worktree to be on its exact contract branch", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "api-fix-cache");
+  const repository = {
+    cwd: targetCwd,
+    branch: "fix-cache",
+    commitTitle: "fix(api): prevent stale cache",
+  };
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "wrong-branch.md", multiRepositoryCodePlan([repository]));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await harness.commands.get("work")!.handler("Fix cache behavior", harness.context);
+    await approvePlan(harness, ".plannotator/wrong-branch.md");
+    harness.setPhase("executing");
+
+    const result = await harness.routeToolCall("subagent", {
+      agent: "worker",
+      task: "Implement the approved cache fix",
+      context: "fresh",
+      cwd: targetCwd,
+      skill: [
+        "test-driven-development",
+        "verification-before-completion",
+        "receiving-code-review",
+      ],
+      acceptance: {
+        ...verifiedAcceptance(workerVerification),
+        criteria: [
+          "Cross-repository behavior is implemented.",
+          "Every repository passes focused and complete verification.",
+        ],
+      },
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /branch.*fix-cache/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("reused worktrees must belong to the approved source repository", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const sourceCwd = join(base, "api");
+  const targetCwd = join(base, "api-fix-cache");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(sourceCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: sourceCwd });
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    execFileSync("git", ["switch", "--quiet", "-c", "fix-cache"], { cwd: targetCwd });
+    writePlan(
+      planCwd,
+      "wrong-source.md",
+      multiRepositoryCodePlan([{
+        cwd: targetCwd,
+        sourceCwd,
+        baseHead: "UNBORN",
+        branch: "fix-cache",
+        commitTitle: "fix(api): prevent stale cache",
+      }]),
+    );
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await harness.commands.get("work")!.handler("Fix cache behavior", harness.context);
+    await approvePlan(harness, ".plannotator/wrong-source.md");
+    harness.setPhase("executing");
+    const result = await harness.routeToolCall("subagent", {
+      agent: "worker",
+      task: "Implement the approved cache fix",
+      context: "fresh",
+      cwd: targetCwd,
+      skill: [
+        "test-driven-development",
+        "verification-before-completion",
+        "receiving-code-review",
+      ],
+      acceptance: {
+        ...verifiedAcceptance(workerVerification),
+        criteria: [
+          "Cross-repository behavior is implemented.",
+          "Every repository passes focused and complete verification.",
+        ],
+      },
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /approved source repository/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("binds MR fixes to the user's current checkout and Jira summaries to lowercase hyphen form", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const jiraCwd = join(base, "api-ABC-123_Fix-Cache");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(jiraCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: planCwd });
+    execFileSync("git", ["switch", "--quiet", "-c", "review-fix"], { cwd: planCwd });
+    execFileSync("git", ["init", "--quiet"], { cwd: jiraCwd });
+
+    writePlan(
+      planCwd,
+      "mr-session.md",
+      multiRepositoryCodePlan(
+        [{
+          cwd: planCwd,
+          branch: "review-fix",
+          commitTitle: "fix(review): address feedback",
+        }],
+        "gitlab-mr-comments",
+      ),
+    );
+    const mr = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await mr.commands.get("mr-comments")!.handler(
+      "https://gitlab.example.test/group/project/-/merge_requests/42",
+      mr.context,
+    );
+    await runPlanningScout(mr);
+    const mrResult = await mr.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/mr-session.md",
+    });
+    assert.equal(mrResult, undefined);
+
+    writePlan(
+      planCwd,
+      "jira-summary.md",
+      multiRepositoryCodePlan(
+        [{
+          cwd: jiraCwd,
+          branch: "ABC-123_Fix-Cache",
+          commitTitle: "fix(cache): prevent stale reads",
+        }],
+        "jira-ticket",
+      ),
+    );
+    const jira = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await jira.commands.get("ticket")!.handler("ABC-123", jira.context);
+    await runPlanningScout(jira);
+    const jiraResult = await jira.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/jira-summary.md",
+    });
+    assert.equal(jiraResult?.block, true);
+    assert.match(jiraResult?.reason ?? "", /Jira repository directories/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("runs approved repository workers and reviewers in parallel and requires semantic commits", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const repositories = [
+    {
+      cwd: join(base, "api-fix-cache"),
+      branch: "fix-cache",
+      commitTitle: "fix(api): prevent stale cache",
+    },
+    {
+      cwd: join(base, "web-fix-cache"),
+      branch: "fix-cache",
+      commitTitle: "fix(web): refresh stale cache",
+    },
+  ];
+  try {
+    mkdirSync(planCwd);
+    for (const repository of repositories) {
+      mkdirSync(repository.cwd);
+      execFileSync("git", ["init", "--quiet"], { cwd: repository.cwd });
+      execFileSync("git", ["switch", "--quiet", "-c", repository.branch], {
+        cwd: repository.cwd,
+      });
+    }
+    writePlan(planCwd, "multi.md", multiRepositoryCodePlan(repositories));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+    await harness.commands.get("work")!.handler(
+      "Fix cache behavior across API and web repositories",
+      harness.context,
+    );
+    await approvePlan(harness, ".plannotator/multi.md");
+    harness.setPhase("executing");
+    assert.equal(
+      await harness.routeToolCall("bash", {
+        command:
+          `git -C ${repositories[0]!.cwd} worktree add -b ${repositories[0]!.branch} ${repositories[0]!.cwd} UNBORN`,
+      }),
+      undefined,
+    );
+    const wrongBaseSetup = await harness.routeToolCall("bash", {
+      command:
+        `git -C ${repositories[0]!.cwd} worktree add -b ${repositories[0]!.branch} ${repositories[0]!.cwd} HEAD`,
+    });
+    assert.equal(wrongBaseSetup?.block, true);
+    assert.match(wrongBaseSetup?.reason ?? "", /exact approved worktree setup/i);
+    const parentWrite = await harness.routeToolCall("write", {
+      path: join(repositories[0]!.cwd, "parent-change.txt"),
+      content: "parent mutation",
+    });
+    assert.equal(parentWrite?.block, true);
+    assert.match(parentWrite?.reason ?? "", /contract-bound worker/i);
+    const parentCommit = await harness.routeToolCall("bash", {
+      command: "git commit --allow-empty -m 'fix: parent mutation'",
+    });
+    assert.equal(parentCommit?.block, true);
+    assert.match(parentCommit?.reason ?? "", /contract-bound workers/i);
+    const unknownMutation = await harness.routeToolCall("slack_send_message", {
+      channel: "review",
+      message: "unapproved external mutation",
+    });
+    assert.equal(unknownMutation?.block, true);
+    assert.match(unknownMutation?.reason ?? "", /blocks unclassified tool/i);
+
+    const criteria = [
+      "Cross-repository behavior is implemented.",
+      "Every repository passes focused and complete verification.",
+    ];
+    const workerInput = {
+      context: "fresh",
+      tasks: repositories.map((repository) => ({
+        agent: "worker",
+        task: `Implement approved plan and commit as ${repository.commitTitle}`,
+        cwd: repository.cwd,
+        skill: [
+          "test-driven-development",
+          "verification-before-completion",
+          "receiving-code-review",
+        ],
+        acceptance: {
+          ...verifiedAcceptance(workerVerification),
+          criteria,
+        },
+      })),
+    };
+    assert.equal(await harness.routeToolCall("subagent", workerInput), undefined);
+    const missingTddEvidence = parallelVerifiedResult(
+      "worker",
+      repositories.length,
+      workerVerification,
+    );
+    delete missingTddEvidence.results[0]!.acceptance.childReport.commandsRun;
+    await harness.routeToolResult("subagent", workerInput, missingTddEvidence);
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /worker=failed/i);
+    assert.equal(await harness.routeToolCall("subagent", workerInput), undefined);
+    const wrongCriterionEvidence = parallelVerifiedResult(
+      "worker",
+      repositories.length,
+      workerVerification,
+    );
+    wrongCriterionEvidence.results[0]!.acceptance.childReport.criteriaSatisfied[0]!.criterion =
+      "An unrelated criterion.";
+    await harness.routeToolResult("subagent", workerInput, wrongCriterionEvidence);
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /worker=failed/i);
+    const wrongCriterionState = (
+      harness.sessionEntries.at(-1)?.data as {
+        active?: { executionGates?: Array<{ workerReason?: string }> };
+      }
+    )?.active;
+    assert.match(
+      wrongCriterionState?.executionGates?.[0]?.workerReason ?? "",
+      /criterion.*exact/i,
+    );
+    assert.equal(await harness.routeToolCall("subagent", workerInput), undefined);
+    const unrelatedTddEvidence = parallelVerifiedResult(
+      "worker",
+      repositories.length,
+      workerVerification,
+    );
+    unrelatedTddEvidence.results[0]!.acceptance.childReport.commandsRun = [
+      {
+        command: "node --test unrelated.test.ts",
+        result: "failed",
+        summary: "Unrelated RED.",
+      },
+      {
+        command: "node --test focused.test.ts",
+        result: "passed",
+        summary: "GREEN.",
+      },
+    ];
+    await harness.routeToolResult("subagent", workerInput, unrelatedTddEvidence);
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /worker=failed/i);
+    const unrelatedTddState = (
+      harness.sessionEntries.at(-1)?.data as {
+        active?: { executionGates?: Array<{ workerReason?: string }> };
+      }
+    )?.active;
+    assert.match(
+      unrelatedTddState?.executionGates?.[0]?.workerReason ?? "",
+      /same.*RED.*GREEN/i,
+    );
+    assert.equal(await harness.routeToolCall("subagent", workerInput), undefined);
+
+    for (const repository of repositories) {
+      writeFileSync(join(repository.cwd, "change.txt"), `${repository.commitTitle}\n`);
+      execFileSync("git", ["add", "change.txt"], { cwd: repository.cwd });
+      execFileSync(
+        "git",
+        [
+          "-c",
+          "user.name=Workflow Test",
+          "-c",
+          "user.email=workflow@example.test",
+          "commit",
+          "--quiet",
+          "-m",
+          repository.commitTitle,
+        ],
+        { cwd: repository.cwd },
+      );
+    }
+    const dirtyPath = join(repositories[0]!.cwd, "leftover.txt");
+    writeFileSync(dirtyPath, "uncommitted leftover\n");
+    await harness.routeToolResult(
+      "subagent",
+      workerInput,
+      parallelVerifiedResult("worker", repositories.length, workerVerification),
+    );
+    const dirtyState = (
+      harness.sessionEntries.at(-1)?.data as {
+        active?: { executionGates?: Array<{ cwd?: string; workerReason?: string }> };
+      }
+    )?.active;
+    assert.match(
+      dirtyState?.executionGates?.find((gate) => gate.cwd === repositories[0]!.cwd)
+        ?.workerReason ?? "",
+      /clean worktree/i,
+    );
+    rmSync(dirtyPath);
+    const cleanWorkerInput = {
+      context: "fresh",
+      tasks: [workerInput.tasks[0]!],
+    };
+    assert.equal(await harness.routeToolCall("subagent", cleanWorkerInput), undefined);
+    execFileSync(
+      "git",
+      [
+        "-c",
+        "user.name=Workflow Test",
+        "-c",
+        "user.email=workflow@example.test",
+        "commit",
+        "--quiet",
+        "--allow-empty",
+        "-m",
+        repositories[0]!.commitTitle,
+      ],
+      { cwd: repositories[0]!.cwd },
+    );
+    await harness.routeToolResult(
+      "subagent",
+      cleanWorkerInput,
+      parallelVerifiedResult("worker", 1, workerVerification),
+    );
+    const cleanState = (
+      harness.sessionEntries.at(-1)?.data as {
+        active?: {
+          executionGates?: Array<{ cwd?: string; worker?: string; workerReason?: string }>;
+        };
+      }
+    )?.active;
+    assert.deepEqual(
+      cleanState?.executionGates?.map((gate) => ({
+        cwd: gate.cwd,
+        worker: gate.worker,
+        workerReason: gate.workerReason,
+      })),
+      repositories.map((repository) => ({
+        cwd: repository.cwd,
+        worker: "verified",
+        workerReason: undefined,
+      })),
+    );
+
+    const reviewerInput = {
+      context: "fresh",
+      tasks: repositories.map((repository) => ({
+        agent: "reviewer",
+        task: "Review approved acceptance criteria and committed diff",
+        cwd: repository.cwd,
+        acceptance: {
+          ...verifiedAcceptance(reviewerVerification),
+          criteria,
+        },
+      })),
+    };
+    assert.equal(await harness.routeToolCall("subagent", reviewerInput), undefined);
+    const initialReviewerResult = parallelVerifiedResult(
+      "reviewer",
+      repositories.length,
+      reviewerVerification,
+    );
+    initialReviewerResult.results[0]!.acceptance.childReport.reviewFindings = [
+      "API repository still needs one correction.",
+    ];
+    await harness.routeToolResult(
+      "subagent",
+      reviewerInput,
+      initialReviewerResult,
+    );
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /reviewer=required/i);
+
+    const affectedRepository = repositories[0]!;
+    const remediationWorkerInput = {
+      context: "fresh",
+      tasks: [workerInput.tasks[0]!],
+    };
+    assert.equal(
+      await harness.routeToolCall("subagent", remediationWorkerInput),
+      undefined,
+    );
+    writeFileSync(join(affectedRepository.cwd, "change.txt"), "remediated\n");
+    execFileSync("git", ["add", "change.txt"], { cwd: affectedRepository.cwd });
+    execFileSync(
+      "git",
+      [
+        "-c",
+        "user.name=Workflow Test",
+        "-c",
+        "user.email=workflow@example.test",
+        "commit",
+        "--quiet",
+        "-m",
+        affectedRepository.commitTitle,
+      ],
+      { cwd: affectedRepository.cwd },
+    );
+    await harness.routeToolResult(
+      "subagent",
+      remediationWorkerInput,
+      parallelVerifiedResult("worker", 1, workerVerification),
+    );
+
+    const remediationReviewerInput = {
+      context: "fresh",
+      tasks: [reviewerInput.tasks[0]!],
+    };
+    assert.equal(
+      await harness.routeToolCall("subagent", remediationReviewerInput),
+      undefined,
+    );
+    await harness.routeToolResult(
+      "subagent",
+      remediationReviewerInput,
+      parallelVerifiedResult("reviewer", 1, reviewerVerification),
+    );
+
+    await harness.commands.get("workflow-status")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /repositories=2/i);
+    assert.match(harness.notices.at(-1)!.message, /worker=verified/i);
+    assert.match(harness.notices.at(-1)!.message, /reviewer=verified/i);
+
+    await harness.commands.get("workflow-done")!.handler("", harness.context);
+    assert.match(harness.notices.at(-1)!.message, /workflow loop finished/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
   }
 });
 
@@ -1583,19 +3024,18 @@ test("does not restore old approval after a queued follow-up", async () => {
   }
 });
 
-test("Jira workflow defines ordered multi-repository sessions", () => {
+test("Jira workflow defines one approved parallel multi-repository execution", () => {
   const template = readFileSync(new URL("../workflows/jira-ticket.md", import.meta.url), "utf8");
 
-  assert.match(template, /may first conduct bounded read-only context exploration/i);
-  assert.match(template, /memory search, repository snapshots.*bounded scout/i);
-  assert.match(template, /required before making ticket-derived claims.*ticket-driven actions/i);
-  assert.match(template, /reviewable ordered repository-session overview/i);
-  assert.match(template, /global defaults and project-local overrides/i);
-  assert.match(template, /fresh explicit approval before each repository session/i);
-  assert.match(template, /exactly one isolated worktree/i);
+  assert.match(template, /extra information is optional/i);
+  assert.match(template, /authoritative ticket through Atlassian MCP early/i);
+  assert.match(template, /rg.*ast-grep.*MCP tools/i);
+  assert.match(template, /Superpowers `brainstorming`/i);
+  assert.match(template, /one approval covers the complete listed repository set/i);
+  assert.match(template, /one foreground parallel subagent call/i);
   assert.match(template, /red.*green.*refactor/i);
-  assert.match(template, /branch name for every repository/i);
-  assert.doesNotMatch(template, /MR URL/i);
+  assert.match(template, /Conventional Commit/i);
+  assert.match(template, /every acceptance criterion and repository gate passes/i);
 });
 
 test("review workflows select tools by remote platform", () => {
@@ -1604,26 +3044,51 @@ test("review workflows select tools by remote platform", () => {
   const config = JSON.parse(readFileSync(new URL("../plannotator.json", import.meta.url), "utf8"));
   const executionPrompt = config.phases.executing.systemPrompt as string;
 
-  for (const content of [review, comments, executionPrompt]) {
-    assert.match(content, /GitLab MCP/);
-    assert.match(content, /glab/);
-    assert.match(content, /GitHub MCP/);
-    assert.match(content, /gh/);
+  for (const content of [review, comments]) {
+    assert.match(content, /GitLab, GitHub, GitHub Enterprise/i);
+    assert.match(content, /MCP tools first/i);
+    assert.match(content, /authenticated host CLI/i);
     assert.match(content, /trusted.*curl/i);
-    assert.match(content, /Never cross platform|never cross platform/i);
+    assert.match(content, /Never cross hosts/i);
+    assert.match(content, /MR\/PR URL is the only remote locator/i);
+    assert.match(content, /get_merge_request.*get_merge_request_commits.*get_merge_request_diffs/is);
+    assert.match(content, /get_merge_request_pipelines.*get_pipeline_jobs/is);
+    assert.match(content, /never call `get_workitem_notes`.*`create_workitem_note`/is);
   }
+  assert.match(executionPrompt, /matching host MCP\/CLI\/trusted curl/i);
+  assert.match(review, /ask the user whether to post/i);
+  assert.match(comments, /ask the user whether to push.*reply/i);
 });
 
 test("local-work defines short summary worktree selection from the shared checkout", () => {
   const template = readFileSync(new URL("../workflows/local-work.md", import.meta.url), "utf8");
   const contract = readFileSync(new URL("../AGENTS.md", import.meta.url), "utf8");
 
-  assert.match(template, /use `caveman` at ultra intensity to extract/i);
+  assert.match(template, /Use `caveman` to derive/i);
   assert.match(template, /at most 20 characters/i);
   assert.match(template, /branch `<summary>` and directory `<source-repository-name>-<summary>`/i);
-  assert.match(template, /shared invoking checkout/i);
-  assert.match(contract, /For local-work, use `caveman` at ultra intensity/i);
-  assert.match(contract, /user stays in the shared checkout/i);
+  assert.match(template, /user stays in the shared checkout/i);
+  assert.match(contract, /Local work uses branch `<summary>` and directory `<repository>-<summary>`/i);
+  assert.match(contract, /Superpowers `brainstorming`/i);
+});
+
+test("merge-request workflows use the user's current checkout rather than a session worktree", () => {
+  const extension = readFileSync(
+    new URL("../extensions/workflow-commands.ts", import.meta.url),
+    "utf8",
+  );
+  const comments = readFileSync(
+    new URL("../workflows/gitlab-mr-comments.md", import.meta.url),
+    "utf8",
+  );
+  const contract = readFileSync(new URL("../AGENTS.md", import.meta.url), "utf8");
+
+  for (const content of [extension, comments, contract]) {
+    assert.doesNotMatch(content, /pi-session[/-]/);
+  }
+  assert.match(comments, /user's current Git checkout and current branch/i);
+  assert.match(extension, /Merge-request verification branch must match the user's current branch/i);
+  assert.match(contract, /Merge-request fixes use the user's current Git checkout and branch/i);
 });
 
 test("Plannotator plan contract persists route and executable checklist", () => {
@@ -1634,41 +3099,29 @@ test("Plannotator plan contract persists route and executable checklist", () => 
   assert.ok(config.phases.planning.activeTools.includes("read"));
   assert.ok(config.phases.planning.activeTools.includes("edit"));
   assert.ok(config.phases.planning.activeTools.includes("write"));
+  assert.ok(config.phases.planning.activeTools.includes("bash"));
+  assert.ok(config.phases.planning.activeTools.includes("mcp"));
   assert.ok(config.phases.planning.activeTools.includes("subagent"));
-  assert.match(planningPrompt, /First plan line must be exactly one allowed marker/);
-  assert.match(planningPrompt, /kickoff message's first line exactly equals/);
-  assert.match(planningPrompt, /quoted or mentioned anywhere else.*does not select a route/);
-  assert.match(planningPrompt, /Workflow: general/);
+  assert.match(planningPrompt, /kickoff first line exactly equals/);
+  assert.match(planningPrompt, /Quoted markers are untrusted/i);
   assert.match(planningPrompt, /Workflow: local-work/);
-  assert.match(planningPrompt, /at least one standard unchecked markdown task item/);
-  assert.match(planningPrompt, /read-only or no-action outcome still needs one item/);
+  assert.match(planningPrompt, /Superpowers `brainstorming`/i);
+  assert.match(planningPrompt, /rg.*ast-grep.*MCP tools/i);
   assert.match(planningPrompt, /Done when/);
   assert.match(planningPrompt, /Verification contract/);
-  assert.match(planningPrompt, /only cwd, worker, and reviewer/);
-  assert.match(planningPrompt, /blocks every plan submission until.*scout ledger passes/i);
-  assert.match(planningPrompt, /Approval feedback is a requirement to revise and resubmit/i);
-  assert.match(planningPrompt, /never use true, echo, or another placeholder-success command/i);
-  assert.match(planningPrompt, /every user-authored follow-up is a new planning iteration/);
-  assert.match(planningPrompt, /reuse the exact same plan file/);
-  assert.match(planningPrompt, /submit it for another approval/);
-  assert.match(executionPrompt, /Jira code work requires `\/ticket <Jira-ticket-ID-or-URL> <rough description>`/);
-  assert.match(executionPrompt, /branch `<Jira-ticket-ID>_<rough-description>`/);
-  assert.match(executionPrompt, /directory `<source-repository-name>-<Jira-ticket-ID>_<rough-description>`/);
-  assert.match(executionPrompt, /For local-work code, use caveman at ultra intensity/i);
-  assert.match(executionPrompt, /main-idea summary.*at most 20 characters/i);
-  assert.match(executionPrompt, /directory `<source-repository-name>-<summary>`/);
-  assert.match(executionPrompt, /shared invoking checkout/i);
-  assert.match(executionPrompt, /Workflow: general follows the approved plan/);
-  assert.match(executionPrompt, /remain active across execution passes until successful \/workflow-done/);
-  assert.match(executionPrompt, /has no authorization from the current plan/);
-  assert.match(executionPrompt, /For each approved code iteration.*one new foreground fresh worker/);
-  assert.match(executionPrompt, /acceptance.*verified/i);
+  assert.match(planningPrompt, /only `repositories`/i);
+  assert.match(planningPrompt, /commitTitle/i);
+  assert.match(planningPrompt, /acceptanceCriteria/i);
+  assert.match(planningPrompt, /Independent repositories may run in parallel/i);
+  assert.match(planningPrompt, /Feedback means revise the same file and resubmit/i);
+  assert.match(executionPrompt, /one foreground parallel subagent call/i);
+  assert.match(executionPrompt, /one fresh worker task per approved repository/i);
+  assert.match(executionPrompt, /test-driven-development/i);
+  assert.match(executionPrompt, /red-green-refactor/i);
+  assert.match(executionPrompt, /exact approved Conventional Commit/i);
   assert.match(executionPrompt, /full-tests.*format.*lint/i);
-  assert.match(executionPrompt, /reviewFindings/);
-  assert.match(executionPrompt, /exact contract cwd/);
-  assert.match(executionPrompt, /unchanged post-review repository snapshot/);
-  assert.match(executionPrompt, /Never stage or commit by default/);
-  assert.match(executionPrompt, /workflow-done remains blocked/i);
+  assert.match(executionPrompt, /ask whether to push and reply/i);
+  assert.match(executionPrompt, /workflow-done remains blocked until every repository gate/i);
 });
 
 test("reviewer requires complete tests, formatting, and lint verification", () => {
@@ -1701,9 +3154,9 @@ test("enables adversarial watchdog review for parent edits and child writers", (
     thinking: "high",
     autoFollow: { blockers: false },
   });
-  assert.match(contract, /watchdog.*advisory.*never auto-follow, mutate, interrupt, or steer/i);
-  assert.match(contract, /inspect current status and evidence at a safe boundary first/i);
-  assert.match(contract, /supplements but never replaces.*fresh final reviewer/i);
+  assert.match(contract, /watchdog evidence is advisory/i);
+  assert.match(contract, /Verify concerns before acting/i);
+  assert.match(contract, /never replaces exact checks or fresh review/i);
 });
 
 test("keeps only four active subagent roles with explicit contracts", () => {
@@ -1727,10 +3180,9 @@ test("keeps only four active subagent roles with explicit contracts", () => {
   ]);
   assert.equal(overrides.reviewer.acceptanceRole, "read-only");
   assert.deepEqual(overrides.reviewer.skills, ["verification-before-completion"]);
-  assert.match(contract, /Active roles do not inherit Pi's discovered skills catalog/);
-  assert.match(contract, /Load only explicitly configured or single-run skills needed by that role's bounded task/i);
-  assert.match(contract, /A skill never grants tools, mutation authority, broader scope/i);
-  assert.match(contract, /Parent-only orchestration skills stay unavailable to children/i);
+  assert.match(contract, /one fresh `worker` per repository/i);
+  assert.match(contract, /Each worker owns only its repository/i);
+  assert.match(contract, /creates the exact approved Conventional Commit/i);
 });
 
 test("keeps enough bounded spawn capacity for repeated plan and implementation iterations", () => {
@@ -1739,7 +3191,8 @@ test("keeps enough bounded spawn capacity for repeated plan and implementation i
   );
 
   assert.equal(config.maxSubagentSpawnsPerSession, 100);
-  assert.equal(config.globalConcurrencyLimit, 3);
+  assert.equal(config.globalConcurrencyLimit, 4);
+  assert.deepEqual(config.parallel, { maxTasks: 8, concurrency: 4 });
 });
 
 test("uses source repository, Jira ticket ID, and rough description for the canonical worktree", async () => {
@@ -1763,6 +3216,36 @@ test("uses source repository, Jira ticket ID, and rough description for the cano
     await approvePlan(harness);
 
     assert.match(harness.notices.at(-1)!.message, /Plan approved/i);
+  } finally {
+    rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test("rejects legacy Jira verification outside the ticket-derived canonical worktree", async () => {
+  const base = mkdtempSync(join(tmpdir(), "pi-workflow-"));
+  const planCwd = join(base, "plan-artifact");
+  const targetCwd = join(base, "plan-artifact-wrong-ticket");
+  try {
+    mkdirSync(planCwd);
+    mkdirSync(targetCwd);
+    execFileSync("git", ["init", "--quiet"], { cwd: targetCwd });
+    writePlan(planCwd, "plan.md", codePlan(targetCwd, "jira-ticket"));
+    const harness = createHarness(
+      "idle",
+      undefined,
+      [],
+      planCwd,
+      { worktreeBaseDir: base },
+    );
+
+    await harness.commands.get("ticket")!.handler("ABC-123 Fix cache invalidation", harness.context);
+    await runPlanningScout(harness);
+    const result = await harness.routeToolCall("plannotator_submit_plan", {
+      filePath: ".plannotator/plan.md",
+    });
+
+    assert.equal(result?.block, true);
+    assert.match(result?.reason ?? "", /stable session worktree identity/i);
   } finally {
     rmSync(base, { recursive: true, force: true });
   }

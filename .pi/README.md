@@ -1,74 +1,51 @@
-## Workflow extension mental model
+## Workflow commands
+
+`workflow-commands.ts` provides four approval-gated Pi workflows:
+
+| Command | Input | Outcome |
+|---|---|---|
+| `/work <requirement>` | Any local requirement and context | Explore, plan, approve, implement, verify, commit. |
+| `/ticket <Jira ID or URL> [context]` | Ticket plus optional extra information | Fetch Jira, explore all repositories, plan, approve, implement, verify, commit. |
+| `/mr-comments <HTTPS review URL> [context]` | GitLab, GitHub, GitHub Enterprise, or another hosted review | Read unresolved threads, plan fixes/replies, approve, fix and commit, then ask before push/reply. |
+| `/mr-review <HTTPS review URL> [context]` | Any supported hosted review | Read review data and code, plan findings, approve, then ask before posting comments. |
+
+Each command enters Plannotator planning. One workflow remains active until `/workflow-done` or `/workflow-abort`.
+
+## Workflow
 
 ```mermaid
 flowchart TD
-    U["User starts workflow command"] --> C{"Command valid?"}
-    C -->|"No"| N["Show validation error"]
-    C -->|"Yes"| P["Check Plannotator is idle"]
-    P -->|"Busy or unavailable"| N
-    P -->|"Idle"| E["Enter Plannotator planning mode"]
-    E --> R["Load matching workflow template"]
-    R --> S["Fresh bounded scout gathers evidence"]
-    S --> D["Agent writes required plan"]
-    D --> A["Submit plan through Plannotator"]
-    A --> F{"Approved without feedback?"}
-    F -->|"No"| D
-    F -->|"Yes: read-only"| V["Run approved report or revalidation"]
-    F -->|"Yes: code work"| W["Exit planning mode"]
-    W --> I["Fresh worker in canonical worktree"]
-    I --> G["Exact approved worker checks"]
-    G --> Q["Fresh reviewer in same worktree"]
-    Q --> H{"Reviewer verified<br/>and no findings?"}
-    H -->|"No"| I
-    H -->|"Yes"| X["/workflow-done"]
-    V --> X
-    X --> Z["Exit workflow and Plannotator"]
+    I["User input"] --> E["Read-only exploration"]
+    E --> P["Superpowers + caveman plan"]
+    P --> A["Plannotator feedback / approval"]
+    A -->|"Feedback"| P
+    A -->|"Approved code plan"| T["Create/reuse approved worktrees"]
+    T --> W["Parallel worker per repository"]
+    W --> C["TDD + exact Conventional Commit"]
+    C --> R["Parallel reviewer per repository"]
+    R --> D{"All acceptance criteria and gates pass?"}
+    D -->|"No"| W
+    D -->|"Yes"| X["/workflow-done"]
+    A -->|"Approved MR review"| Q["Ask before posting"]
+    Q --> X
 ```
 
-Extension creates one active workflow at time. It persists workflow state in session custom entries, so it can restore active loop after reload or session restoration.
+Planning exploration supports `rg`, `rg --files`, `ast-grep`, read-only Git and hosted-code CLI commands, read-only Atlassian/GitLab/GitHub/Sourcegraph or other MCP operations, and read-only web tools. Local or remote mutation remains blocked before approval.
 
-## Start the right workflow
+## Plan contract
 
-Run in Pi TUI.
-
-| Command | Input | Use it for |
-|---|---|---|
-| `/work <task>` | Local requirement | Local implementation, bug fix, or read-only investigation. |
-| `/ticket <Jira key or URL> <rough description>` | Jira issue plus short description | Ticket-driven investigation or implementation. |
-| `/mr-review <review URL>` | GitLab merge-request or trusted GitHub pull-request URL | Read-only review and, after approval, posting exact planned comments. |
-| `/mr-comments <review URL>` | GitLab merge-request or trusted GitHub pull-request URL | Triage existing review discussions; may make approved comment replies or non-force push actions. |
-
-Examples:
+Plan first line preserves route:
 
 ```text
-/work Fix cache invalidation when a booking is cancelled.
-/ticket ABC-123 Fix cache invalidation
-/mr-review https://gitlab.example.com/group/project/-/merge_requests/42
-/mr-comments https://gitlab.example.com/group/project/-/merge_requests/42
+Workflow: local-work
+Workflow: jira-ticket
+Workflow: gitlab-mr-comments
+Workflow: gitlab-mr-review
 ```
 
-`/mr-review` and `/mr-comments` accept HTTP(S) GitLab `/-/merge_requests/<id>` URLs, GitHub.com `/owner/repository/pull/<id>` URLs, and GitHub Enterprise pull-request URLs only when their host equals the current checkout's `origin` host.
-
-## What happens after `/work`
-
-1. Extension requires Plannotator to be idle, then enters planning mode.
-2. It loads `.pi/agent/workflows/local-work.md` and appends your task as `Workflow input`.
-3. Planning stays read-only. No production code edits, worktree creation, dependency installs, commits, or external mutations are allowed.
-4. Workflow requires one fresh, bounded, read-only `scout` before plan submission. A `researcher` is allowed for independent external-fact question.
-5. The plan must begin with `Workflow: local-work` and use all required headings.
-6. Plannotator approval binds exact plan content and repository snapshot.
-7. Code work: extension leaves planning mode and starts fresh sole `worker` in approved canonical worktree.
-8. Worker must report verified runtime acceptance ledger for exact approved commands.
-9. A fresh read-only `reviewer` repeats exact reviewer contract. It must report `reviewFindings: []` before completion.
-10. Run `/workflow-done` after all applicable gates are verified.
-
-## Required plan shape
-
-Every workflow plan must have these headings in this order of purpose:
+Required headings:
 
 ```text
-Workflow: <workflow marker>
-
 Goal
 In scope
 Out of scope
@@ -83,150 +60,124 @@ Open questions
 Risks
 ```
 
-Use evidence labels consistently:
+Every implementation action and acceptance criterion uses `- [ ]`. Every `Done when` criterion maps to an implementation item and exact check.
 
-- `FACT`: source-backed claim, including `path:line` for code.
-- `HYPOTHESIS`: confidence plus falsifier.
-- `UNKNOWN`: missing fact plus next check.
-
-`Implementation plan` must have at least one executable `- [ ]` item, including read-only report or revalidation outcome.
-
-### Code-work verification contract
-
-For implementation or bug-fix work, `Verification contract` must be one machine-readable JSON block containing only:
+Code plans use:
 
 ```json
 {
-  "cwd": "/absolute/canonical/worktree/path",
-  "worker": [
-    { "id": "focused-test", "command": "...", "timeoutMs": 120000 }
-  ],
-  "reviewer": [
-    { "id": "full-tests", "command": "...", "timeoutMs": 120000 },
-    { "id": "format", "command": "...", "timeoutMs": 120000 },
-    { "id": "lint", "command": "...", "timeoutMs": 120000 }
+  "repositories": [
+    {
+      "cwd": "/absolute/worktree/git-root",
+      "sourceCwd": "/absolute/source-repository/git-root",
+      "baseHead": "0123456789abcdef0123456789abcdef01234567",
+      "branch": "fix-cache",
+      "commitTitle": "fix(cache): prevent stale reads",
+      "acceptanceCriteria": [
+        "Cancelled bookings cannot return stale cache entries."
+      ],
+      "worker": [
+        {
+          "id": "focused-tests",
+          "command": "npm test -- cache",
+          "timeoutMs": 120000
+        }
+      ],
+      "reviewer": [
+        {
+          "id": "full-tests",
+          "command": "npm test",
+          "timeoutMs": 600000
+        },
+        {
+          "id": "format",
+          "command": "npm run format:check",
+          "timeoutMs": 120000
+        },
+        {
+          "id": "lint",
+          "command": "npm run lint",
+          "timeoutMs": 120000
+        }
+      ]
+    }
   ]
 }
 ```
 
-Rules enforced by extension:
+Rules:
 
-- every command is one line and has positive `timeoutMs`;
-- runtime commands must match approved IDs, text, ordering, and timeouts exactly;
-- reviewer IDs must be exactly `full-tests`, `format`, and `lint`;
-- format and lint are check-only, never auto-fixing;
-- worker and reviewer must complete with verified acceptance; and
-- reviewer must report empty `reviewFindings` array.
+- repository `cwd` values are unique absolute worktree roots beneath configured `worktreeBaseDir`;
+- `sourceCwd` is the exact absolute source Git root and `baseHead` is its approved HEAD; a reused `cwd` must share that source repository's Git common directory;
+- `commitTitle` follows Conventional Commits;
+- `acceptanceCriteria` exactly match the approved plan;
+- runtime acceptance criteria and commands match contract;
+- reviewer IDs are exactly `full-tests`, `format`, and `lint`;
+- format/lint commands are non-fixing;
+- multiple repositories launch as one parallel worker call, then one parallel reviewer call;
+- a new worktree uses only `git -C <sourceCwd> worktree add -b <branch> <cwd> <baseHead>`;
+- worker completion requires the exact approved commit title, a clean worktree, and structured per-criterion, failed RED, passing GREEN, and test-change evidence; and
+- `/workflow-done` requires every repository gate and unchanged post-review snapshot.
 
-Read-only plan: write exactly:
+Read-only plan:
 
 ```text
 Not applicable - read-only plan.
 ```
 
-Extension then blocks code workers and reviewers. It also hashes repository state and refuses completion if that state changes after approval.
+After approval, a read-only plan runs one foreground fresh scout with attested acceptance, the exact `Done when` criteria, and per-criterion evidence before it can complete.
 
-## Worker and reviewer roles
+## Worktree naming
 
-The local configuration permits four active subagent roles:
+Configured base: `agent/extensions/subagent/config.json`.
 
-| Role | Purpose | Default skills |
-|---|---|---|
-| `scout` | One bounded, read-only repository evidence question. | None inherited. |
-| `researcher` | Independent current external-fact stream only. | None inherited. |
-| `worker` | Sole code and test writer in approved worktree. | `test-driven-development`, `verification-before-completion`, `receiving-code-review` |
-| `reviewer` | Independent final gate after worker passes. | `verification-before-completion` |
+- `/work`: branch `<summary>`, directory `<source-repository>-<summary>`. Summary is lowercase ASCII hyphen form, maximum 20 characters.
+- `/ticket`: branch `<JIRA-ID>_<summary>`, directory `<source-repository>-<JIRA-ID>_<summary>`. Summary uses the same lowercase-hyphen 20-character limit. Extra command context is optional; plan derives it from user context plus authoritative ticket.
+- `/mr-comments`: branch `<session-key>`, directory `<session-key>`. No additional prefix is added.
 
-Workflow extension rejects ad-hoc worker or reviewer delegation outside approved workflow contract. It also rejects contracts that use different working directory or different verification commands.
+Worktrees are created or reused only after approval. User remains in shared checkout.
 
-## Worktree rules for code workflows
+## Review hosts and confirmation
 
-The approved `cwd` is not arbitrary. Extension derives and preserves one canonical worktree identity under configured `worktreeBaseDir` from `.pi/agent/extensions/subagent/config.json`.
+Review commands accept an HTTPS URL followed by optional context. Platform-specific retrieval order:
 
-- Local work uses branch `<summary>` and worktree directory `<source-repository-name>-<summary>`. Before planning code work, use `caveman` at ultra intensity to extract a non-empty lowercase ASCII hyphen-separated main-idea summary from the user input, at most 20 characters. Search shared checkout to select source repository; user remains there while worker uses canonical worktree.
-- Merge-request workflows use `pi-session-<session-key>` identity.
-- Jira code workflows use `<source-repository-name>-<JIRA_TICKET_ID>_<rough-description>` for their canonical worktree directory. The branch uses `<JIRA_TICKET_ID>_<rough-description>`. The rough description is required after ticket ID or URL, normalized to lowercase ASCII hyphen-separated text.
-- Reuse canonical worktree across follow-up iterations.
-- Never create temporary fallback worktree.
-- Never create worktree during planning.
+1. matching read-only MCP;
+2. authenticated `glab`, `gh`, or host CLI;
+3. trusted same-host GET/HEAD `curl`.
 
-The plan, worker launch, reviewer launch, and final gate must all refer to same canonical `cwd`.
+Hosted-review plans include a `Remote action contract`; `actions` may be empty for a clean review. Every proposed comment, reply, or non-force push has one exact `toolName` and exact object `input` bound to the review platform and URL target. Approval alone never authorizes those calls.
 
-## Ticket workflow differences
+`/mr-review` never posts automatically. After plan approval and its read-only scout gate, it asks whether to execute every exact approved comment call.
 
-`/ticket` uses `Workflow: jira-ticket` and `.pi/agent/workflows/jira-ticket.md`. Code work: use `/ticket <Jira key or URL> <rough description>` so branch is `<JIRA_TICKET_ID>_<rough-description>` and worktree directory is `<source-repository-name>-<JIRA_TICKET_ID>_<rough-description>`.
+`/mr-comments` implements approved fixes with TDD and a Conventional Commit, verifies them, then asks whether to execute every exact approved push and reply call. Reply-only plans run the read-only scout gate and also ask first. Each successful tool result is correlated to its contract action. No force push, approval, merge, thread resolution, closure, deletion, or unlisted remote mutation is implied.
 
-- Ticket information is read early through Jira tooling before ticket-derived claims.
-- Initial read-only exploration can include repository snapshots, memory, instructions, and skills.
-- A ticket can cover more than one repository session. Each approved repository session requires fresh explicit approval.
-- Ticket mutations still require explicit user authorization.
-- Commit, push, merge-request creation, tag, or version bump is never implied by plan approval.
-
-## Merge-request workflow differences
-
-### `/mr-review`
-
-This route is remote-read-only during planning. It fetches current merge-request or pull-request metadata, source/target branches, head SHA, diff, checks/pipelines, discussions, and changed-file context. It selects GitLab MCP then `glab` then trusted authenticated `curl` for GitLab; for GitHub/GitHub Enterprise it uses a connected GitHub MCP when capable, then `gh` (`--hostname <host>` for Enterprise), then trusted authenticated `curl`.
-
-After approval, it re-fetches head SHA and discussions. If evidence or anchors changed, it returns to planning. It may post exact approved comments. It cannot edit code, create worktree, approve, merge, or resolve discussions.
-
-### `/mr-comments`
-
-This route triages unresolved review discussions. It follows same approval and refresh requirements. Workflow template permits exact approved replies and any exact approved non-force push action; no unrelated remote action is authorized.
-
-## Control an active workflow
+## Active-loop commands
 
 | Command | Meaning |
 |---|---|
-| `/workflow-status` | Read-only view of active workflow, iteration, plan hash, contract, and gate state. |
-| `/workflow-retry` | Retry preserved follow-up transition only. Never use as generic restart. |
-| `/workflow-abort` | End active workflow without claiming completion. Preserves resumable state. |
-| `/workflow-continue` | Restore aborted workflow and resume planning. |
-| `/workflow-done` | Complete when current plan and all required gates pass. |
+| `/workflow-status` | Show workflow, iteration, approved plan, repository count, and gates. |
+| `/workflow-retry` | Retry preserved transition. |
+| `/workflow-done` | Finish only after all acceptance criteria and gates pass. |
+| `/workflow-abort` | Abandon without completion claim. |
+| `/workflow-continue` | Resume aborted workflow through a new planning iteration. |
 
-A later user follow-up is **not** covered by prior approval. Extension queues it as new iteration. The next planning pass must refresh evidence with new scout, add iteration delta under `Evidence`, revise same plan, and collect another approval.
+Later scope changes re-enter planning and require approval. Direct answers to extension-generated post-review posting questions are treated as confirmations, not new scope.
 
-## Project-specific template override
+After session restoration, interrupted scout, worker, or reviewer calls become failed/retryable gates. An interrupted remote action is cleared and requires a fresh user decision, so stale tool-call IDs cannot deadlock the workflow.
 
-A repository can override one workflow template without changing global extension:
+## Verification
 
 ```text
-<repository>/.pi/workflows/
-├── local-work.md
-├── jira-ticket.md
-├── gitlab-mr-review.md
-└── gitlab-mr-comments.md
+node --check agent/extensions/workflow-commands.ts
+node --test agent/tests/workflow-commands.test.ts
+git diff --check
 ```
 
-When present, extension reads project-local template before falling back to `.pi/agent/workflows/`. Keep its `Workflow: <marker>` line correct and preserve extension-required rules and plan headings.
+Source map:
 
-## Efficient use
-
-1. Pick route first. Never use `/work` for merge-request review or `/mr-review` for local code change.
-2. Give narrow input. Include symptom, intended outcome, known reproduction, and constraints.
-3. Let planning finish before asking for edits. Approval controls mutation authority.
-4. Review submitted plan, especially `In scope`, `Out of scope`, `Evidence`, and exact verification contract.
-5. Code work: require focused test before full-suite, format, and lint checks.
-6. Use `/workflow-status` when uncertain; do not bypass workflow with ad-hoc worker or reviewer calls.
-7. Send corrections as follow-ups. Extension preserves work but requires fresh approved iteration.
-8. Use `/workflow-abort` if objective changes materially, then `/workflow-continue` when ready to re-plan.
-
-## Troubleshooting
-
-| Symptom | Likely reason | Safe next action |
-|---|---|---|
-| Workflow will not start | Plannotator is not idle, unavailable, or did not enter planning mode. | Finish or exit existing planning work, then retry command. |
-| Plan approval does not start worker | Plan had feedback, changed while pending, missing contract, or Plannotator could not exit. | Revise and resubmit; inspect `/workflow-status`; use `/workflow-retry` for preserved transition. |
-| Worker or reviewer blocked | Contract, role, `cwd`, or acceptance command differs from approved plan. | Fix plan or launch parameters through new approved iteration. |
-| `/workflow-done` blocked | Pending follow-up, changed repository/plan, missing worker gate, reviewer failure, or findings remain. | Read status, resolve through planned worker/reviewer cycle, then retry. |
-| Follow-up ignored or blocked | A workflow transition is in progress or needs replanning. | Wait for transition, then let new iteration enter planning. |
-
-## Source map
-
-- Extension behavior: `.pi/agent/extensions/workflow-commands.ts`
-- Local workflow: `.pi/agent/workflows/local-work.md`
-- Jira workflow: `.pi/agent/workflows/jira-ticket.md`
-- Merge-request review workflow: `.pi/agent/workflows/gitlab-mr-review.md`
-- Merge-request comment workflow: `.pi/agent/workflows/gitlab-mr-comments.md`
-- Role policy: `.pi/agent/settings.json` and `.pi/agent/AGENTS.md`
-- Regression tests: `.pi/agent/tests/workflow-commands.test.ts`
+- `agent/extensions/workflow-commands.ts`
+- `agent/workflows/*.md`
+- `agent/plannotator.json`
+- `agent/settings.json`
+- `agent/AGENTS.md`
+- `agent/tests/workflow-commands.test.ts`

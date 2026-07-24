@@ -1,17 +1,36 @@
 Workflow: local-work
 
-Load `caveman` at ultra intensity for chat plus installed repository-relevant skills. Keep plans, evidence, requirements, tests, and safety steps fully explicit.
+Load `caveman` at ultra intensity for chat, Superpowers `brainstorming` for plan quality, and repository-relevant skills. Keep evidence, requirements, plans, tests, and safety steps explicit.
 
-Stay in Plannotator planning mode until approval. Do not edit production code, create a worktree, commit, install dependencies, or mutate external systems during planning.
+Stay in Plannotator planning until approval. Planning is read-only except the plan file. This workflow remains active until `/workflow-done` passes or `/workflow-abort`.
 
-This workflow remains active until successful `/workflow-done` or explicit `/workflow-abort` without a completion claim. Treat every later user-authored follow-up as a new iteration: re-enter planning, refresh repository evidence with one new bounded foreground fresh read-only scout, revise the same plan file, and obtain another approval before new implementation. Preserve prior approved work and reuse the canonical worktree. Never execute follow-up scope under an earlier approval. Use `/workflow-status` for a read-only status check and `/workflow-retry` only for a preserved follow-up.
+1. Use the complete workflow input as the requirement. Classify implementation, bug fix, or read-only investigation.
+2. Explore every relevant repository or directory before planning. Read nearest instructions, branch, `HEAD`, status, architecture/build docs, representative code, callers, and tests. Use `rg`, `rg --files`, `ast-grep`, read-only Git/CLI commands, connected MCP tools, and read-only hosted-code or documentation tools as useful. Use one fresh bounded `scout`; use `researcher` only for independent current facts. Label claims `FACT`, `HYPOTHESIS` with confidence and falsifier, or `UNKNOWN` with next check.
+3. Use Superpowers `brainstorming` plus gathered evidence to write one solid implementation plan. First line stays `Workflow: local-work`. Use headings `Goal`, `In scope`, `Out of scope`, `Evidence`, `Things to implement`, `Implementation plan`, `Requirement-to-test mapping`, `Done when`, `Verification contract`, `Skill recommendation`, `Open questions`, and `Risks`. Every acceptance criterion appears as `- [ ]` under `Done when` and maps to an implementation item plus exact verification.
+4. Submit the plan through Plannotator. Feedback means revise the same plan and resubmit. Implement nothing until approval.
+5. Code plans may span multiple repositories. Use `caveman` to derive one non-empty lowercase ASCII hyphen summary, at most 20 characters. For each repository use branch `<summary>` and directory `<source-repository-name>-<summary>` beneath configured `worktreeBaseDir`. The user stays in the shared checkout. Put every repository in one `Verification contract` JSON object:
 
-1. Classify the request as implementation, bug fix, or read-only investigation from explicit evidence. Do not blend routes.
-2. Read applicable repository instructions, task-relevant prompts and skills, architecture/contributor/build docs, branch, HEAD, status, representative code, callers, and tests. Read relevant sources fully and cite `path:line`. Mark missing context `UNKNOWN`; never infer conventions.
-3. Delegate one foreground fresh read-only `scout` one bounded repository question. Use one `researcher` only for an independent current external-doc stream. Parent verifies every handoff and owns the plan. No planner, delegate, oracle, nested delegation, or automatic review fanout.
-4. On a follow-up iteration, add an iteration delta under `Evidence`: corrected requirement, reason for the prior miss, invalidated assumption or evidence, exact regression check, and unfinished work carried forward. Map every delta to one implementation item and one verification item.
-5. Build an annotation-ready plan whose first line is exactly `Workflow: local-work`, followed by exact headings: `Goal`, `In scope`, `Out of scope`, `Evidence`, `Things to implement`, `Implementation plan`, `Requirement-to-test mapping`, `Done when`, `Verification contract`, `Skill recommendation`, `Open questions`, and `Risks`. Under `Implementation plan`, use standard `- [ ]` items and include at least one executable revalidation/report item for read-only outcomes. Label claims `FACT`, `HYPOTHESIS` with confidence/falsifier, or `UNKNOWN` with next check. Include base HEAD and exact files/symbols when known.
-6. For code work, use `caveman` at ultra intensity to extract a lowercase ASCII hyphen-separated main-idea summary from the user input. The summary must be non-empty and at most 20 characters. Use branch `<summary>` and directory `<source-repository-name>-<summary>` beneath the configured worktree base. First search the shared invoking checkout to identify the source repository; after approval, create or reuse only that canonical worktree, while the user remains in the shared checkout. Then place its exact absolute repository `cwd`, focused commands, complete repository test-suite, check-only format, and lint commands in the machine-readable `Verification contract`: one JSON block with only `cwd`, `worker`, and `reviewer`; every command item has `id`, exact one-line `command`, and positive integer `timeoutMs`; reviewer IDs are exactly `full-tests`, `format`, and `lint`. Never use placeholder success commands. Missing commands or `cwd` are an `UNKNOWN` blocker to approval and a passing verdict. For read-only work, write exactly `Not applicable - read-only plan.` under that heading.
-7. In `Skill recommendation`, list relevant installed project/global skills. Recommend a new install only when materially useful; include source and benefit. Otherwise state `No new skill needed`. Never install during planning.
+```json
+{
+  "repositories": [
+    {
+      "cwd": "/absolute/worktree/git-root",
+      "sourceCwd": "/absolute/source-repository-git-root",
+      "baseHead": "exact-source-HEAD-object-id",
+      "branch": "lowercase-summary",
+      "commitTitle": "fix(scope): concise semantic title",
+      "acceptanceCriteria": ["Exact criterion copied from Done when"],
+      "worker": [{ "id": "focused-tests", "command": "exact command", "timeoutMs": 120000 }],
+      "reviewer": [
+        { "id": "full-tests", "command": "exact complete test command", "timeoutMs": 600000 },
+        { "id": "format", "command": "exact non-fixing format check", "timeoutMs": 120000 },
+        { "id": "lint", "command": "exact non-fixing lint check", "timeoutMs": 120000 }
+      ]
+    }
+  ]
+}
+```
 
-For an approved implementation or bug-fix plan, reuse or create the one canonical worktree from the approved base HEAD at the exact contract `cwd`. Delegate code and regression tests to one new fresh `worker` as sole writer. The foreground worker launch must use `context: "fresh"`, that exact `cwd`, and runtime `acceptance: { level: "verified" }` with the exact approved worker commands, order, and timeouts and no allowed failures or command overrides. Require red, green, refactor evidence. After a meaningful diff and passed worker ledger, launch one foreground fresh read-only `reviewer` in the same `cwd` with the exact approved runtime commands whose IDs are `full-tests`, `format`, and `lint`; commands use non-fixing modes with no overrides or allowed failures. Its acceptance `reviewFindings` lists every actionable finding and is empty only when none exist. Any finding returns to one serial worker, then repeats both gates. Only the latest verified worker ledger plus a fresh verified reviewer ledger with no findings permits completion. For an approved read-only plan, perform only its listed revalidation and report items; do not create a worktree or launch code gates. Do not stage or commit unless the user separately requested it and the approved plan lists it as an exact worker action before the fresh reviewer gate. Never push, tag, bump versions, or mutate external systems unless separately authorized.
+For read-only work, write exactly `Not applicable - read-only plan.` under `Verification contract`. After approval, run one foreground fresh `scout` in the approved plan cwd with attested acceptance, exact `Done when` criteria, per-criterion evidence, and a structured report.
+
+After approval, create or reuse each exact worktree from its approved `sourceCwd` and `baseHead`; new worktrees use `git -C <sourceCwd> worktree add -b <branch> <cwd> <baseHead>`, and reused worktrees must share the source Git common directory. Launch one foreground parallel subagent call with one fresh `worker` task per repository. Each worker is sole writer for its repository, uses Superpowers `test-driven-development`, proves the same approved test command failed RED before it passed GREEN, copies every exact acceptance criterion in order with evidence, names tests added or updated, runs exact commands, stages only scoped paths, creates the exact approved Conventional Commit, and leaves a clean worktree. Independent repositories run in parallel. Then run one fresh `reviewer` task per repository in parallel with exact ordered per-criterion evidence and a clean-worktree check. Findings return to affected workers, followed by fresh worker and reviewer gates. Never push, publish, tag, bump versions, or mutate external systems unless separately authorized. Stop only after every `Done when` criterion and every repository gate passes.
