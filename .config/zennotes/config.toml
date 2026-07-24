@@ -15,7 +15,7 @@ config_version = 1
 [vim]
 enabled = true  # true | false — CodeMirror Vim bindings
 insert_escape = "jk"  # key sequence to leave insert mode, e.g. "jk"; empty disables
-yank_to_clipboard = true  # also copy Vim yank/delete/change to the system clipboard
+yank_to_clipboard = true  # sync the system clipboard with Vim yank/delete/change and p/P paste
 which_key_hints = true  # show the leader-key hint overlay (Vim only)
 which_key_hint_mode = "sticky"  # timed | sticky
 which_key_hint_timeout_ms = 900  # how long timed hints stay visible (ms)
@@ -34,8 +34,13 @@ tabs_enabled = true  # enable tab-based editing
 wrap_tabs = false  # wrap the tab strip instead of scrolling it
 font_size = 16  # editor + preview font size (px)
 line_height = 1.7  # line-height multiplier
+scroll_off = 0  # vim scrolloff — lines kept above/below the cursor (0 = off)
+time_format = "12h"  # clock format for the @time macro (12h or 24h)
 preview_max_width = 920  # max reading width for the preview (px)
 editor_max_width = 920  # max width of the editor column (px)
+completed_task_style = "none"  # none | strikethrough | gray | gray-strikethrough — style checked-task text
+math_renderer = "katex"  # katex | typst: typesetter for $…$ / $$…$$ math
+loose_math_delimiters = false  # render $$…$$ display math even with text before/after the fences
 line_number_mode = "relative"  # off | absolute | relative
 line_number_position = "text"  # text | edge
 word_wrap = true  # wrap long lines vs. scroll horizontally
@@ -60,6 +65,7 @@ mono_font = ""  # code / monospace font; empty = system default
 [view]
 note_sort_order = "none"  # none | manual | updated-desc | updated-asc | created-desc | created-asc | name-asc | name-desc
 group_by_kind = true  # group notes by kind in the list
+nested_tags = true  # show /-separated tags as a collapsible tree (sidebar + Tags view)
 view_settings_scope = "global"  # apply note/list view settings globally or per vault (global | vault)
 auto_reveal = false  # auto-expand the sidebar to the active note
 quick_note_date_title = false  # title quick notes by date instead of a timestamp
@@ -69,6 +75,7 @@ calendar_week_start = "monday"  # monday | sunday | locale
 calendar_show_week_numbers = true  # show ISO week numbers in the calendar
 tasks_view_mode = "calendar"  # list | calendar | kanban
 kanban_group_by = "status"  # status | priority | folder
+kanban_statuses = []  # custom-status Kanban columns, in order — e.g. ["backlog", "in_progress", "review", "done"]
 
 # Keymap overrides. Add or uncomment "<action.id>" = "<binding>" lines.
 # Binding syntax: "Mod+P" = Cmd/Ctrl+P, "Shift+Mod+K", "Ctrl+W", "Space",
@@ -122,6 +129,7 @@ kanban_group_by = "status"  # status | priority | folder
 # "vim.leaderInsertTemplate" = "i"  # Leader: insert template into note
 # "vim.leaderDailyNote" = "d"  # Leader: today's daily note
 # "vim.leaderWeeklyNote" = "w"  # Leader: this week's note
+# "vim.leaderMonthlyNote" = "m"  # Leader: this month's note
 # "vim.leaderCalendar" = "c"  # Leader: toggle calendar
 # "vim.panePrefix" = "Ctrl+W"  # Pane command prefix
 # "vim.paneFocusLeft" = "h"  # Pane: focus left
