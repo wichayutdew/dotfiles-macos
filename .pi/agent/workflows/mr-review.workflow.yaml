@@ -12,9 +12,8 @@ steps:
     prompt:
       file: steps/mr-review/plan.md
     subagent:
-      agent: pi-workflows.step
+      agent: scout
       context: fresh
-      model: openai-gateway/gpt-5.6-sol
       timeoutMs: 1800000
       turnBudget:
         maxTurns: 40
@@ -77,9 +76,8 @@ steps:
     prompt:
       file: steps/mr-review/review.md
     subagent:
-      agent: pi-workflows.step
+      agent: reviewer
       context: fresh
-      model: openai-gateway/gpt-5.6-sol
       timeoutMs: 1800000
       turnBudget:
         maxTurns: 40
@@ -136,7 +134,7 @@ steps:
     prompt:
       file: steps/mr-review/confirm.md
     subagent:
-      agent: pi-workflows.step
+      agent: reviewer
       context: fresh
       timeoutMs: 300000
       turnBudget:
@@ -166,7 +164,7 @@ steps:
     prompt:
       file: steps/shared/publish-remote.md
     subagent:
-      agent: pi-workflows.step
+      agent: worker
       context: fresh
       timeoutMs: 900000
     permissions:

@@ -12,7 +12,7 @@ steps:
     prompt:
       file: steps/work/plan.md
     subagent:
-      agent: pi-workflows.step
+      agent: scout
       context: fresh
       timeoutMs: 1200000
       turnBudget:
@@ -65,7 +65,7 @@ steps:
     prompt:
       file: steps/work/implement.md
     subagent:
-      agent: pi-workflows.step
+      agent: worker
       context: fresh
       timeoutMs: 7200000
       artifacts: true
@@ -104,9 +104,8 @@ steps:
     prompt:
       file: steps/work/verify.md
     subagent:
-      agent: pi-workflows.step
+      agent: reviewer
       context: fresh
-      model: openai-gateway/gpt-5.6-sol
       timeoutMs: 3600000
       turnBudget:
         maxTurns: 40
