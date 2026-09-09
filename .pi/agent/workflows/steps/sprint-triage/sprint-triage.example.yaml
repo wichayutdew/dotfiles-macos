@@ -22,7 +22,7 @@ knowledgeBase:
 confluence:
   cloudId: REPLACE_WITH_CONFLUENCE_CLOUD_ID
   pageId: REPLACE_WITH_CONFLUENCE_PAGE_ID
-  # Append approved knowledge at the end of the dedicated guide page.
-  appendMode: end
+  # Insert approved novel guidance at the top of the dedicated guide page.
+  appendMode: top
 gitlab:
   targetBranch: REPLACE_WITH_MR_TARGET_BRANCH

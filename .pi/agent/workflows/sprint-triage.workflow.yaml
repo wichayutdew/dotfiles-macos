@@ -55,6 +55,7 @@ steps:
           - "- Brief description:"
           - "- Steps to take:"
           - "- Useful links:"
+          - "- Existing-guide matches:"
           - "## Publication contract"
           - "## Knowledge Base"
           - "- Title:"
@@ -62,7 +63,7 @@ steps:
           - "- Exact index Markdown:"
           - "## Confluence"
           - "- Confluence page:"
-          - "- Exact append HTML:"
+          - "- Exact top-insert HTML:"
         forbiddenSubstrings:
           - "The complete gate artifact is the exact Markdown saved at"
         onValidationFailure: retry
@@ -95,7 +96,7 @@ steps:
       bash: {mode: unrestricted}
     transitions: {ready: publish, retry: implement, blocked: $pause, handoff: implement}
   publish:
-    title: Open MR and append Confluence
+    title: Open MR and insert Confluence guide
     prompt: {file: steps/sprint-triage/publish.md}
     agent: scout
     maxToolCalls: 10

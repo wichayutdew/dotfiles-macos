@@ -5,7 +5,7 @@ Collection: `{{last.summary}}`
 Rejected plan: `{{gate.artifact}}`
 Feedback: `{{gate.feedback}}`
 
-Re-read `~/.pi/agent/workflows/steps/sprint-triage/sprint-triage.yaml`. Fetch the Confluence page for append context.
+Re-read `~/.pi/agent/workflows/steps/sprint-triage/sprint-triage.yaml`. Fetch the Confluence page as HTML for existing-guide comparison and top-insertion context.
 
 Submit:
 
@@ -42,14 +42,16 @@ Calculate the staged report's SHA-256 after writing it. The staging file is revi
 - Number of tickets skipped due to any issue: <count and reasons, if nonzero>
 
 # Human guide (Confluence)
-Group only reusable guidance. Use the same compact bullet format; do not repeat ticket narratives. For every guide, inspect the collected threads and fetched Confluence context for durable operational references. Include only verified links, such as the configured Grafana dashboard, the Confluence guide page, a GitLab permalink for a relevant job or schedule, a tracked work item, or another directly relevant operational resource.
+Group only reusable guidance. Use the same compact bullet format; do not repeat ticket narratives. For every candidate guide, inspect the collected threads and all existing guidance in the fetched Confluence HTML. Treat a candidate as already handled when its operational trigger/topic or issue and its remediation steps materially overlap an existing guide. Omit an already-handled candidate; continue with every novel candidate. Do not include omitted candidates in the numbered guide list or the HTML fragment. For every retained guide, inspect the collected threads and fetched Confluence context for durable operational references. Include only verified links, such as the configured Grafana dashboard, the Confluence guide page, a GitLab permalink for a relevant job or schedule, a tracked work item, or another directly relevant operational resource.
 
 ## Guide <number>: <short topic>
 - Brief description: <when this guide applies>
 - Steps to take: <ordered, actionable support steps>
 - Useful links: <verified label and URL list, or `None identified`>
 
-Create a self-contained Confluence HTML fragment for the publication contract. It must not contain Markdown syntax or Markdown code fences. Use `<h2>` for the sprint addendum heading; use one `<h3>` per guide; use `<p>` with `<strong>` for the guide description labels; use `<ol><li>` for ordered steps; and use `<ul><li><a href="…">…</a></li></ul>` for useful links. Use `<p>None identified</p>` when a guide has no useful links. Escape text and attributes as HTML, and include only verified absolute `https://` URLs.
+- Existing-guide matches: <one omitted candidate topic/issue and the matching existing guide heading per line, or `None` if every candidate is novel>
+
+Create a self-contained Confluence HTML fragment containing only retained novel guides for the publication contract. It must not contain Markdown syntax or Markdown code fences. Use `<h2>` for the sprint addendum heading; use one `<h3>` per guide; use `<p>` with `<strong>` for the guide description labels; use `<ol><li>` for ordered steps; and use `<ul><li><a href="…">…</a></li></ul>` for useful links. Use `<p>None identified</p>` when a guide has no useful links. Escape text and attributes as HTML, and include only verified absolute `https://` URLs.
 
 ## Publication contract
 
@@ -70,9 +72,10 @@ If no MR template is verified, create the MR with no description adjustment, rea
 
 ## Confluence
 - Confluence page: <source page title, URL, and version/hash>
-- Exact append HTML:
+- Existing-guide matches: <one omitted candidate topic/issue and matching existing guide heading per line, or `None`>
+- Exact top-insert HTML:
 ```html
-<complete approved human-guide HTML fragment>
+<complete approved HTML fragment containing only novel human guides>
 ```
 
 The complete approval artifact ends after `## Publication contract` and its Knowledge Base and Confluence subsections.
