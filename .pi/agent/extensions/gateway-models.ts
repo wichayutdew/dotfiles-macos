@@ -183,11 +183,11 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         name: "claude-sonnet-5",
         ...sonnetModelConfig,
       },
-      {
-        id: "claude-opus-5",
-        name: "claude-opus-5",
-        ...opusModelConfig,
-      },
+      // {
+      //   id: "claude-opus-5",
+      //   name: "claude-opus-5",
+      //   ...opusModelConfig,
+      // },
       {
         id: "gpt-5.6-luna",
         name: "gpt-5.6-luna",
@@ -200,18 +200,18 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         api: "openai-responses",
         ...terraModelConfig,
       },
-      {
-        id: "gpt-5.6-sol",
-        name: "gpt-5.6-sol",
-        api: "openai-responses",
-        ...solModelConfig,
-      },
-      {
-        id: "gpt-6-astra",
-        name: "gpt-6-astra",
-        api: "openai-responses",
-        ...astraModelConfig,
-      },
+      // {
+      //   id: "gpt-5.6-sol",
+      //   name: "gpt-5.6-sol",
+      //   api: "openai-responses",
+      //   ...solModelConfig,
+      // },
+      // {
+      //   id: "gpt-6-astra",
+      //   name: "gpt-6-astra",
+      //   api: "openai-responses",
+      //   ...astraModelConfig,
+      // },
       {
         id: "gemini-3.8-flash",
         name: "gemini-3.8-flash",
