@@ -27,7 +27,7 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 
 - Always draft plans under `~/.plannotator/plans/`
 - Submit the complete Markdown text as the gate `artifact`. Never submit a path.
-- Do not edit product code before Plannotator approval.
+- Do not edit product code before Plannotator approval. Once a complete plan is approved, execute every in-scope task through verification without requesting further routine approval.
 
 ## Implementation
 
@@ -38,6 +38,7 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 ## Execution discipline
 
 - Before implementation, establish the goal, observable acceptance criteria, and verification method. Ask only for information that cannot be determined from available evidence.
+- When an approved plan provides the needed decisions and authority, continue autonomously through all in-scope implementation and verification work. Stop only for a genuine blocker: unavailable required information, an out-of-scope decision, missing authority for an external mutation, missing credentials, or a failure that cannot be resolved from available evidence.
 - When unblocked, take the next concrete tool or edit action. Do not emit progress-only promises such as "I will" or "next I will" between actionable steps.
 - When context pressure risks reliable execution, preserve the goal, acceptance criteria, verification method, current repository state, and next concrete action through compaction or `/clean-execute <plan.md>`.
 
@@ -48,7 +49,7 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 ## Workflow children
 
 - When executing a declarative workflow step, do not launch subagents.
-- Use `blocked` when progress requires information, a decision, authority, credentials, or approval from the user. Never use `retry`, `handoff`, or a next-step outcome to ask the user a question.
+- Use `blocked` only for a genuine blocker: required information or a decision absent from the approved plan, missing authority for an external mutation, missing credentials, or a failure that cannot be resolved from available evidence. Do not use `blocked` for routine implementation, verification, or in-scope decisions after plan approval. Never use `retry`, `handoff`, or a next-step outcome to ask the user a question.
 - Use `retry` only for a transient failure that can be retried without new user input.
 - Do not open a skill file unless the step YAML lists that skill.
 - Format all human-facing output—including summaries, plans, reports, comments, and replies—for scanning: short headings, then one distinct fact, action, or metadata value per bullet or paragraph. Never pack unrelated values into one line or emit a dense prose wall.
