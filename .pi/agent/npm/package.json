@@ -2,7 +2,7 @@
   "name": "pi-extensions",
   "private": true,
   "dependencies": {
-    "@plannotator/pi-extension": "^0.27.12",
+    "@plannotator/pi-extension": "^0.27.13",
     "@wichayutdew/pi-workflows": "^3.9.0",
     "pi-mcp-adapter": "^2.32.1",
     "pi-web-access": "^0.28.0",
