@@ -35,6 +35,12 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 - TDD only when the test has an assessable benefit. Never add a test solely to satisfy TDD.
 - Never push, merge, or mutate external services without the current step's authority. Never print secrets.
 
+## Execution discipline
+
+- Before implementation, establish the goal, observable acceptance criteria, and verification method. Ask only for information that cannot be determined from available evidence.
+- When unblocked, take the next concrete tool or edit action. Do not emit progress-only promises such as "I will" or "next I will" between actionable steps.
+- When context pressure risks reliable execution, preserve the goal, acceptance criteria, verification method, current repository state, and next concrete action through compaction or `/clean-execute <plan.md>`.
+
 ## Subagents
 
 - In normal chat, launch subagents when they materially improve independent research, review, or implementation work, subject to the active tool and repository rules.

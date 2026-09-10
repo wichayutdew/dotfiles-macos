@@ -3,7 +3,7 @@ id: sprint-triage
 command: sprint-triage
 description: "OpsBot API ticket rows → Slack threads → dual summaries → worktree → commit → MR and Confluence."
 start: collect
-maxStepVisits: 10
+maxStepVisits: 30
 summaryMaxChars: 50000
 steps:
   collect:

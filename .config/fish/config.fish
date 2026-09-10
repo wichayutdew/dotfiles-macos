@@ -30,6 +30,7 @@ end
 
 # ---- YAZI OPEN IN NVIM ----
 set -gx EDITOR 'nvim'
+set -gx MCP_UI_VIEWER none
 
 # ---- ALIASES ----
 alias leet 'nvim leetcode.nvim'
