@@ -4,10 +4,6 @@ Input: `{{workflow.input}}`
 
 Read `~/.pi/agent/workflows/steps/sprint-triage/sprint-triage.yaml`. All API parameters come only from its `opsbot` configuration. Do not hardcode a channel, profile, ticket status, person, request topic, ticket date field, or ticket example.
 
-## Permitted MCP calls
-
-Use only the MCP calls allowed for this workflow step in `sprint-triage.workflow.yaml`. Do not discover, call, or infer additional MCP tools.
-
 ## Ticket collection
 
 1. Validate that `opsbot.channelId`, `opsbot.supportProfile`, `opsbot.ticketStatuses`, `opsbot.includeAllUnclosed`, `opsbot.user`, and `opsbot.timeZone` are present and valid.
@@ -28,7 +24,7 @@ curl --silent --show-error --location --max-time 20 --get \
   --data-urlencode "user=${user}"
 ```
 
-6. Treat a nonzero `curl` exit code, non-2xx response, invalid JSON, or a response without a `rows` array as `retry` for a transient transport failure and `blocked` for a persistent or schema/configuration failure. Report the factual error without credentials.
+6. Treat a nonzero `curl` exit code, non-2xx response, invalid JSON, or a response without a `rows` array as `handoff` for a transient transport failure and `blocked` for a persistent or schema/configuration failure. Report the factual error without credentials.
 7. Treat returned `rows` as the authoritative ticket set. Do not locally filter by `last_activity_time`, creation time, request topic, assignee, requester, status, or any other ticket field.
 8. Deduplicate nonempty `ticket_link` values in returned row order. Record source-row count, duplicate-link count, selected-link count, every selected link, and the full source row for each selected link. A missing or malformed `ticket_link` is `blocked`; do not reconstruct ticket membership from another source.
 
@@ -57,5 +53,5 @@ Handoff:
 Do not summarize, title, classify, infer a resolution, explain a ticket, or reconcile results outside the API response and Slack-thread evidence. Return `blocked` rather than silently truncating required evidence when it cannot fit within the workflow handoff limit.
 
 `ready`: complete API ticket rows plus complete Slack MCP thread evidence.
-`retry`: transient API transport or Slack MCP failure.
+`handoff`: transient API transport or Slack MCP failure.
 `blocked`: invalid configuration or dates, persistent API failure, invalid API response, missing/malformed ticket link, malformed Slack permalink, persistent Slack MCP failure, or required evidence exceeding the handoff limit.

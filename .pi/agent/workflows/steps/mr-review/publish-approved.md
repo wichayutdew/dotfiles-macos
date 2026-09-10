@@ -7,6 +7,6 @@ Handoff: `{{last.summary}}`
 
 GitHub: create pending review, add marked comments, submit `COMMENT`. Never approve, merge, resolve, close, or delete.
 
-`published`: every approved action exists on the host.
-`retry`: transient failure.
+`ready`: every approved action exists on the host.
+`handoff`: transient failure.
 `blocked`: ambiguity or error.

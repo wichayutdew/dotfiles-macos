@@ -5,6 +5,9 @@ Restart workspace: `{{restart.workspace}}`
 
 Use `publication.sourceBranch` at `repositories[0].baseHead`. Branch is `<type>/<JIRA-KEY>` or `<type>/<semantic-kebab-summary>`. Never append the run id.
 
-On restart, rebind that exact worktree and branch. Preserve unrelated work. If source HEAD moved past `baseHead`, return `workspace-refresh` with no mutation.
+On restart, rebind that exact worktree and branch. Preserve unrelated work. If source HEAD moved past `baseHead`, return `gaps` with no mutation.
 
-`ready`: bound `workspace.cwd` plus manifest. `retry`: transient failure. `blocked`: unsafe state.
+`ready`: bound `workspace.cwd` plus manifest.
+`gaps`: source HEAD moved beyond the approved base and the plan must be refreshed.
+`handoff`: transient mechanical workspace work remains and requires no user input.
+`blocked`: the workspace state is unsafe and requires user input; put the question in `remaining`.

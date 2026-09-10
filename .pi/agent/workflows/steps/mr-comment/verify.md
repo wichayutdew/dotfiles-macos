@@ -4,8 +4,7 @@ Input: `{{workflow.input}}`
 Approved plan: `{{reviewed.artifact}}`
 Ledger: `{{last.summary}}`
 
-`passed`: verdicts and checks hold; hand `remoteActions` to deliver.
-`no-actions`: nothing left to push or reply.
-`failed`: return to implement with the exact gap.
-`retry`: transient read-only failure.
+`ready`: verdicts and checks hold; include `remoteActions`, explicitly empty when nothing remains.
+`gaps`: return to implement with the exact gap.
+`handoff`: transient read-only failure.
 `blocked`: corrupted workspace.

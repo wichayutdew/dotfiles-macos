@@ -14,10 +14,8 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [atlassian]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {ready: plan, retry: intake, blocked: $pause, handoff: intake}
+    transitions: {ready: plan, blocked: $pause, handoff: intake}
   plan:
     title: Plan work for Plannotator
     prompt: {file: steps/work/plan.md}
@@ -26,29 +24,20 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [atlassian, context7, sourcegraph, glean, gh_grep, github/get_file_contents, gitlab]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
     gate:
-      provider: plannotator
-      submitOutcome: submit
-      approvedOutcome: approved
-      rejectedOutcome: changes-requested
-      timeoutMs: 30000
       artifactContract:
         maxChars: 30000
-        requiredSubstrings:
-          - "## Goal/Acceptance Criteria"
-          - "## Non Goal"
-          - "## Implementation Steps and Tests"
-          - "## Validation"
-          - "## Risks/Decisions Needed"
-          - "## Publications Contract/Metadata"
-          - "## Execution appendix (machine-readable)"
-        forbiddenSubstrings:
-          - "The complete gate artifact is the exact Markdown saved at"
-        onValidationFailure: retry
-    transitions: {approved: prepare-workspace, changes-requested: plan, retry: plan, blocked: $pause, handoff: plan}
+        requiredHeadings:
+          - { level: 1, title: "<Outcome title>", guidance: "Provide an outcome title before the gate artifact." }
+          - { level: 2, title: Goal/Acceptance Criteria, guidance: "State the observable outcome and acceptance criteria." }
+          - { level: 2, title: Non Goal, guidance: "State explicitly excluded work." }
+          - { level: 2, title: Implementation Steps and Tests, guidance: "List only add/remove steps. List a test only when it has an assessable benefit." }
+          - { level: 2, title: Validation, guidance: "Give exact independent Bash commands and their expected proof." }
+          - { level: 2, title: Risks/Decisions Needed, guidance: "State risks and unresolved decisions." }
+          - { level: 2, title: Publications Contract/Metadata, guidance: "Provide observed provider/repository/target, source branch, semantic title, description template, traceability mode, and Jira key or null. Jira mode requires exactly one [KEY] in the title; requirement mode permits no bracketed key." }
+          - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repositories (sourceRoot, baseHead, branch, worker, reviewer), traceability, and publication (provider, repository, sourceBranch, targetBranch, title, descriptionTemplate, managedDescription)." }
+    transitions: {ready: prepare-workspace, blocked: $pause, handoff: plan}
   prepare-workspace:
     title: Create worktree and branch
     prompt: {file: steps/shared/prepare-workspace.md}
@@ -59,11 +48,9 @@ steps:
       allowedRoots: [~/repositories/worktrees]
     permissions:
       tools: [read, ls, bash]
-      mcp: []
-      extensions: []
       skills: [using-git-worktrees]
       bash: {mode: unrestricted}
-    transitions: {ready: implement, workspace-refresh: plan, retry: prepare-workspace, blocked: $pause, handoff: prepare-workspace}
+    transitions: {ready: implement, gaps: plan, blocked: $pause, handoff: prepare-workspace}
   implement:
     title: Implement approved plan with TDD
     prompt: {file: steps/work/implement.md}
@@ -72,10 +59,9 @@ steps:
     permissions:
       tools: [read, ls, bash, edit, write, mcp]
       mcp: [context7]
-      extensions: []
       skills: [test-driven-development]
       bash: {mode: unrestricted}
-    transitions: {checkpoint: implement, ready: verify, retry: implement, blocked: $pause, handoff: implement}
+    transitions: {ready: verify, blocked: $pause, handoff: implement}
   verify:
     title: Check goal and acceptance criteria
     prompt: {file: steps/work/verify.md}
@@ -83,11 +69,9 @@ steps:
     maxToolCalls: 60
     permissions:
       tools: [read, ls, bash]
-      mcp: []
-      extensions: []
       skills: [verification-before-completion]
       bash: {mode: unrestricted}
-    transitions: {passed: publish, failed: implement, retry: verify, blocked: verify, handoff: verify}
+    transitions: {ready: publish, gaps: implement, blocked: $pause, handoff: verify}
   publish:
     title: Push and open or update PR/MR
     prompt: {file: steps/work/publish-remote.md}
@@ -96,7 +80,5 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [gitlab, github/pull_request_read, github/create_pull_request, github/update_pull_request]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {published: $done, retry: publish, blocked: $pause, handoff: publish}
+    transitions: {ready: $done, blocked: $pause, handoff: publish}

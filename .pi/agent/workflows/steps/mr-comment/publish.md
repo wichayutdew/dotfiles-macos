@@ -6,7 +6,6 @@ Ledger: `{{last.summary}}`
 
 Execute only approved `remoteActions`. For GitHub reviewer replies use `add_reply_to_pull_request_comment`; use `add_issue_comment` only for a general PR comment. Never force-push, resolve, approve, or merge.
 
-`published`: push and replies confirmed.
-`no-actions`: nothing to do.
-`retry`: transient failure.
-`superseded` / `blocked`: remote moved or ambiguous.
+`ready`: all required pushes and replies are confirmed, or the approved action list is empty.
+`handoff`: transient failure.
+`blocked`: remote moved or ambiguous.

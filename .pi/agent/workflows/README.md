@@ -1,6 +1,6 @@
 # Workflow Specifications
 
-This directory defines autonomous workflow specifications in `agent/workflows/` composed from stage prompts in `agent/workflows/steps/`.
+This directory defines autonomous workflow specifications in `agent/workflows/` composed from stage prompts in `agent/workflows/steps/`. A `handoff` outcome from any step re-enters that same step with its handoff context.
 
 ---
 
@@ -11,33 +11,27 @@ Normalizes a free-form requirement or verifies one Jira key, then drafts a Plann
 flowchart TD
     Start([Start: /work]) --> Intake[intake]
     Intake -->|ready| Plan[plan + Plannotator]
-    Intake -->|retry| Intake
     Intake -->|blocked| Pause[$pause]
 
-    Plan -->|approved| Prep[prepare-workspace]
-    Plan -->|changes-requested / retry| Plan
+    Plan -->|ready| Prep[prepare-workspace]
     Plan -->|blocked| Pause
 
     Prep -->|ready| Imp[implement]
-    Prep -->|workspace-refresh| Plan
-    Prep -->|retry| Prep
+    Prep -->|gaps| Plan
     Prep -->|blocked| Pause
 
-    Imp -->|checkpoint| Imp
     Imp -->|ready| Ver[verify]
-    Imp -->|retry| Imp
     Imp -->|blocked| Pause
 
-    Ver -->|passed| Pub[publish]
-    Ver -->|failed| Imp
-    Ver -->|retry / blocked| Ver
+    Ver -->|ready| Pub[publish]
+    Ver -->|gaps| Imp
+    Ver -->|blocked| Pause
 
-    Pub -->|published| Done([$done])
-    Pub -->|retry| Pub
+    Pub -->|ready| Done([$done])
     Pub -->|blocked| Pause
 ```
 
-The plan gate requires: Goal/Acceptance Criteria, Non Goal, Implementation Steps and Tests, Validation, Risks/Decisions Needed, Publications Contract/Metadata, and Execution appendix (machine-readable). Branches are `type/JIRA-123` for verified Jira work or `type/semantic-summary` otherwise; no random suffixes are allowed. Implementation is checkpointed: each worker pass commits and tests one coherent approved slice, returns `checkpoint` with the exact remaining slices, and loops until all approved implementation work is complete.
+The plan gate requires: Goal/Acceptance Criteria, Non Goal, Implementation Steps and Tests, Validation, Risks/Decisions Needed, Publications Contract/Metadata, and Execution appendix (machine-readable). Branches are `type/JIRA-123` for verified Jira work or `type/semantic-summary` otherwise; no random suffixes are allowed.
 
 ---
 
@@ -46,42 +40,43 @@ Retrieves scope/Jira context, gates scope through Plannotator, investigates fact
 
 ```mermaid
 flowchart TD
-    Start([Start: /investigate]) --> Ret[retrieve + Plannotator]
-    Ret -->|approved| Inv[investigate]
-    Ret -->|changes-requested| Ret
-    Ret -->|retry| Ret
-    Ret -->|blocked| Pause[$pause]
+    Start([Start: /investigate]) --> Intake[intake]
+    Intake -->|ready| Plan[plan + Plannotator]
+    Intake -->|blocked| Pause[$pause]
 
-    Inv -->|ready| Val[validate]
-    Inv -->|retry| Inv
-    Inv -->|blocked| Pause
+    Plan -->|ready| Res[research]
+    Plan -->|blocked| Pause
 
-    Val -->|approved| Done([$done])
-    Val -->|gaps| Inv
-    Val -->|retry / blocked| Val
+    Res -->|ready| Val[validate]
+    Res -->|blocked| Pause
+
+    Val -->|ready| Report[write-report]
+    Val -->|gaps| Res
+    Val -->|blocked| Pause
+
+    Report -->|ready| Done([$done])
+    Report -->|blocked| Pause
 ```
 
 ---
 
 ## 3. `/mr-review` — Hosted Code Review
-Fetches MR/PR context and discussions, drafts an evidence-based review with proposed inline comments for Plannotator review, publishes comments, and verifies published state.
+Fetches MR/PR context and discussions, drafts an evidence-based review with proposed inline comments, gates those comments through Plannotator, then publishes them.
 
 ```mermaid
 flowchart TD
     Start([Start: /mr-review]) --> Fetch[fetch]
-    Fetch -->|fetched| Review[review + Plannotator]
+    Fetch -->|ready| Review[review]
     Fetch -->|blocked| Pause[$pause]
 
-    Review -->|approved| Pub[publish]
-    Review -->|changes-requested| Review
+    Review -->|ready| Plan[plan + Plannotator]
     Review -->|blocked| Pause
 
-    Pub -->|published| Ver[verify]
-    Pub -->|blocked| Pause
+    Plan -->|ready| Pub[publish]
+    Plan -->|blocked| Pause
 
-    Ver -->|verified| Done([$done])
-    Ver -->|failed| Pub
-    Ver -->|retry / blocked| Ver
+    Pub -->|ready| Done([$done])
+    Pub -->|blocked| Pause
 ```
 
 ---
@@ -93,72 +88,46 @@ Fetches unresolved review discussions, checks out the branch, plans code fixes a
 flowchart TD
     Start([Start: /mr-comment]) --> Fetch[fetch]
     Fetch -->|ready| Checkout[checkout-source]
-    Fetch -->|retry| Fetch
     Fetch -->|blocked| Pause[$pause]
 
     Checkout -->|ready| Plan[plan + Plannotator]
-    Checkout -->|retry| Checkout
     Checkout -->|blocked| Pause
 
-    Plan -->|approved| Imp[implement]
-    Plan -->|changes-requested| Plan
-    Plan -->|retry| Plan
+    Plan -->|ready| Imp[implement]
     Plan -->|blocked| Pause
 
     Imp -->|ready| Ver[verify]
-    Imp -->|retry| Imp
     Imp -->|blocked| Pause
 
     Ver -->|ready| Del[deliver]
-    Ver -->|no-actions| Done([$done])
-    Ver -->|failed| Imp
-    Ver -->|retry / blocked| Ver
+    Ver -->|gaps| Imp
+    Ver -->|blocked| Pause
 
-    Del -->|published / no-actions| Done
-    Del -->|retry| Del
-    Del -->|superseded / blocked| Pause
+    Del -->|ready| Done([$done])
+    Del -->|blocked| Pause
 ```
 
 ---
 
 ## 5. `/sprint-triage` — Support Ticket Triage & Knowledge Base
-Collects OpsBot/Slack ticket threads and drafts redacted records in step handoffs, stores complete ledger and draft content in the Plannotator plan artifact, then checks out & binds KB repo only after approval to write report + ledger + index, verify, and publish to GitLab & Confluence.
+Collects configured OpsBot ticket rows and complete Slack threads as factual source evidence, then gates a staged knowledge-base report, its integrity hash, ledger, human-guide fragment, and publication metadata through Plannotator. Only after approval, it creates and binds the KB worktree, copies the approved staged report verbatim, writes the approved index and any distinct approved ledger, then publishes the GitLab MR and top-inserted Confluence guide.
 
 ```mermaid
 flowchart TD
     Start([Start: /sprint-triage]) --> Collect[collect]
-    Collect -->|ready| Draft[draft]
-    Collect -->|retry| Collect
+    Collect -->|ready| Plan[plan + Plannotator]
     Collect -->|blocked| Pause[$pause]
 
-    Draft -->|ready| Plan[plan + Plannotator]
-    Draft -->|retry| Draft
-    Draft -->|blocked| Pause
-
-    Plan -->|approved| Checkout[checkout]
-    Plan -->|changes-requested| Plan
-    Plan -->|retry| Plan
+    Plan -->|ready| Checkout[checkout]
     Plan -->|blocked| Pause
 
     Checkout -->|ready| Imp[implement]
-    Checkout -->|retry| Checkout
     Checkout -->|blocked| Pause
 
-    Imp -->|ready| Ver[verify]
-    Imp -->|retry| Imp
+    Imp -->|ready| Pub[publish]
     Imp -->|blocked| Pause
 
-    Ver -->|ready| Pub[publish]
-    Ver -->|failed| Imp
-    Ver -->|retry| Ver
-    Ver -->|blocked| Pause
-
-    Pub -->|ready| Conf[confirm]
-    Pub -->|retry| Pub
+    Pub -->|ready| Done([$done])
     Pub -->|blocked| Pause
-
-    Conf -->|ready| Done([$done])
-    Conf -->|retry| Conf
-    Conf -->|blocked| Pause
 ```
 

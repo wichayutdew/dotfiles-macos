@@ -7,7 +7,7 @@ Ledger: `{{last.summary}}`
 
 Re-run `repositories[0].reviewer[]`. Confirm commit title, status vs dirty baseline, and each acceptance criterion. A skipped or failing check is a fail.
 
-`passed`: criteria and checks hold.
-`failed`: return to implement with the exact gap.
-`retry`: transient read-only failure.
+`ready`: criteria and checks hold.
+`gaps`: return to implement with the exact gap.
+`handoff`: transient read-only failure.
 `blocked`: corrupted workspace.

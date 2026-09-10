@@ -6,7 +6,7 @@ Draft: `{{last.summary}}`
 
 Re-check citations. Reject filler, missing stories, or claims that miss the goal.
 
-`approved`: draft satisfies the goal.
+`ready`: draft satisfies the goal.
 `gaps`: return to research with exact gaps.
-`retry`: transient read failure.
+`handoff`: transient read failure.
 `blocked`: irreconcilable evidence.

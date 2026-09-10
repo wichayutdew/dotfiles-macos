@@ -15,10 +15,8 @@ steps:
       tools: [read, ls, bash, mcp]
       mcp:
         - slack/slack_slack_get_thread_replies
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {ready: plan, retry: collect, blocked: $pause, handoff: collect}
+    transitions: {ready: plan, blocked: $pause, handoff: collect}
   plan:
     title: Approve KB and human-guide summaries
     prompt: {file: steps/sprint-triage/plan.md}
@@ -27,47 +25,19 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [atlassian]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
     gate:
-      provider: plannotator
-      submitOutcome: submit
-      approvedOutcome: approved
-      rejectedOutcome: changes-requested
-      timeoutMs: 30000
       artifactContract:
         maxChars: 20000
-        requiredSubstrings:
-          - "# Knowledge-base (LLM)"
-          - "- Staged KB report:"
-          - "- Path:"
-          - "- Integrity SHA-256:"
-          - "- Ticket count:"
-          - "- Reviewer instruction:"
-          - "# Ledger"
-          - "- Date period of all supports:"
-          - "- Support channels:"
-          - "- Number of tickets summarized:"
-          - "- Number of tickets skipped due to any issue:"
-          - "# Human guide (Confluence)"
-          - "## Guide"
-          - "- Brief description:"
-          - "- Steps to take:"
-          - "- Useful links:"
-          - "- Existing-guide matches:"
-          - "## Publication contract"
-          - "## Knowledge Base"
-          - "- Title:"
-          - "- Description:"
-          - "- Exact index Markdown:"
-          - "## Confluence"
-          - "- Confluence page:"
-          - "- Exact top-insert HTML:"
-        forbiddenSubstrings:
-          - "The complete gate artifact is the exact Markdown saved at"
-        onValidationFailure: retry
-    transitions: {approved: checkout, changes-requested: plan, retry: plan, blocked: $pause, handoff: plan}
+        requiredHeadings:
+          - { level: 1, title: Knowledge-base (LLM), guidance: "Include Staged KB report with Path, Integrity SHA-256, Ticket count, and Reviewer instruction. Before submission, create the complete staged report at /tmp/sprint-triage/<period>/ticket-summaries.md, where period is YYYY-MM-DD_to_YYYY-MM-DD from the Asia/Bangkok collection interval. It must contain the complete ticket records and its Ledger. Use one compact record per summarized ticket, with no field headings below the ticket heading: Slack URL; Inquiry summary (request, context, impact); Action taken (investigation, mitigation, observed outcome); Knowledge gained (reusable system or process knowledge); and Unknown gap (unverified fact, why it matters, concrete falsifier). Compute SHA-256 after writing and never rewrite the staged file afterward. Block when the staged evidence is missing, unreadable, or exceeds safe redaction limits." }
+          - { level: 1, title: Ledger, guidance: "Include Date period of all supports (start, end, timezone), Support channels (names and IDs), Number of tickets summarized, and Number of tickets skipped due to any issue (count and reasons if nonzero)." }
+          - { level: 1, title: Human guide (Confluence), guidance: "Include only novel reusable guidance in compact bullets; omit a candidate when its operational trigger/topic or issue and remediation materially overlap existing guidance. Include Existing-guide matches with omitted topic/issue and matching existing heading, or None." }
+          - { level: 2, title: "Guide <number>: <short topic>", guidance: "Repeat for every retained guide. Include Brief description (when it applies), Steps to take (ordered actionable support steps), and Useful links (verified label and URL list, or `None identified`). Inspect threads and existing Confluence context for durable operational references; links must be directly relevant and verified." }
+          - { level: 2, title: Publication contract, guidance: "Include only retained novel guides in a self-contained Confluence HTML fragment: no Markdown or code fences; h2 for the sprint addendum, h3 per guide, p with strong description labels, ol/li for ordered steps, ul/li/a for useful links, p None identified if absent; escape text and attributes; use only verified absolute https:// URLs." }
+          - { level: 2, title: Knowledge Base, guidance: "Include Title, Description, Report path, Ledger path, Index path, Exact index Markdown in a fenced md block, MR title, and MR description from a verified host template. If no template is verified, create without a description adjustment, read it back, then update only the managed region; that fallback is authorized and not blocked." }
+          - { level: 2, title: Confluence, guidance: "Include Confluence page title, URL, and version/hash; Existing-guide matches; and Exact top-insert HTML in a fenced html block containing the complete approved fragment of only retained novel guides." }
+    transitions: {ready: checkout, blocked: $pause, handoff: plan}
   checkout:
     title: Create knowledge-base worktree
     prompt: {file: steps/sprint-triage/checkout.md}
@@ -78,11 +48,9 @@ steps:
       allowedRoots: [~/repositories/worktrees]
     permissions:
       tools: [read, ls, bash]
-      mcp: []
-      extensions: []
       skills: [using-git-worktrees]
       bash: {mode: unrestricted}
-    transitions: {ready: implement, retry: checkout, blocked: $pause, handoff: checkout}
+    transitions: {ready: implement, blocked: $pause, handoff: checkout}
   implement:
     title: Commit approved KB files
     prompt: {file: steps/sprint-triage/implement.md}
@@ -90,11 +58,8 @@ steps:
     maxToolCalls: 60
     permissions:
       tools: [read, ls, bash, edit, write]
-      mcp: []
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {ready: publish, retry: implement, blocked: $pause, handoff: implement}
+    transitions: {ready: publish, blocked: $pause, handoff: implement}
   publish:
     title: Open MR and insert Confluence guide
     prompt: {file: steps/sprint-triage/publish.md}
@@ -103,7 +68,5 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [atlassian, gitlab]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {ready: $done, retry: publish, blocked: $pause, handoff: publish}
+    transitions: {ready: $done, blocked: $pause, handoff: publish}

@@ -10,5 +10,5 @@ Read `~/.pi/agent/workflows/steps/sprint-triage/sprint-triage.yaml`.
 2. Re-read the Confluence page as HTML. Block if its version or hash drifted. Verify `confluence.appendMode` is `top`. Extract the approved `Exact top-insert HTML` fragment from the plan artifact, insert it before the fetched page body, and update the page through the Atlassian MCP with `contentFormat: "html"`. Do not send Markdown, Markdown code fences, or an HTML-escaped fragment. Preserve the page title and all pre-existing body content.
 
 `ready`: MR and top-inserted Confluence guide confirmed.
-`retry`: transient API failure.
+`handoff`: transient API failure.
 `blocked`: hash mismatch or mutation failure.

@@ -11,4 +11,5 @@ Before mutation, verify that the approved `Staged KB report` exists at its appro
 Copy that staged report verbatim to the approved `Report path`. Do not regenerate, edit, summarize, or merge its ticket records. Write the approved index exactly as approved. The staged report already contains the approved ledger; do not create a separate ledger file unless the approved publication contract names a distinct `Ledger path`. Commit with the approved message. Do not push.
 
 `ready`: files committed.
-`blocked`: path or hash mismatch.
+`handoff`: actionable implementation work remains and requires no user input.
+`blocked`: a path or hash mismatch requires user input; put the question in `remaining`.

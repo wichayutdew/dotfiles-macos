@@ -16,6 +16,6 @@ Existing open review: title is immutable. Change only the interior of one matchi
 
 No markers: append one pair. Mixed, duplicated, or malformed markers: `blocked`. Never replace the whole body. Never approve, merge, or close.
 
-`published`: push plus permitted create/update.
-`retry`: transient failure before mutation.
+`ready`: push plus permitted create/update.
+`handoff`: transient failure before mutation.
 `blocked`: unsafe or ambiguous state.

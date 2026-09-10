@@ -7,6 +7,6 @@ Look for feature bugs, technical bugs, service degradation, secret leaks, bad ar
 
 Handoff each finding with path, line, topic, evidence, and a concrete fix. Or state `No actionable findings.`
 
-`ready`: findings complete.
-`retry`: transient read failure.
+`ready`: findings are complete.
+`handoff`: transient read failure.
 `blocked`: stale head or missing evidence.

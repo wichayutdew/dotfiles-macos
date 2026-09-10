@@ -26,5 +26,5 @@ Each story:
 ## Dependency
 
 `ready`: draft complete with cited evidence.
-`retry`: transient tool failure.
+`handoff`: transient tool failure.
 `blocked`: required evidence inaccessible.

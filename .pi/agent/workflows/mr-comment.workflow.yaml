@@ -14,10 +14,8 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [gitlab, github/pull_request_read, context7]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {ready: checkout-source, retry: fetch, blocked: $pause, handoff: fetch}
+    transitions: {ready: checkout-source, blocked: $pause, handoff: fetch}
   checkout-source:
     title: Check out the source branch
     prompt: {file: steps/mr-comment/checkout-source.md}
@@ -28,11 +26,9 @@ steps:
       allowedRoots: [~/repositories/worktrees, .]
     permissions:
       tools: [read, ls, bash]
-      mcp: []
-      extensions: []
       skills: [using-git-worktrees]
       bash: {mode: unrestricted}
-    transitions: {ready: plan, retry: checkout-source, blocked: $pause, handoff: checkout-source}
+    transitions: {ready: plan, blocked: $pause, handoff: checkout-source}
   plan:
     title: Decide each review comment
     prompt: {file: steps/mr-comment/plan.md}
@@ -41,30 +37,18 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [gitlab, github/pull_request_read, sourcegraph, context7]
-      extensions: []
       skills: [receiving-code-review]
       bash: {mode: unrestricted}
     gate:
-      provider: plannotator
-      submitOutcome: submit
-      approvedOutcome: approved
-      rejectedOutcome: changes-requested
-      timeoutMs: 30000
       artifactContract:
         maxChars: 10000
-        requiredSubstrings:
-          - "## Comments"
-          - "### Suggestion"
-          - "### Verdict"
-          - "### Response message"
-          - "### Metadata"
-          - "## Implementation plan"
-          - "## Validation"
-          - "## Execution appendix (machine-readable)"
-        forbiddenSubstrings:
-          - "The complete gate artifact is the exact Markdown saved at"
-        onValidationFailure: retry
-    transitions: {approved: implement, changes-requested: plan, retry: plan, blocked: $pause, handoff: plan}
+        requiredHeadings:
+          - { level: 1, title: "<Outcome title>", guidance: "Provide an outcome title before the gate artifact." }
+          - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, repeat level-3 Suggestion (what the reviewer asked for), Verdict (whether to implement and how, backed by code evidence), Response message (the human reply to post when handled), and Metadata. Metadata must use one value per bullet, never a packed sentence: commentId, discussionId, reviewer, path, line, and host." }
+          - { level: 2, title: Implementation plan, guidance: "List scoped files and observable changes; leave empty for reply-only." }
+          - { level: 2, title: Validation, guidance: "List tests or checks with an assessable benefit." }
+          - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repository, workerCommands, reviewerCommands, and remoteActions; use MCP-first replies and push." }
+    transitions: {ready: implement, blocked: $pause, handoff: plan}
   implement:
     title: Apply approved comment fixes
     prompt: {file: steps/mr-comment/implement.md}
@@ -73,10 +57,9 @@ steps:
     permissions:
       tools: [read, ls, bash, edit, write, mcp]
       mcp: [context7]
-      extensions: []
       skills: [test-driven-development]
       bash: {mode: unrestricted}
-    transitions: {ready: verify, retry: implement, blocked: $pause, handoff: implement}
+    transitions: {ready: verify, blocked: $pause, handoff: implement}
   verify:
     title: Check reviewer intent
     prompt: {file: steps/mr-comment/verify.md}
@@ -84,11 +67,9 @@ steps:
     maxToolCalls: 60
     permissions:
       tools: [read, ls, bash]
-      mcp: []
-      extensions: []
       skills: [verification-before-completion]
       bash: {mode: unrestricted}
-    transitions: {passed: deliver, no-actions: $done, failed: implement, retry: verify, blocked: verify, handoff: verify}
+    transitions: {ready: deliver, gaps: implement, blocked: $pause, handoff: verify}
   deliver:
     title: Push and reply
     prompt: {file: steps/mr-comment/publish.md}
@@ -97,7 +78,5 @@ steps:
     permissions:
       tools: [read, ls, bash, mcp]
       mcp: [gitlab, github/pull_request_read, github/add_issue_comment, github/add_reply_to_pull_request_comment, github/add_comment_to_pending_review]
-      extensions: []
-      skills: []
       bash: {mode: unrestricted}
-    transitions: {published: $done, no-actions: $done, retry: deliver, superseded: $pause, blocked: $pause, handoff: deliver}
+    transitions: {ready: $done, blocked: $pause, handoff: deliver}
