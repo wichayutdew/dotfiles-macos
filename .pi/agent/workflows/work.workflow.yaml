@@ -3,7 +3,7 @@ id: work
 command: work
 description: "Jira or brief → plan → worktree → TDD → review → PR/MR."
 start: intake
-maxStepVisits: 10
+maxStepVisits: 30
 summaryMaxChars: 30000
 steps:
   intake:

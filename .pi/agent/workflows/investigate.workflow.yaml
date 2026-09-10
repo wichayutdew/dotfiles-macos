@@ -3,7 +3,7 @@ id: investigate
 command: investigate
 description: "Jira or question → scope → research → review → write report."
 start: intake
-maxStepVisits: 10
+maxStepVisits: 30
 summaryMaxChars: 30000
 steps:
   intake:
