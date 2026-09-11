@@ -28,3 +28,13 @@ Each story:
 `ready`: draft complete with cited evidence.
 `handoff`: transient tool failure.
 `blocked`: required evidence inaccessible.
+
+
+## Required ready response
+Put the complete research draft in `Completed`, including every required heading, story, citation, source identity, and unresolved evidence gap. On `handoff`, retain the complete partial draft and exact remaining research.
+
+# Completed
+<complete draft with cited evidence>
+
+# Remaining
+<exact remaining work, or None.>

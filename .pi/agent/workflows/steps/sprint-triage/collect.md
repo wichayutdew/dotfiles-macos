@@ -40,18 +40,40 @@ For each selected ticket link:
 
 Do not use OpsBot thread MCP, Grafana MCP, Slack HTTP, or Slack search as a fallback. A malformed permalink, missing thread root, or persistent Slack MCP retrieval failure is `blocked`.
 
-## Handoff
+## Required ready response
 
-Handoff:
-- validated OpsBot API configuration, requested local dates, and calculated UTC boundaries;
-- exact non-secret API parameter values;
-- source-row, duplicate-link, and selected-link counts;
-- complete selected ticket rows in API order;
-- every retained Slack thread message in chronological source order; and
-- factual retrieval failures or skip reasons.
+A `ready` result is the evidence payload consumed by `plan` through `{{last.summary}}`. Put **all evidence in its `completed` field**. Tool-activity bullets are not evidence and are insufficient for `ready`.
 
-Do not summarize, title, classify, infer a resolution, explain a ticket, or reconcile results outside the API response and Slack-thread evidence. Return `blocked` rather than silently truncating required evidence when it cannot fit within the workflow handoff limit.
+Use this exact structure, preserving source values verbatim:
 
-`ready`: complete API ticket rows plus complete Slack MCP thread evidence.
+````markdown
+# Completed
+- Validated OpsBot configuration: <field/value list>.
+- Collection interval: <start local date> through <end local date> (<timezone>); UTC: <start UTC> through <end UTC>.
+- API parameters: <non-secret field/value list>.
+- Counts: source rows=<n>; duplicate links=<n>; selected links=<n>.
+
+## Ticket 1: <ticket_link>
+Source row (verbatim JSON):
+```json
+<complete source row>
+```
+Slack thread (chronological source order):
+```json
+<complete returned message array, including every supported field>
+```
+
+## Ticket N: <ticket_link>
+...
+
+# Remaining
+- None.
+````
+
+Every selected ticket must have one ticket section, its complete source row, and every returned Slack message in chronological source order. A tool call, a permalink, a retrieval status, or a prose synopsis cannot replace any required row or message. The source data is not a ticket summary: do not title, classify, infer a resolution, explain a ticket, or reconcile results outside the API response and Slack-thread evidence.
+
+Return `blocked` rather than silently truncating required evidence when it cannot fit within the workflow handoff limit.
+
+`ready`: the `completed` field contains the complete API ticket rows and complete Slack MCP thread evidence in the required structure. Do not return `ready` merely because no active-step work remains or a delegated child ended: absence of a complete, verifiable structured collection result is not ready.
 `handoff`: transient API transport or Slack MCP failure.
 `blocked`: invalid configuration or dates, persistent API failure, invalid API response, missing/malformed ticket link, malformed Slack permalink, persistent Slack MCP failure, or required evidence exceeding the handoff limit.

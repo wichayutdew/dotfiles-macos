@@ -12,3 +12,13 @@ A parent recovery `handoff` is unconfirmed context, not proof that local work or
 `ready`: local work is complete and includes the required remote-action data.
 `handoff`: transient tool failure.
 `blocked`: an unapproved command is required.
+
+
+## Required ready response
+Put workspace, starting/ending HEAD, commits and subjects, changed paths, exact commands/outcomes, and complete `remoteActions` (or `[]`) in `Completed`.
+
+# Completed
+<complete implementation ledger>
+
+# Remaining
+<exact remaining work, or None.>

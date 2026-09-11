@@ -10,3 +10,15 @@ Handoff each finding with path, line, topic, evidence, and a concrete fix. Or st
 `ready`: findings are complete.
 `handoff`: transient read failure.
 `blocked`: stale head or missing evidence.
+
+
+## Required ready response
+Put the reviewed head SHA and every finding (path, line, topic, evidence, exact fix) in `Completed`; when empty, state `No actionable findings.` with the SHA.
+
+# Completed
+<complete findings ledger>
+
+# Remaining
+- None.
+
+When Evidence is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters fetch.

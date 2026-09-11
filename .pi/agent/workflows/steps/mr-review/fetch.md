@@ -11,3 +11,13 @@ Do not summarize, shorten, reword, classify, identify bugs, assess risk, infer c
 `ready`: complete evidence.
 `handoff`: transient read-only host retrieval work remains and requires no user input.
 `blocked`: bad URL, unsupported host, incomplete evidence requiring user input, or required evidence exceeds the handoff limit; put the question in `remaining`.
+
+
+## Required ready response
+Put all required host-native evidence in `Completed`, preserving identity, branches, head SHA, description, commits, files/diff, checks, reviews, and comments verbatim. Tool activity is not evidence.
+
+# Completed
+<complete fetched review evidence>
+
+# Remaining
+- None.

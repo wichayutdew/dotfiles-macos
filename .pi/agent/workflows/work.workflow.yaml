@@ -36,7 +36,7 @@ steps:
           - { level: 2, title: Risks/Decisions Needed, guidance: "State risks and unresolved decisions." }
           - { level: 2, title: Publications Contract/Metadata, guidance: "Provide observed provider/repository/target, source branch, semantic title, description template, traceability mode, and Jira key or null. Jira mode requires exactly one [KEY] in the title; requirement mode permits no bracketed key." }
           - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repositories (sourceRoot, baseHead, branch, worker, reviewer), traceability, and publication (provider, repository, sourceBranch, targetBranch, title, descriptionTemplate, managedDescription)." }
-    transitions: {ready: prepare-workspace, blocked: $pause, handoff: plan}
+    transitions: {ready: prepare-workspace, gaps: intake, blocked: $pause, handoff: plan}
   prepare-workspace:
     title: Create worktree and branch
     prompt: {file: steps/shared/prepare-workspace.md}

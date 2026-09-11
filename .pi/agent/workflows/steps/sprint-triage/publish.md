@@ -12,3 +12,5 @@ Read `~/.pi/agent/workflows/steps/sprint-triage/sprint-triage.yaml`.
 `ready`: MR and top-inserted Confluence guide confirmed.
 `handoff`: transient API failure.
 `blocked`: hash mismatch or mutation failure.
+
+When the KB publication ledger is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters implementation.

@@ -9,3 +9,5 @@ Write or replace only the path under `# Report destination`. Use the validated d
 `ready`: file written.
 `handoff`: transient write failure.
 `blocked`: destination missing or unsafe.
+
+When the Validated draft payload is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters validation.

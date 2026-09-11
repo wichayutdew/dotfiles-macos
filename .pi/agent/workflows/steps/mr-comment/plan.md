@@ -10,3 +10,15 @@ Base each verdict on the current checkout and host evidence. Preserve every unre
 `ready`: every comment has the required artifact content and is ready for review.
 `handoff`: transient API failure.
 `blocked`: unsafe or missing anchors.
+
+
+## Required ready response
+On `ready` or `handoff`, put every unresolved comment identity, anchor, current verdict, required action, and missing-check fact in `Completed`.
+
+# Completed
+<complete verdict ledger>
+
+# Remaining
+<exact remaining work, or None.>
+
+When fetched Evidence is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters fetch.

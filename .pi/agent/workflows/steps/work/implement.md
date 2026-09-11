@@ -16,3 +16,13 @@ When approved work remains after the committed feature, return `handoff`; do not
 `ready`: every approved implementation slice is complete, with red/green evidence and commits; use exactly `No active-step work remains.` in `remaining`.
 `handoff`: red/green evidence and a commit for one coherent slice; remaining approved work is explicitly listed in `remaining`.
 `blocked`: missing authority, prerequisite, or unrecoverable blocker; include the user question in `remaining`.
+
+
+## Required ready response
+Put completed feature, commit SHA/subject, changed paths, red/green commands and outputs, and exact remaining approved work in `Completed`.
+
+# Completed
+<complete implementation ledger>
+
+# Remaining
+<exact remaining work, or None.>

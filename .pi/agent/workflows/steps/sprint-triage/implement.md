@@ -13,3 +13,13 @@ Copy that staged report verbatim to the approved `Report path`. Do not regenerat
 `ready`: files committed.
 `handoff`: actionable implementation work remains and requires no user input.
 `blocked`: a path or hash mismatch requires user input; put the question in `remaining`.
+
+
+## Required ready response
+Put worktree, branch, base/commit SHAs, committed paths, commit subject, staged report source/destination, approved/observed SHA-256 values, index/ledger paths, and exact verification results in `Completed`.
+
+# Completed
+<complete KB publication ledger>
+
+# Remaining
+<exact remaining work, or None.>

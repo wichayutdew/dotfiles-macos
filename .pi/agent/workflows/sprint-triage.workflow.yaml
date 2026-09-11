@@ -37,7 +37,7 @@ steps:
           - { level: 2, title: Publication contract, guidance: "Include only retained novel guides in a self-contained Confluence HTML fragment: no Markdown or code fences; h2 for the sprint addendum, h3 per guide, p with strong description labels, ol/li for ordered steps, ul/li/a for useful links, p None identified if absent; escape text and attributes; use only verified absolute https:// URLs." }
           - { level: 2, title: Knowledge Base, guidance: "Include Title, Description, Report path, Ledger path, Index path, Exact index Markdown in a fenced md block, MR title, and MR description from a verified host template. If no template is verified, create without a description adjustment, read it back, then update only the managed region; that fallback is authorized and not blocked." }
           - { level: 2, title: Confluence, guidance: "Include Confluence page title, URL, and version/hash; Existing-guide matches; and Exact top-insert HTML in a fenced html block containing the complete approved fragment of only retained novel guides." }
-    transitions: {ready: checkout, blocked: $pause, handoff: plan}
+    transitions: {ready: checkout, gaps: collect, blocked: $pause, handoff: plan}
   checkout:
     title: Create knowledge-base worktree
     prompt: {file: steps/sprint-triage/checkout.md}
@@ -69,4 +69,4 @@ steps:
       tools: [read, ls, bash, mcp]
       mcp: [atlassian, gitlab]
       bash: {mode: unrestricted}
-    transitions: {ready: $done, blocked: $pause, handoff: publish}
+    transitions: {ready: $done, gaps: implement, blocked: $pause, handoff: publish}

@@ -11,3 +11,13 @@ On restart, rebind that exact worktree and branch. Preserve unrelated work. If s
 `gaps`: source HEAD moved beyond the approved base and the plan must be refreshed.
 `handoff`: transient mechanical workspace work remains and requires no user input.
 `blocked`: the workspace state is unsafe and requires user input; put the question in `remaining`.
+
+
+## Required ready response
+Put cwd, repository/origin, source branch, base branch, base HEAD, current HEAD, and verbatim dirty baseline in `Completed`.
+
+# Completed
+<complete workspace manifest>
+
+# Remaining
+<exact remaining work, or None.>

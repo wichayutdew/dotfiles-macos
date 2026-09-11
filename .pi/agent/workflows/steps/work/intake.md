@@ -14,3 +14,13 @@ Never mutate Jira, Git, remotes, or worktrees.
 `ready`: complete source evidence has been retrieved.
 `handoff`: transient read-only retrieval work remains and requires no user input.
 `blocked`: source evidence requires user-provided clarification, access, or authority; put the question in `remaining`.
+
+
+## Required ready response
+Put source identity, complete original input, complete Jira record or `null`, retrieval metadata, and restart-workspace facts in `Completed`. Tool activity is not evidence.
+
+# Completed
+<complete intake evidence>
+
+# Remaining
+- None.

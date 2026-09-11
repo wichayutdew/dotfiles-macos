@@ -9,3 +9,13 @@ Do not summarize, shorten, reword, classify, interpret comments, infer conclusio
 `ready`: complete evidence.
 `handoff`: transient read failure.
 `blocked`: bad URL, auth, missing MCP/CLI capability, incomplete evidence, or required evidence exceeds the handoff limit.
+
+
+## Required ready response
+Put all required host-native evidence in `Completed`, preserving it verbatim: identity, branches, SHAs, remote/status, files/diff, and every unresolved comment/anchor. Tool activity is not evidence.
+
+# Completed
+<complete fetched review evidence>
+
+# Remaining
+- None.

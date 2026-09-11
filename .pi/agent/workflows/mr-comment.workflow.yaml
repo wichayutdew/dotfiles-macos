@@ -28,7 +28,7 @@ steps:
       tools: [read, ls, bash]
       skills: [using-git-worktrees]
       bash: {mode: unrestricted}
-    transitions: {ready: plan, blocked: $pause, handoff: checkout-source}
+    transitions: {ready: plan, gaps: fetch, blocked: $pause, handoff: checkout-source}
   plan:
     title: Decide each review comment
     prompt: {file: steps/mr-comment/plan.md}
@@ -43,11 +43,11 @@ steps:
       artifactContract:
         maxChars: 10000
         requiredHeadings:
-          - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, repeat level-3 Suggestion (what the reviewer asked for), Verdict (whether to implement and how, backed by code evidence), Response message (the human reply to post when handled), and Metadata. Metadata must use one value per bullet, never a packed sentence: commentId, discussionId, reviewer, path, line, and host." }
+          - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, use a level-3 Suggestion heading containing what the reviewer asked for, followed by - Verdict: (whether to implement and how, backed by code evidence), - Response message: (the human reply to post when handled), and - Metadata: followed by a fenced JSON object. The JSON must contain commentId, discussionId, reviewer, path, line, and host." }
           - { level: 2, title: Implementation plan, guidance: "List scoped files and observable changes; leave empty for reply-only." }
           - { level: 2, title: Validation, guidance: "List tests or checks with an assessable benefit." }
           - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repository, workerCommands, reviewerCommands, and remoteActions; use MCP-first replies and push." }
-    transitions: {ready: implement, blocked: $pause, handoff: plan}
+    transitions: {ready: implement, gaps: fetch, blocked: $pause, handoff: plan}
   implement:
     title: Apply approved comment fixes
     prompt: {file: steps/mr-comment/implement.md}

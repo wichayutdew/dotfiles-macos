@@ -34,7 +34,7 @@ steps:
           - { level: 2, title: Non Goal, guidance: "State explicitly excluded scope." }
           - { level: 2, title: Investigation Resources, guidance: "List each relevant tool or MCP and why it matters to the goal." }
           - { level: 2, title: Questions, guidance: "List open user questions, or `None`." }
-    transitions: {ready: research, blocked: $pause, handoff: plan}
+    transitions: {ready: research, gaps: intake, blocked: $pause, handoff: plan}
   research:
     title: Deep-research the approved scope
     prompt: {file: steps/investigate/research.md}
@@ -65,4 +65,4 @@ steps:
     permissions:
       tools: [read, ls, bash, write]
       bash: {mode: unrestricted}
-    transitions: {ready: $done, blocked: $pause, handoff: write-report}
+    transitions: {ready: $done, gaps: validate, blocked: $pause, handoff: write-report}

@@ -8,3 +8,13 @@ Ledger: `{{last.summary}}`
 `gaps`: return to implement with the exact gap.
 `handoff`: transient read-only failure.
 `blocked`: corrupted workspace.
+
+
+## Required ready response
+Put the complete verification ledger and `remoteActions` (explicitly `[]` when empty) in `Completed`.
+
+# Completed
+<complete verified actions and checks>
+
+# Remaining
+- None.
