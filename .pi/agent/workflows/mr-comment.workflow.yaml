@@ -43,10 +43,10 @@ steps:
       artifactContract:
         maxChars: 10000
         requiredHeadings:
-          - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, use a level-3 Suggestion heading containing what the reviewer asked for, followed by - Verdict: (implement, reply-only, or decline, with code evidence), - Requires code change: (true or false), - Response message: (the exact reply, or none only for decline), - Publication: (commit + push + reply, reply, or none), - Scoped paths: (repository-relative paths or none), and - Metadata: followed by a fenced JSON object containing commentId, discussionId, reviewer, path, line, and host." }
+          - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, use a level-3 Suggestion heading containing what the reviewer asked for, followed by - Verdict: (implement, reply-only, or decline, with code evidence), - Requires code change: (true or false), - Response message: (the exact reply), - Publication: (commit + push + reply or reply), - Scoped paths: (repository-relative paths or none), and - Metadata: followed by a fenced JSON object containing commentId, discussionId, reviewer, path, line, and host." }
           - { level: 2, title: Implementation plan, guidance: "List scoped files and observable changes; leave empty for reply-only." }
           - { level: 2, title: Validation, guidance: "List tests or checks with an assessable benefit." }
-          - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repository, workerCommands, reviewerCommands, and publication. publication must contain sourceBranch, commitSubject (or null for no code changes), and replies with one {discussionId, commentId, body} entry for every implement or reply-only verdict. Any implementation verdict requires scoped paths, one imperative Conventional Commit subject, and a non-force push. Use MCP-first replies and push." }
+          - { level: 2, title: Execution appendix (machine-readable), guidance: "Provide JSON with repository, workerCommands, reviewerCommands, and publication. publication must contain sourceBranch, commitSubject (or null for no code changes), and replies with one {discussionId, commentId, body} entry for every verdict. Any implementation verdict requires scoped paths, one imperative Conventional Commit subject, and a non-force push. Use MCP-first replies and push." }
     transitions: {ready: implement, gaps: fetch, blocked: $pause, handoff: plan}
   implement:
     title: Apply approved comment fixes

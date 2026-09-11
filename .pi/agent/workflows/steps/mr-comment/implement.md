@@ -15,7 +15,7 @@ A parent recovery `handoff` is unconfirmed context, not proof that local work or
 
 
 ## Required ready response
-Put workspace, starting/ending HEAD, current branch, changed paths, exact commands/outcomes, commit status, and the approved `publication` object verbatim in `Completed`. An empty `publication.replies` list is valid only when every approved verdict is `decline`; it is never evidence that an accepted comment needs no reply.
+Put workspace, starting/ending HEAD, current branch, changed paths, exact commands/outcomes, commit status, and the approved `publication` object verbatim in `Completed`. `publication.replies` must contain exactly one reply for every approved verdict, including declines.
 
 # Completed
 <complete implementation ledger>
