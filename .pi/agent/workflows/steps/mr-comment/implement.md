@@ -9,13 +9,13 @@ Run only `workerCommands`. Reply-only plans: no commit. Do not push or reply her
 
 A parent recovery `handoff` is unconfirmed context, not proof that local work or a reply is complete. Reconcile the approved verdicts, plan, and ledger before returning a valid outcome; do not infer progress from it.
 
-`ready`: local work is complete and includes the required remote-action data.
+`ready`: local work is complete and preserves the complete approved publication contract.
 `handoff`: transient tool failure.
 `blocked`: an unapproved command is required.
 
 
 ## Required ready response
-Put workspace, starting/ending HEAD, commits and subjects, changed paths, exact commands/outcomes, and complete `remoteActions` (or `[]`) in `Completed`.
+Put workspace, starting/ending HEAD, current branch, changed paths, exact commands/outcomes, commit status, and the approved `publication` object verbatim in `Completed`. An empty `publication.replies` list is valid only when every approved verdict is `decline`; it is never evidence that an accepted comment needs no reply.
 
 # Completed
 <complete implementation ledger>
