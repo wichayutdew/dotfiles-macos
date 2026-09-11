@@ -29,7 +29,6 @@ steps:
       artifactContract:
         maxChars: 30000
         requiredHeadings:
-          - { level: 1, title: "<Outcome title>", guidance: "Provide an outcome title before the gate artifact." }
           - { level: 2, title: Goal/Acceptance Criteria, guidance: "State the observable outcome and acceptance criteria." }
           - { level: 2, title: Non Goal, guidance: "State explicitly excluded work." }
           - { level: 2, title: Implementation Steps and Tests, guidance: "List only add/remove steps. List a test only when it has an assessable benefit." }

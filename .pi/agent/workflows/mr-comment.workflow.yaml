@@ -43,7 +43,6 @@ steps:
       artifactContract:
         maxChars: 10000
         requiredHeadings:
-          - { level: 1, title: "<Outcome title>", guidance: "Provide an outcome title before the gate artifact." }
           - { level: 2, title: Comments, guidance: "Include every unresolved comment. For each, repeat level-3 Suggestion (what the reviewer asked for), Verdict (whether to implement and how, backed by code evidence), Response message (the human reply to post when handled), and Metadata. Metadata must use one value per bullet, never a packed sentence: commentId, discussionId, reviewer, path, line, and host." }
           - { level: 2, title: Implementation plan, guidance: "List scoped files and observable changes; leave empty for reply-only." }
           - { level: 2, title: Validation, guidance: "List tests or checks with an assessable benefit." }

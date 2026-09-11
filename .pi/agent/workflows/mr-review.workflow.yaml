@@ -40,7 +40,7 @@ steps:
       artifactContract:
         maxChars: 30000
         requiredHeadings:
-          - { level: 2, title: "Review <number>: <short description>", guidance: "Repeat for every comment to publish, incrementing the review number. Include these exact bullets: **Path / line:** <path>:<line>; **Detailed suggestion:** <specific recommended change>; **Verdict:** <topic> — <why this should be improved>; and **Comment:** <exact human-sounding text to post>." }
+          - { level: 2, title: Reviews, guidance: "Repeat for every comment to publish, incrementing the review number. Include these exact bullets: **Path / line:** <path>:<line>; **Detailed suggestion:** <specific recommended change>; **Verdict:** <topic> — <why this should be improved>; and **Comment:** <exact human-sounding text to post>." }
           - { level: 2, title: Publication contract, guidance: "Provide fenced JSON actions for GitLab MCP or GitHub pending-review MCP: create, one comment each, then submit_pending with COMMENT. Use each review's Comment value as published text. CLI is allowed only with mcpFallback. Do not approve, merge, close, resolve, or delete." }
     transitions: {ready: publish, blocked: $pause, handoff: plan}
   publish:
