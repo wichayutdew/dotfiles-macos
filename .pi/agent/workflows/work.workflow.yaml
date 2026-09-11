@@ -54,7 +54,7 @@ steps:
     title: Implement approved plan with TDD
     prompt: {file: steps/work/implement.md}
     agent: worker
-    maxToolCalls: 60
+    maxToolCalls: 120
     permissions:
       tools: [read, ls, bash, edit, write, mcp]
       mcp: [context7]
