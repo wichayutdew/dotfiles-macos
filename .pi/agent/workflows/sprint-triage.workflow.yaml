@@ -12,7 +12,7 @@ steps:
     agent: scout
     maxToolCalls: 30
     permissions:
-      tools: [read, ls, bash, mcp]
+      tools: [read, ls, bash, mcp, write]
       mcp:
         - slack/slack_slack_get_thread_replies
       bash: {mode: unrestricted}

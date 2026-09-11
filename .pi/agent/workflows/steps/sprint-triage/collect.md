@@ -1,4 +1,4 @@
-Collect every configured OpsBot ticket and its Slack thread. Read-only.
+Collect every configured OpsBot ticket and its Slack thread. Do not mutate OpsBot, Slack, Git, or Confluence; write only the local evidence file required below.
 
 Input: `{{workflow.input}}`
 
@@ -40,40 +40,70 @@ For each selected ticket link:
 
 Do not use OpsBot thread MCP, Grafana MCP, Slack HTTP, or Slack search as a fallback. A malformed permalink, missing thread root, or persistent Slack MCP retrieval failure is `blocked`.
 
-## Required ready response
+## Required evidence file and ready response
 
-A `ready` result is the evidence payload consumed by `plan` through `{{last.summary}}`. Put **all evidence in its `completed` field**. Tool-activity bullets are not evidence and are insufficient for `ready`.
+The workflow completion protocol permits only compact plain-text `completed` items. Therefore, do **not** put source evidence, Markdown, fenced JSON, tool-activity bullets, a permalink, a retrieval status, or a prose synopsis in the handoff. They are not evidence and are insufficient for `ready`.
 
-Use this exact structure, preserving source values verbatim:
+After all selected threads have been retrieved, write exactly one canonical JSON file at `/private/tmp/sprint-triage/{{run.id}}/collection.json`. Preserve source values verbatim. JSON escaping of characters such as Slack-text newlines is required and preserves the source value after parsing.
 
-````markdown
-# Completed
-- Validated OpsBot configuration: <field/value list>.
-- Collection interval: <start local date> through <end local date> (<timezone>); UTC: <start UTC> through <end UTC>.
-- API parameters: <non-secret field/value list>.
-- Counts: source rows=<n>; duplicate links=<n>; selected links=<n>.
+The top-level JSON object must contain exactly these evidence fields:
 
-## Ticket 1: <ticket_link>
-Source row (verbatim JSON):
 ```json
-<complete source row>
+{
+  "schemaVersion": 1,
+  "runId": "{{run.id}}",
+  "opsbot": {
+    "channelId": "<validated value>",
+    "supportProfile": "<validated value>",
+    "ticketStatuses": ["<validated value>"],
+    "includeAllUnclosed": true,
+    "user": "<validated value>",
+    "timeZone": "<validated value>"
+  },
+  "interval": {
+    "startLocalDate": "YYYY-MM-DD",
+    "endLocalDate": "YYYY-MM-DD",
+    "startUtc": "RFC3339 UTC instant",
+    "endUtc": "RFC3339 UTC instant"
+  },
+  "apiParameters": {
+    "channelIdList": "<non-secret request value>",
+    "profileIdList": "<non-secret request value>",
+    "includeAllUnclosed": "0 or 1",
+    "startDate": "RFC3339 UTC instant",
+    "endDate": "RFC3339 UTC instant",
+    "ticketStatusList": "<non-secret request value>",
+    "user": "<non-secret request value>"
+  },
+  "counts": {
+    "sourceRows": 0,
+    "duplicateLinks": 0,
+    "selectedLinks": 0
+  },
+  "tickets": [
+    {
+      "ticketLink": "<selected ticket_link>",
+      "sourceRow": { "<complete source row field>": "<source value>" },
+      "slackThread": {
+        "pagesRead": 1,
+        "complete": true,
+        "messages": [{ "<every supported returned message field>": "<source value>" }]
+      }
+    }
+  ]
+}
 ```
-Slack thread (chronological source order):
-```json
-<complete returned message array, including every supported field>
+
+The example defines shape only; do not omit, summarize, rename, normalize, or infer source-row or Slack-message fields. `tickets` must be in selected-link order. Each selected ticket must have its full source row and all returned Slack messages in chronological source order. Set `pagesRead` to every Slack MCP page read and `complete` to `true` only after its cursor is exhausted. `counts.sourceRows`, `counts.duplicateLinks`, and `counts.selectedLinks` must equal the actual collection values; `tickets.length` must equal `counts.selectedLinks`.
+
+Before returning `ready`, reread the exact written file, parse it as JSON, verify all required top-level fields and ticket/thread requirements above, verify its `runId` equals `{{run.id}}`, and calculate its byte count and SHA-256. The SHA-256 must be lowercase hexadecimal and calculated after the final write; do not rewrite the file afterward.
+
+Return exactly one plain-text `completed` item in this form, replacing every placeholder:
+
+```text
+Evidence file: path=/private/tmp/sprint-triage/{{run.id}}/collection.json; sha256=<lowercase 64-hex digest>; bytes=<decimal byte count>; tickets=<selected-link count>.
 ```
 
-## Ticket N: <ticket_link>
-...
-
-# Remaining
-- None.
-````
-
-Every selected ticket must have one ticket section, its complete source row, and every returned Slack message in chronological source order. A tool call, a permalink, a retrieval status, or a prose synopsis cannot replace any required row or message. The source data is not a ticket summary: do not title, classify, infer a resolution, explain a ticket, or reconcile results outside the API response and Slack-thread evidence.
-
-Return `blocked` rather than silently truncating required evidence when it cannot fit within the workflow handoff limit.
-
-`ready`: the `completed` field contains the complete API ticket rows and complete Slack MCP thread evidence in the required structure. Do not return `ready` merely because no active-step work remains or a delegated child ended: absence of a complete, verifiable structured collection result is not ready.
+`ready`: the evidence file exists, is readable and valid JSON, contains complete required evidence, passes the required correspondence checks, and the sole completed item is the exact verified locator above. Do not return `ready` merely because no active-step work remains or a delegated child ended.
 `handoff`: transient API transport or Slack MCP failure.
-`blocked`: invalid configuration or dates, persistent API failure, invalid API response, missing/malformed ticket link, malformed Slack permalink, persistent Slack MCP failure, or required evidence exceeding the handoff limit.
+`blocked`: invalid configuration or dates, persistent API failure, invalid API response, missing/malformed ticket link, malformed Slack permalink, persistent Slack MCP failure, failure to write/read/parse/hash/validate the evidence file, or incomplete evidence. Do not return `ready` when required evidence cannot be persisted and verified.
