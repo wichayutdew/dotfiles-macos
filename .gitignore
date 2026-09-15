@@ -4,7 +4,6 @@
 # except these directories
 !/.config
 !/notes
-!/.1password
 !/.agents
 !AGENTS.md
 !/.pi

@@ -143,6 +143,6 @@ esc = ['mode main']
 q = ['mode main']
 c = ['exec-and-forget open -a /Applications/Ghostty.app', 'mode main']
 b = ['exec-and-forget open -a /Applications/Zen.app', 'mode main']
-p = ['exec-and-forget open -a /Applications/1Password.app', 'mode main']
+p = ['exec-and-forget open -a /Applications/Bitwarden.app', 'mode main']
 n = ['exec-and-forget open -a /Applications/Obsidian.app', 'mode main']
 
