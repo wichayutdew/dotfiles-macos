@@ -1,0 +1,28 @@
+# Copy to sprint-triage.yaml in this directory and replace every placeholder locally.
+# Do not commit the concrete file: it identifies private operational targets.
+version: 1
+opsbot:
+  # Slack channel ID sent as channel_id_list to the ticket-insight API.
+  channelId: REPLACE_WITH_OPSBOT_CHANNEL_ID
+  supportProfile: REPLACE_WITH_SUPPORT_PROFILE
+  # Explicit API status values, sent as ticket_status_list.
+  ticketStatuses: [pending, in_progress, done]
+  # Optional. Defaults to true, so unclosed tickets are always included.
+  includeAllUnclosed: true
+  # Optional. Defaults to all.
+  user: all
+  # Requested calendar dates are converted to UTC API boundaries in this zone.
+  timeZone: REPLACE_WITH_IANA_TIME_ZONE
+knowledgeBase:
+  # Existing clean Git checkout. Workflow creates a linked worktree from it.
+  localRepositoryPath: REPLACE_WITH_LOCAL_KNOWLEDGE_BASE_REPOSITORY_PATH
+  # AI-readable sprint reports and reverse-chronological index.
+  contentDirectory: REPLACE_WITH_KNOWLEDGE_CONTENT_DIRECTORY
+  indexFile: REPLACE_WITH_KNOWLEDGE_INDEX_FILE
+confluence:
+  cloudId: REPLACE_WITH_CONFLUENCE_CLOUD_ID
+  pageId: REPLACE_WITH_CONFLUENCE_PAGE_ID
+  # Insert approved novel guidance at the top of the dedicated guide page.
+  appendMode: top
+gitlab:
+  targetBranch: REPLACE_WITH_MR_TARGET_BRANCH

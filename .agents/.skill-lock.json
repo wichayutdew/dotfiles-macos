@@ -6,18 +6,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman/SKILL.md",
-      "skillFolderHash": "bdf0c87a2bdd47fc7fe9008c40cc6491ee801b81",
+      "skillFolderHash": "02b646b008b9d1e5b67e5f65fab56fd7073d9212",
       "installedAt": "2026-08-21T18:31:12.191Z",
-      "updatedAt": "2026-08-21T18:31:12.191Z"
+      "updatedAt": "2026-09-20T15:41:04.873Z"
     },
     "brainstorming": {
       "source": "obra/superpowers",
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/brainstorming/SKILL.md",
-      "skillFolderHash": "881fc4ac82a25e61a58d332426b5673efe060da0",
+      "skillFolderHash": "03d4c6657cd20ba0fce9d270fc688150bd191c3b",
       "installedAt": "2026-08-21T18:33:12.269Z",
-      "updatedAt": "2026-08-21T18:33:12.269Z"
+      "updatedAt": "2026-09-20T15:41:17.086Z"
     },
     "dispatching-parallel-agents": {
       "source": "obra/superpowers",
@@ -33,9 +33,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/executing-plans/SKILL.md",
-      "skillFolderHash": "1484ffb29998ba1db2a7b6bf0e641081eb8612e9",
+      "skillFolderHash": "899ffeab92be3de6cd9ed0078b32737b18b8c135",
       "installedAt": "2026-08-21T18:33:12.280Z",
-      "updatedAt": "2026-08-21T18:33:12.280Z"
+      "updatedAt": "2026-09-20T15:41:18.909Z"
     },
     "finishing-a-development-branch": {
       "source": "obra/superpowers",
@@ -60,36 +60,36 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/requesting-code-review/SKILL.md",
-      "skillFolderHash": "2ef6b5734813e7504d9866a7ec1ae89b505bfe70",
+      "skillFolderHash": "5fcdadfccd8c90987a11969d2f8c844820fee6e1",
       "installedAt": "2026-08-21T18:33:12.296Z",
-      "updatedAt": "2026-08-21T18:33:12.296Z"
+      "updatedAt": "2026-09-20T15:41:21.344Z"
     },
     "subagent-driven-development": {
       "source": "obra/superpowers",
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/subagent-driven-development/SKILL.md",
-      "skillFolderHash": "8133f2b10d4e71e73d867f2e2e365e0778ff0e4e",
+      "skillFolderHash": "5d44ced88725298e847c62c67a726dcc29e20d00",
       "installedAt": "2026-08-21T18:33:12.301Z",
-      "updatedAt": "2026-08-21T18:33:12.301Z"
+      "updatedAt": "2026-09-20T15:41:24.021Z"
     },
     "systematic-debugging": {
       "source": "obra/superpowers",
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/systematic-debugging/SKILL.md",
-      "skillFolderHash": "ab83fc82f82582e047d96fc516bac9bc03095ee0",
+      "skillFolderHash": "9a48dfda84bf339cba4b03fd803ba0dca2e158e3",
       "installedAt": "2026-08-21T18:33:12.307Z",
-      "updatedAt": "2026-08-21T18:33:12.307Z"
+      "updatedAt": "2026-09-20T15:41:25.859Z"
     },
     "test-driven-development": {
       "source": "obra/superpowers",
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/test-driven-development/SKILL.md",
-      "skillFolderHash": "a82cf8b413600c6bd7c4b482272d7990e9588cf1",
+      "skillFolderHash": "847144cf0824095922c0d4875648b9fa74877e1a",
       "installedAt": "2026-08-21T18:33:12.314Z",
-      "updatedAt": "2026-08-21T18:33:12.314Z"
+      "updatedAt": "2026-09-20T15:41:27.716Z"
     },
     "using-git-worktrees": {
       "source": "obra/superpowers",
@@ -105,9 +105,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/using-superpowers/SKILL.md",
-      "skillFolderHash": "e8e3b9ddf73018fdc48d188b12ba654e7363de9f",
+      "skillFolderHash": "4c777432715fe58984d212a36aedc6a18472e512",
       "installedAt": "2026-08-21T18:33:12.326Z",
-      "updatedAt": "2026-08-21T18:33:12.326Z"
+      "updatedAt": "2026-09-20T15:41:29.963Z"
     },
     "verification-before-completion": {
       "source": "obra/superpowers",
@@ -123,18 +123,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/writing-plans/SKILL.md",
-      "skillFolderHash": "e4d3c3faf3853a453016cece5de2ca0581807742",
+      "skillFolderHash": "bcaac5df52c27d16685a35932c17a1c418d8ce98",
       "installedAt": "2026-08-21T18:33:12.340Z",
-      "updatedAt": "2026-08-21T18:33:12.340Z"
+      "updatedAt": "2026-09-20T15:41:31.873Z"
     },
     "writing-skills": {
       "source": "obra/superpowers",
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/writing-skills/SKILL.md",
-      "skillFolderHash": "1768f7552ec98fc6b06aeea747a0c4ef6bde0473",
+      "skillFolderHash": "f761162236b19330da62b22ad0da20f5dac7c6ab",
       "installedAt": "2026-08-21T18:33:12.347Z",
-      "updatedAt": "2026-08-21T18:33:12.347Z"
+      "updatedAt": "2026-09-20T15:41:34.940Z"
     },
     "ponytail-review": {
       "source": "dietrichgebert/ponytail",
@@ -159,27 +159,27 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-commit/SKILL.md",
-      "skillFolderHash": "6ba13fa3503e9607eed8f94828b524510d83b7ef",
+      "skillFolderHash": "7b600195c1d3cdd277dc608c56384c86afb7ec11",
       "installedAt": "2026-08-21T18:45:39.164Z",
-      "updatedAt": "2026-08-21T18:45:39.164Z"
+      "updatedAt": "2026-09-20T15:41:07.858Z"
     },
     "caveman-compress": {
       "source": "JuliusBrussee/caveman",
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-compress/SKILL.md",
-      "skillFolderHash": "93f72d3b21f227a8cc9d851325d474886e16dc0b",
+      "skillFolderHash": "1f4d964edb53b0ba264638a028011246a3839013",
       "installedAt": "2026-08-21T18:45:39.190Z",
-      "updatedAt": "2026-08-21T18:45:39.190Z"
+      "updatedAt": "2026-09-20T15:41:11.585Z"
     },
     "caveman-review": {
       "source": "JuliusBrussee/caveman",
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-review/SKILL.md",
-      "skillFolderHash": "2d9762b7aec395b9713fde57fb8965bc3bbd2c3f",
+      "skillFolderHash": "515d07fbd383fb9a15ad94647d133f681dc56197",
       "installedAt": "2026-08-21T18:45:39.208Z",
-      "updatedAt": "2026-08-21T18:45:39.208Z"
+      "updatedAt": "2026-09-20T15:41:14.823Z"
     },
     "plannotator-tui": {
       "source": "plannotator/herdr-annotate",
@@ -189,6 +189,51 @@
       "skillFolderHash": "8dc2b0ee52d7bbf7892b4e21b20ab0e1e8190d4e",
       "installedAt": "2026-09-06T16:58:10.994Z",
       "updatedAt": "2026-09-06T16:58:10.994Z"
+    },
+    "investigate": {
+      "source": "wichayutdew/workflow-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
+      "skillPath": "skills/investigate/SKILL.md",
+      "skillFolderHash": "f5eae22563207665b4d71ac162b0ce637d2c954c",
+      "installedAt": "2026-09-20T15:33:36.163Z",
+      "updatedAt": "2026-09-20T15:33:36.163Z"
+    },
+    "mr-comment": {
+      "source": "wichayutdew/workflow-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
+      "skillPath": "skills/mr-comment/SKILL.md",
+      "skillFolderHash": "7793085c12813d370eaf1db26a961580427742c2",
+      "installedAt": "2026-09-20T15:33:36.194Z",
+      "updatedAt": "2026-09-20T15:33:36.194Z"
+    },
+    "mr-review": {
+      "source": "wichayutdew/workflow-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
+      "skillPath": "skills/mr-review/SKILL.md",
+      "skillFolderHash": "77ca42d14c70097ccd4876962862fbc92f7dfaa6",
+      "installedAt": "2026-09-20T15:33:36.214Z",
+      "updatedAt": "2026-09-20T15:33:36.214Z"
+    },
+    "sprint-triage": {
+      "source": "wichayutdew/workflow-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
+      "skillPath": "skills/sprint-triage/SKILL.md",
+      "skillFolderHash": "1cb22f5f61c52629a309037692f72ebec3f8f24c",
+      "installedAt": "2026-09-20T15:33:36.228Z",
+      "updatedAt": "2026-09-20T15:41:57.409Z"
+    },
+    "work": {
+      "source": "wichayutdew/workflow-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
+      "skillPath": "skills/work/SKILL.md",
+      "skillFolderHash": "98af7d39ab538849d949ad6dc77068607c388f3a",
+      "installedAt": "2026-09-20T15:33:36.240Z",
+      "updatedAt": "2026-09-20T15:33:36.240Z"
     }
   },
   "dismissed": {
@@ -196,14 +241,13 @@
   },
   "lastSelectedAgents": [
     "amp",
-    "antigravity",
-    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
-    "deepagents",
+    "droid",
     "gemini-cli",
     "github-copilot",
+    "kilo",
     "kimi-code-cli",
     "opencode",
     "warp",
