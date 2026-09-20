@@ -35,9 +35,18 @@ Read the specified file and treat it as the sole authoritative source for ticket
 4. Every ticket has a nonempty unique `ticketLink`, its complete `sourceRow` object, and a `slackThread` object with a positive integer `pagesRead`, `complete: true`, and a complete `messages` array.
 5. Ticket order matches selected-link order. Each message array is in chronological source order and retains every supported returned message field, including source text, author, timestamp, links, and formatting when returned.
 
-Use `sprint-triage.yaml` in this skill directory only after that validation succeeds. If it is absent, ask the user to create it from `sprint-triage.example.yaml`, replace every placeholder locally, and keep the concrete file uncommitted. Then fetch the Confluence page as HTML for existing-guide comparison and top-insertion context.
+Use `sprint-triage.yaml` in this skill directory only after that validation succeeds. If it is absent, ask the user to create it from `sprint-triage.example.yaml`, replace every placeholder locally, and keep the concrete file uncommitted.
 
-`ready`: validated evidence-file source data, both products, and the complete approval artifact are ready for review.
+The approval artifact retains every exact heading required by `SKILL.md`. Its `## Publication fragment` must contain exactly one of these decisions:
+
+- one fenced `html` block containing non-empty approved markup for a Confluence top append; or
+- the exact text `None`, which is an approved intentional Confluence skip.
+
+When proposing a non-empty fragment, validate the configured Confluence target, require `appendMode: top`, fetch the current page as HTML for guide comparison, and record the page version or content-integrity evidence in `## Execution contract`. Block a non-empty fragment when the target or integrity evidence is unavailable. A `None` fragment needs no Confluence fetch and must remain explicit in the approval artifact.
+
+`## Execution contract` must also name the knowledge-base worktree and topic-branch expectation, the expected committed artifact verification, and `gitlab.targetBranch` as the MR target.
+
+`ready`: validated evidence-file source data, a complete approval artifact with either a non-empty fragment or `None`, and the required publication contract are ready for review.
 `gaps`: the collection locator or evidence file is missing, generic/tool-activity-only, malformed, outside the permitted path, unreadable, hash- or byte-count-mismatched, invalid JSON, or incomplete/unverifiable structured collection evidence; it must be recollected before planning can continue. Report the factual failed validation in `remaining`.
 `handoff`: actionable planning work remains and requires no user input.
 `blocked`: unsafe redaction or another user decision is required; put the question in `remaining`.

@@ -14,15 +14,17 @@ opsbot:
   # Requested calendar dates are converted to UTC API boundaries in this zone.
   timeZone: REPLACE_WITH_IANA_TIME_ZONE
 knowledgeBase:
-  # Existing clean Git checkout. Workflow creates a linked worktree from it.
+  # Existing clean primary Git checkout. Every run creates a new linked worktree and topic branch from gitlab.targetBranch.
   localRepositoryPath: REPLACE_WITH_LOCAL_KNOWLEDGE_BASE_REPOSITORY_PATH
   # AI-readable sprint reports and reverse-chronological index.
   contentDirectory: REPLACE_WITH_KNOWLEDGE_CONTENT_DIRECTORY
   indexFile: REPLACE_WITH_KNOWLEDGE_INDEX_FILE
 confluence:
+  # Required only when the approved Publication fragment is non-empty.
   cloudId: REPLACE_WITH_CONFLUENCE_CLOUD_ID
   pageId: REPLACE_WITH_CONFLUENCE_PAGE_ID
   # Insert approved novel guidance at the top of the dedicated guide page.
   appendMode: top
 gitlab:
+  # Source for the linked worktree and target for the review MR.
   targetBranch: REPLACE_WITH_MR_TARGET_BRANCH

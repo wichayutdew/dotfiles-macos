@@ -1,6 +1,6 @@
 ---
 name: sprint-triage
-description: Triage support tickets into approval-gated knowledge-base and Confluence publications.
+description: Use when triaging support tickets requiring approval-gated knowledge-base reports, GitLab merge-request review, or optional Confluence guidance.
 ---
 
 # Sprint Triage
@@ -9,7 +9,15 @@ description: Triage support tickets into approval-gated knowledge-base and Confl
 
 Treat the text that invoked this skill as the authoritative triage request. Derive configured ticket, Slack, knowledge-base, and Confluence context from that request and available integrations. Do not require workflow template variables, a restart workspace, a session ID, or a state-file path.
 
-For each stage, use a fresh subagent whenever the harness supports subagents. Give that subagent only the invoking request, the prior stage artifact, and the linked stage prompt; do not give it or rely on parent conversational context. The parent retains only the resulting artifact and declared outcome before starting the next fresh subagent. If the harness has no subagent capability, load the stage prompt in the active session and carry prior artifacts there. Ask one focused question only when a required business fact, access grant, or authority cannot be discovered. At an approval gate, stop for explicit human approval before continuing. A compatible harness may use equivalent authenticated tools; otherwise report that dependency as blocked.
+When running in Pi inside Herdr (`HERDR_ENV=1`), run the bundled adapter from this skill directory after confirming `pi` and `herdr` are available:
+
+```sh
+python3 scripts/run-pi.py "<natural-language request>"
+```
+
+Do not execute the stage prompts inline in that environment. The adapter launches every stage in a fresh, unfocused background Herdr pane, captures its artifact, and closes that child pane after the stage completes.
+
+For non-Pi+Herdr contexts, use a fresh subagent whenever the harness supports subagents. Give that subagent only the invoking request, the prior stage artifact, and the linked stage prompt; do not give it or rely on parent conversational context. The parent retains only the resulting artifact and declared outcome before starting the next fresh subagent. If the harness has no subagent capability, load the stage prompt in the active session and carry prior artifacts there. Ask one focused question only when a required business fact, access grant, or authority cannot be discovered. At an approval gate, stop for explicit human approval before continuing. A compatible harness may use equivalent authenticated tools; otherwise report that dependency as blocked.
 
 ## Stages
 
@@ -23,7 +31,7 @@ For each stage, use a fresh subagent whenever the harness supports subagents. Gi
 
 ## Publication-plan approval gate
 
-Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings:
+Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings. The approved knowledge-base change is published through a GitLab merge request; a Confluence append is performed only when its approved publication fragment is non-empty:
 
 - level 1: `Knowledge base repository`
 - level 2: `Report`
