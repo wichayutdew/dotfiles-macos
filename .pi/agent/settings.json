@@ -8,8 +8,7 @@
     "npm:pi-zentui",
     "npm:@plannotator/pi-extension",
     "npm:pi-mcp-adapter",
-    "npm:pi-web-access",
-    "npm:@wichayutdew/pi-workflows"
+    "npm:pi-web-access"
   ],
   "terminal": {
     "showTerminalProgress": true,
