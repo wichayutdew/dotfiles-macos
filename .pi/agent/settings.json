@@ -22,7 +22,7 @@
     "reserveTokens": 32768,
     "keepRecentTokens": 24000
   },
-  "enableSkillCommands": false,
+  "enableSkillCommands": true,
   "editorPaddingX": 2,
   "autocompleteMaxVisible": 3,
   "transport": "auto",

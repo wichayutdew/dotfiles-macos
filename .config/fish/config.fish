@@ -49,7 +49,7 @@ alias t 'herdr'
 alias ci 'zi'
 alias c 'z'
 alias y 'yazi'
-alias cc 'pi'
+alias cc 'pi --plan'
 alias q 'pi -p --model openai-gateway/gpt-5.6-luna'
 
 # ---- Agoda Specific ----
