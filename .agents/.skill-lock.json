@@ -6,9 +6,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman/SKILL.md",
-      "skillFolderHash": "02b646b008b9d1e5b67e5f65fab56fd7073d9212",
+      "skillFolderHash": "2d9a159619205a175577d6540b1ed64fd73d83b1",
       "installedAt": "2026-08-21T18:31:12.191Z",
-      "updatedAt": "2026-09-20T15:41:04.873Z"
+      "updatedAt": "2026-09-21T06:01:21.186Z"
     },
     "brainstorming": {
       "source": "obra/superpowers",
@@ -168,9 +168,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-compress/SKILL.md",
-      "skillFolderHash": "1f4d964edb53b0ba264638a028011246a3839013",
+      "skillFolderHash": "21aa5ecc4fdf9667604102c6ec723030ec4f4b9c",
       "installedAt": "2026-08-21T18:45:39.190Z",
-      "updatedAt": "2026-09-20T15:41:11.585Z"
+      "updatedAt": "2026-09-21T06:01:24.473Z"
     },
     "caveman-review": {
       "source": "JuliusBrussee/caveman",
@@ -186,54 +186,54 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/plannotator/herdr-annotate.git",
       "skillPath": "skills/plannotator-tui/SKILL.md",
-      "skillFolderHash": "8dc2b0ee52d7bbf7892b4e21b20ab0e1e8190d4e",
+      "skillFolderHash": "ac3bb3a7e92d4752c2e56718ebdd5f7597502393",
       "installedAt": "2026-09-06T16:58:10.994Z",
-      "updatedAt": "2026-09-06T16:58:10.994Z"
+      "updatedAt": "2026-09-21T06:01:26.758Z"
     },
     "investigate": {
       "source": "wichayutdew/workflow-skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
       "skillPath": "skills/investigate/SKILL.md",
-      "skillFolderHash": "059c7a1e0198fd574d64fda0ff756704ac67b328",
+      "skillFolderHash": "5ef61d65a6246a87ba1227efaee41b3a32f15b5c",
       "installedAt": "2026-09-20T15:33:36.163Z",
-      "updatedAt": "2026-09-20T16:23:56.793Z"
+      "updatedAt": "2026-09-21T06:01:33.282Z"
     },
     "mr-comment": {
       "source": "wichayutdew/workflow-skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
       "skillPath": "skills/mr-comment/SKILL.md",
-      "skillFolderHash": "a6625c61f3a51e31c8b5e8dfe9eb93c2d0e01d2f",
+      "skillFolderHash": "19d4b1265c620046e58d99472556fa09f9721082",
       "installedAt": "2026-09-20T15:33:36.194Z",
-      "updatedAt": "2026-09-20T16:24:02.604Z"
+      "updatedAt": "2026-09-21T06:01:39.132Z"
     },
     "mr-review": {
       "source": "wichayutdew/workflow-skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
       "skillPath": "skills/mr-review/SKILL.md",
-      "skillFolderHash": "a6cac47574a0e2f329f7b1fa3a1e268b1d053a0d",
+      "skillFolderHash": "665870349c7da8fa506717282742ccf0207419c4",
       "installedAt": "2026-09-20T15:33:36.214Z",
-      "updatedAt": "2026-09-20T16:24:08.939Z"
+      "updatedAt": "2026-09-21T06:01:45.429Z"
     },
     "sprint-triage": {
       "source": "wichayutdew/workflow-skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
       "skillPath": "skills/sprint-triage/SKILL.md",
-      "skillFolderHash": "96cea10cc7fb953a166711469ab4a6b9a3626123",
+      "skillFolderHash": "9ba6a2735a471f9c673580c9fb25d65df3554dae",
       "installedAt": "2026-09-20T15:33:36.228Z",
-      "updatedAt": "2026-09-20T16:24:17.155Z"
+      "updatedAt": "2026-09-21T06:01:51.359Z"
     },
     "work": {
       "source": "wichayutdew/workflow-skills",
       "sourceType": "github",
       "sourceUrl": "https://github.com/wichayutdew/workflow-skills.git",
       "skillPath": "skills/work/SKILL.md",
-      "skillFolderHash": "a45fd8db4ec1c17e7d1dd422a12603e464c997b0",
+      "skillFolderHash": "64086f26703a34f56a172bbd45249fe79810ef94",
       "installedAt": "2026-09-20T15:33:36.240Z",
-      "updatedAt": "2026-09-20T16:24:23.391Z"
+      "updatedAt": "2026-09-21T06:01:57.112Z"
     }
   },
   "dismissed": {

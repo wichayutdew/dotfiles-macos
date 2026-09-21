@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""Run this skill's stages in fresh Pi processes."""
+"""Run one workflow stage in an interactive Pi child session."""
 import argparse
 import json
 import os
 import shutil
 import shlex
 import subprocess
-import sys
 import time
 import uuid
 from pathlib import Path
 
-WORKFLOW = {'start': 'intake', 'gate': 'plan', 'stages': {'intake': ('intake.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'intake'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'prepare-workspace', 'gaps': 'intake', 'blocked': '$pause', 'handoff': 'plan'}), 'prepare-workspace': ('prepare-workspace.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'implement', 'gaps': 'plan', 'blocked': '$pause', 'handoff': 'prepare-workspace'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k2.7-code', 'high', {'ready': 'verify', 'blocked': '$pause', 'handoff': 'implement'}), 'verify': ('verify.md', 'reviewer', 'gateway/grok-4.6', 'high', {'ready': 'publish', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'verify'}), 'publish': ('publish-remote.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'work'}
+WORKFLOW = {'start': 'intake', 'stages': {'intake': ('intake.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'intake'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'prepare-workspace', 'gaps': 'intake', 'blocked': '$pause', 'handoff': 'plan'}), 'prepare-workspace': ('prepare-workspace.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'implement', 'gaps': 'plan', 'blocked': '$pause', 'handoff': 'prepare-workspace'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k2.7-code', 'high', {'ready': 'verify', 'blocked': '$pause', 'handoff': 'implement'}), 'verify': ('verify.md', 'reviewer', 'gateway/grok-4.6', 'high', {'ready': 'publish', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'verify'}), 'publish': ('publish-remote.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'work'}
 SKILL_DIR = Path(__file__).resolve().parents[1]
 
 
@@ -19,129 +18,106 @@ def state_root():
     return Path(os.environ.get("WORKFLOW_SKILLS_STATE_DIR", Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "workflow-skills"))
 
 
-def parse_args():
+def args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("request", nargs="?", help="Natural-language request")
-    parser.add_argument("--dry-run", action="store_true", help="Print the first Pi command without running it")
-    parser.add_argument("--run-id", help="Resume an adapter-created run")
-    parser.add_argument("--approve", action="store_true", help="Resume a plan gate after explicit human approval")
-    args = parser.parse_args()
-    if args.run_id:
-        if args.request:
-            parser.error("request cannot be combined with --run-id")
-    elif not args.request or not args.request.strip():
+    parser.add_argument("--stage", required=True, choices=WORKFLOW["stages"])
+    parser.add_argument("--request", required=True)
+    parser.add_argument("--previous-handoff", type=Path)
+    parser.add_argument("--dry-run", action="store_true")
+    result = parser.parse_args()
+    if not result.request.strip():
         parser.error("a non-empty natural-language request is required")
-    return args
+    if result.previous_handoff and not result.previous_handoff.is_file():
+        parser.error(f"previous handoff not found: {result.previous_handoff}")
+    return result
 
 
-def load_run(args):
-    root = state_root()
-    if args.run_id:
-        run_dir = root / args.run_id
-        state_file = run_dir / "state.json"
-        if not state_file.is_file():
-            raise SystemExit(f"run not found: {args.run_id}")
-        state = json.loads(state_file.read_text())
-        if state.get("status") != "awaiting-approval" or not args.approve:
-            raise SystemExit(f"run {args.run_id} awaits explicit approval; resume with --run-id {args.run_id} --approve")
-        state["status"] = "running"
-    else:
-        run_dir = root / f"{int(time.time())}-{uuid.uuid4().hex[:8]}"
-        run_dir.mkdir(parents=True, exist_ok=False)
-        state = {"request": args.request, "stage": WORKFLOW["start"], "visits": 0, "status": "running"}
-        (run_dir / "request.md").write_text(args.request + "\n")
-    return run_dir, state
+def child_prompt(stage, request, previous):
+    filename, role, _model, _thinking, routes = WORKFLOW["stages"][stage]
+    return f"""You are the {role} stage of the {WORKFLOW['name']} workflow.
+
+Request:
+{request}
+
+Previous handoff: {previous or 'None'}
+
+Read and follow this stage prompt exactly:
+{(SKILL_DIR / filename).read_text()}
+
+When finished, call `workflow_complete` exactly once with a status from {', '.join(routes)} and a JSON array of remaining work, blockers, or artifact paths. Do not print a Machine-readable handoff section or write the launcher handoff yourself: this tool persists it and exits Pi."""
 
 
-def outcome(raw):
-    marker = "## Machine-readable handoff"
-    if marker not in raw:
-        raise ValueError("Pi response lacks a Machine-readable handoff section")
-    payload = raw.split(marker, 1)[1].strip()
-    if payload.startswith("```json"):
-        payload = payload[len("```json"):].split("```", 1)[0].strip()
-    parsed = json.loads(payload)
-    if parsed.get("status") not in {"ready", "gaps", "handoff", "blocked"}:
-        raise ValueError("handoff status must be ready, gaps, handoff, or blocked")
-    return parsed
+def extension():
+    return '''import { writeFile, rename } from "node:fs/promises";
+import { Type } from "typebox";
+const path = process.env.WORKFLOW_SKILLS_HANDOFF_PATH;
+const allowed = new Set((process.env.WORKFLOW_SKILLS_ALLOWED_STATUSES || "").split(","));
+export default function (pi) {
+  pi.registerTool({ name: "workflow_complete", label: "Complete workflow stage", description: "Persist the handoff and gracefully exit Pi.", parameters: Type.Object({ status: Type.String(), remaining: Type.Array(Type.String()) }), async execute(_id, params, _signal, _update, ctx) {
+    if (!allowed.has(params.status)) return { content: [{ type: "text", text: "Invalid workflow status" }], details: {} };
+    const handoff = { schemaVersion: 1, workflow: process.env.WORKFLOW_SKILLS_WORKFLOW, stage: process.env.WORKFLOW_SKILLS_STAGE, status: params.status, remaining: params.remaining };
+    await writeFile(`${path}.${process.pid}.tmp`, JSON.stringify(handoff) + "\\n");
+    await rename(`${path}.${process.pid}.tmp`, path);
+    ctx.shutdown();
+    return { content: [{ type: "text", text: "Handoff saved; Pi is closing." }], details: {} };
+  }});
+}
+'''
 
 
-def prompt(stage, previous):
-    filename, role, model, thinking, routes = WORKFLOW["stages"][stage]
-    return f"""You are the {role} stage of the {WORKFLOW['name']} workflow.\n\nRequest:\n{previous['request']}\n\nPrevious artifact: {previous.get('artifact', 'None')}\n\nRead and follow this stage prompt exactly:\n{(SKILL_DIR / filename).read_text()}\n\nEnd with `## Machine-readable handoff` followed by one fenced JSON object with status and remaining. Valid statuses: {', '.join(routes)}."""
+def read_handoff(path, stage):
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"invalid or unreadable handoff: {exc}") from exc
+    if value.get("schemaVersion") != 1 or value.get("workflow") != WORKFLOW["name"] or value.get("stage") != stage:
+        raise ValueError("handoff does not match this workflow stage")
+    if value.get("status") not in WORKFLOW["stages"][stage][4] or not isinstance(value.get("remaining"), list) or not all(isinstance(item, str) for item in value["remaining"]):
+        raise ValueError("handoff has an invalid status or remaining value")
+    return value
 
 
-def run_stage(command, artifact):
-    """Run one isolated Pi stage, visualizing it in Herdr when available."""
-    if os.environ.get("HERDR_ENV") == "1" and os.environ.get("HERDR_PANE_ID") and shutil.which("herdr"):
-        split = subprocess.run(
-            ["herdr", "pane", "split", "--current", "--direction", "down", "--cwd", str(Path.cwd()), "--no-focus"],
-            text=True,
-            capture_output=True,
-        )
-        if split.returncode == 0:
-            try:
-                pane_id = json.loads(split.stdout)["result"]["pane"]["pane_id"]
-            except (KeyError, TypeError, json.JSONDecodeError):
-                pane_id = None
-            if pane_id:
-                exit_path = artifact.with_suffix(".exit")
-                done_marker = f"__WORKFLOW_SKILLS_STAGE_DONE_{uuid.uuid4().hex}__"
-                shell_command = (
-                    f"{' '.join(shlex.quote(part) for part in command)} > {shlex.quote(str(artifact))} 2>&1; "
-                    f"status=$?; printf '%s' \"$status\" > {shlex.quote(str(exit_path))}; "
-                    f"printf '\\n{done_marker}%s\\n' \"$status\""
-                )
-                try:
-                    subprocess.run(["herdr", "pane", "run", pane_id, shell_command], check=True, text=True, capture_output=True)
-                    subprocess.run(
-                        ["herdr", "pane", "wait-output", pane_id, "--match", done_marker, "--source", "recent-unwrapped"],
-                        check=True,
-                        text=True,
-                        capture_output=True,
-                    )
-                    return int(exit_path.read_text().strip()), artifact.read_text()
-                finally:
-                    subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True)
-    result = subprocess.run(command, text=True, capture_output=True)
-    artifact.write_text(result.stdout + result.stderr)
-    return result.returncode, result.stdout + result.stderr
+def run_child(command, environment):
+    if not (os.environ.get("HERDR_ENV") == "1" and os.environ.get("HERDR_PANE_ID") and shutil.which("herdr")):
+        raise RuntimeError("interactive child stages require Pi inside Herdr")
+    split = subprocess.run(["herdr", "pane", "split", "--current", "--direction", "down", "--cwd", str(Path.cwd()), "--no-focus"], text=True, capture_output=True, check=True)
+    try:
+        pane_id = json.loads(split.stdout)["result"]["pane"]["pane_id"]
+    except (KeyError, TypeError, json.JSONDecodeError) as exc:
+        raise RuntimeError("Herdr did not return a child pane id") from exc
+    marker = f"__WORKFLOW_SKILLS_STAGE_DONE_{uuid.uuid4().hex}__"
+    octal_marker = "".join(f"\\{byte:03o}" for byte in marker.encode())
+    env = " ".join(f"{key}={shlex.quote(value)}" for key, value in environment.items())
+    script = f"env {env} {' '.join(shlex.quote(part) for part in command)}; set code $status; printf '\\n{octal_marker}%s\\n' \"$code\""
+    try:
+        subprocess.run(["herdr", "pane", "run", pane_id, f"fish -c {shlex.quote(script)}"], text=True, capture_output=True, check=True)
+        subprocess.run(["herdr", "pane", "wait-output", pane_id, "--match", marker, "--source", "recent-unwrapped"], text=True, capture_output=True, check=True)
+    finally:
+        subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True)
 
 
 def main():
-    args = parse_args()
-    run_dir, state = load_run(args)
-    if not args.dry_run and not shutil.which("pi"):
-        raise SystemExit("Pi executable not found on PATH; use the portable skill instructions or install Pi")
-    while True:
-        stage = state["stage"]
-        filename, role, model, thinking, routes = WORKFLOW["stages"][stage]
-        command = ["pi", "--print", "--model", model, "--thinking", thinking, "--", prompt(stage, state)]
-        if args.dry_run:
-            print(json.dumps({"stage": stage, "command": command[:-1] + ["<assembled prompt>"], "stateDir": str(run_dir)}, indent=2))
-            return
-        artifact = run_dir / f"stage-{state['visits'] + 1}-{stage}.md"
-        returncode, raw = run_stage(command, artifact)
-        if returncode:
-            raise SystemExit(f"Pi failed at {stage}; artifact: {artifact}")
-        try:
-            handoff = outcome(raw)
-        except (ValueError, json.JSONDecodeError) as exc:
-            raise SystemExit(f"invalid Pi handoff at {stage}: {exc}; artifact: {artifact}")
-        state.update({"artifact": str(artifact), "visits": state["visits"] + 1, "lastOutcome": handoff})
-        target = routes[handoff["status"]]
-        if stage == WORKFLOW["gate"] and handoff["status"] == "ready":
-            state.update({"status": "awaiting-approval", "stage": target})
-            (run_dir / "state.json").write_text(json.dumps(state, indent=2) + "\n")
-            print(f"approval required; resume with: python3 {Path(__file__).name} --run-id {run_dir.name} --approve")
-            return
-        if target in {"$done", "$pause"}:
-            state["status"] = "done" if target == "$done" else "blocked"
-            (run_dir / "state.json").write_text(json.dumps(state, indent=2) + "\n")
-            print(f"{state['status']}; artifact: {artifact}")
-            return
-        state["stage"] = target
-        (run_dir / "state.json").write_text(json.dumps(state, indent=2) + "\n")
+    parsed = args()
+    _file, _role, model, thinking, routes = WORKFLOW["stages"][parsed.stage]
+    pi = shutil.which("pi")
+    run_dir = state_root() / f"{int(time.time())}-{uuid.uuid4().hex[:8]}"
+    handoff = run_dir / "handoff.json"
+    extension_path = run_dir / "workflow-handoff.ts"
+    command = [pi or "pi", "--extension", str(extension_path), "--model", model, "--thinking", thinking, "--name", f"{WORKFLOW['name']}:{parsed.stage}", "--", child_prompt(parsed.stage, parsed.request, parsed.previous_handoff)]
+    if parsed.dry_run:
+        print(json.dumps({"stage": parsed.stage, "command": command[:-1] + ["<assembled prompt>"], "handoffPath": str(handoff)}, indent=2))
+        return
+    if not pi:
+        raise SystemExit("Pi executable not found on PATH")
+    run_dir.mkdir(parents=True, exist_ok=False)
+    extension_path.write_text(extension())
+    environment = {"WORKFLOW_SKILLS_HANDOFF_PATH": str(handoff), "WORKFLOW_SKILLS_WORKFLOW": WORKFLOW["name"], "WORKFLOW_SKILLS_STAGE": parsed.stage, "WORKFLOW_SKILLS_ALLOWED_STATUSES": ",".join(routes)}
+    try:
+        run_child(command, environment)
+        result = read_handoff(handoff, parsed.stage)
+    except (RuntimeError, subprocess.CalledProcessError, ValueError) as exc:
+        raise SystemExit(f"stage {parsed.stage} failed: {exc}") from exc
+    print(json.dumps({"handoffPath": str(handoff), "handoff": result}, indent=2))
 
 
 if __name__ == "__main__":
