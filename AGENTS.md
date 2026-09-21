@@ -25,7 +25,8 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 
 ## Planning and gates
 
-- Always draft plans under `~/.plannotator/plans/`
+- Always draft plans under `/Users/wphongphanpa/repositories/personal/plans/plannotator`
+- Reuse an existing linked worktree; otherwise, always create a new worktree under `/Users/wphongphanpa/repositories/worktrees`.
 - Submit the complete Markdown text as the gate `artifact`. Never submit a path.
 - Do not edit product code before Plannotator approval. Once a complete plan is approved, execute every in-scope task through verification without requesting further routine approval.
 
