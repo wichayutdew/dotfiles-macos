@@ -1,5 +1,6 @@
 # ignore everything
 /*
+sprint-triage.yaml
 
 # except these directories
 !/.config

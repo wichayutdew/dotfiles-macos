@@ -2,6 +2,8 @@
 # Do not commit the concrete file: it identifies private operational targets.
 version: 1
 opsbot:
+  # Private absolute HTTPS ticket-dataset API endpoint. Keep its concrete value local.
+  datasetEndpoint: REPLACE_WITH_OPSBOT_DATASET_ENDPOINT
   # Slack channel ID sent as channel_id_list to the ticket-insight API.
   channelId: REPLACE_WITH_OPSBOT_CHANNEL_ID
   supportProfile: REPLACE_WITH_SUPPORT_PROFILE

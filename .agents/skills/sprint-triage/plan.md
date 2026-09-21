@@ -30,7 +30,7 @@ Reject a tool-activity-only handoff, any prose summary, a missing/duplicate/malf
 Read the specified file and treat it as the sole authoritative source for ticket and Slack-thread content. Recalculate its SHA-256 and byte count, then require exact matches with the locator before parsing JSON. Parse the JSON and require all of the following before continuing:
 
 1. Top-level `schemaVersion` is `1`; `runId` equals `{{run.id}}`; and `opsbot`, `interval`, `apiParameters`, `counts`, and `tickets` exist.
-2. `interval` has the requested inclusive local dates and UTC instants calculated in `opsbot.timeZone`; `opsbot` matches the currently configured OpsBot values; and `apiParameters` matches the non-secret API request values.
+2. `opsbot.datasetEndpoint` is an absolute `https` URL that exactly matches the currently configured value; `interval` has the requested inclusive local dates and UTC instants calculated in `opsbot.timeZone`; the remaining `opsbot` values match the current configuration; and `apiParameters` matches the non-secret API request values.
 3. `counts.sourceRows`, `counts.duplicateLinks`, and `counts.selectedLinks` are nonnegative integers; `tickets` is an array; and `tickets.length` equals `counts.selectedLinks` and the locator ticket count.
 4. Every ticket has a nonempty unique `ticketLink`, its complete `sourceRow` object, and a `slackThread` object with a positive integer `pagesRead`, `complete: true`, and a complete `messages` array.
 5. Ticket order matches selected-link order. Each message array is in chronological source order and retains every supported returned message field, including source text, author, timestamp, links, and formatting when returned.

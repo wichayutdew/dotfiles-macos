@@ -18,7 +18,7 @@ Use `sprint-triage.yaml` in this skill directory. If it is absent, ask the user 
 
 ## Ticket collection
 
-1. Validate that `opsbot.channelId`, `opsbot.supportProfile`, `opsbot.ticketStatuses`, `opsbot.includeAllUnclosed`, `opsbot.user`, and `opsbot.timeZone` are present and valid.
+1. Validate that `opsbot.datasetEndpoint` is a present absolute `https` URL and that `opsbot.channelId`, `opsbot.supportProfile`, `opsbot.ticketStatuses`, `opsbot.includeAllUnclosed`, `opsbot.user`, and `opsbot.timeZone` are present and valid.
 2. Require `workflow.input` to provide an inclusive start and end calendar date in `YYYY-MM-DD` format. Interpret those dates in `opsbot.timeZone`.
 3. Convert the start of the start date and the end of the end date to RFC3339 UTC instants. For example, an Asia/Bangkok interval of `2026-08-10` through `2026-08-21` becomes `2026-08-09T17:00:00.000Z` through `2026-08-21T16:59:59.999Z`.
 4. Convert `opsbot.includeAllUnclosed` to `1` or `0`. Join `opsbot.ticketStatuses` with commas.
@@ -26,7 +26,7 @@ Use `sprint-triage.yaml` in this skill directory. If it is absent, ask the user 
 
 ```bash
 curl --silent --show-error --location --max-time 20 --get \
-  'https://opsbot.agodadev.io/api/ticket_insight/dataset' \
+  "${datasetEndpoint}" \
   --data-urlencode "channel_id_list=${channelId},-" \
   --data-urlencode "profile_id_list=${supportProfile}" \
   --data-urlencode "include_all_unclosed=${includeAllUnclosed}" \
@@ -65,6 +65,7 @@ The top-level JSON object must contain exactly these evidence fields:
   "schemaVersion": 1,
   "runId": "{{run.id}}",
   "opsbot": {
+    "datasetEndpoint": "<validated value>",
     "channelId": "<validated value>",
     "supportProfile": "<validated value>",
     "ticketStatuses": ["<validated value>"],
