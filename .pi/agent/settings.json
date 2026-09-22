@@ -28,5 +28,8 @@
   "transport": "auto",
   "quietStartup": false,
   "outputPad": 1,
-  "theme": "light/dark"
+  "theme": "light/dark",
+  "extensions": [
+    "/Users/wphongphanpa/.hindsight/coding-agents/dist/pi.js"
+  ]
 }
