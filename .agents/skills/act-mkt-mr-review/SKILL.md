@@ -1,5 +1,5 @@
 ---
-name: mr-review
+name: act-mkt-mr-review
 description: Review a PR or merge request through evidence collection, finding validation, approval, and publication of comments.
 ---
 

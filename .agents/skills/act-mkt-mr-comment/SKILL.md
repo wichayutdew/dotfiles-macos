@@ -1,13 +1,13 @@
 ---
-name: sprint-triage
-description: Use when triaging support tickets requiring approval-gated knowledge-base reports, GitLab merge-request review, or optional Confluence guidance.
+name: act-mkt-mr-comment
+description: Resolve PR or merge-request review comments through evidence collection, planning, implementation, verification, and publication.
 ---
 
-# Sprint Triage
+# MR Comment
 
 ## Portable execution contract
 
-Treat the text that invoked this skill as the authoritative triage request. Derive configured ticket, Slack, knowledge-base, and Confluence context from that request and available integrations. Do not require workflow template variables, a restart workspace, a session ID, or a state-file path.
+Treat the text that invoked this skill as the authoritative review-comment request. Derive the hosted-review URL, repository, branch, and unresolved-discussion context from that request and the active workspace. Do not require workflow template variables, a restart workspace, a session ID, or a state-file path.
 
 When running in Pi inside Herdr (`HERDR_ENV=1`), run the bundled adapter from this skill directory after confirming `pi` and `herdr` are available:
 
@@ -23,25 +23,23 @@ If Pi or Herd is unavailable, use a fresh subagent when the harness supports sub
 
 | Stage | Prompt | Pi role / model | Outcomes |
 | --- | --- | --- | --- |
-| collect | [collect.md](collect.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → plan; `blocked` → pause; `handoff` → collect |
-| plan | [plan.md](plan.md) | planner — `gateway/gpt-5.6-terra`, high | `ready` → checkout; `gaps` → collect; `blocked` → pause; `handoff` → plan |
-| checkout | [checkout.md](checkout.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → implement; `blocked` → pause; `handoff` → checkout |
-| implement | [implement.md](implement.md) | worker — `gateway/kimi-k2.7-code`, high | `ready` → publish; `blocked` → pause; `handoff` → implement |
-| publish | [publish.md](publish.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → done; `gaps` → implement; `blocked` → pause; `handoff` → publish |
+| fetch | [fetch.md](fetch.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → checkout-source; `blocked` → pause; `handoff` → fetch |
+| checkout-source | [checkout-source.md](checkout-source.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → plan; `gaps` → fetch; `blocked` → pause; `handoff` → checkout-source |
+| plan | [plan.md](plan.md) | planner — `gateway/gpt-5.6-terra`, high | `ready` → implement; `gaps` → fetch; `blocked` → pause; `handoff` → plan |
+| implement | [implement.md](implement.md) | worker — `gateway/kimi-k2.7-code`, high | `ready` → verify; `blocked` → pause; `handoff` → implement |
+| verify | [verify.md](verify.md) | reviewer — `gateway/grok-4.6`, high | `ready` → deliver; `gaps` → implement; `blocked` → pause; `handoff` → verify |
+| deliver | [publish.md](publish.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → done; `gaps` → implement; `blocked` → pause; `handoff` → deliver |
 
-## Publication-plan approval gate
+## Comment-plan approval gate
 
-Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings. The approved knowledge-base change is published through a GitLab merge request; a Confluence append is performed only when its approved publication fragment is non-empty:
+Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact level-2 headings:
 
-- level 1: `Knowledge base repository`
-- level 2: `Report`
-- level 2: `Ledger`
-- level 1: `Confluence top append`
-- level 2: `Guides`
-- level 2: `Publication fragment`
-- level 1: `Execution contract`
+- `Comments`
+- `Implementation plan`
+- `Validation`
+- `Execution appendix (machine-readable)`
 
-The required report and execution-contract details are defined in [plan.md](plan.md). When Plannotator is available, submit the complete artifact to Plannotator and wait for its approval before continuing. Otherwise, stop in the conversation for explicit human approval rather than claiming an extension validates it.
+When Plannotator is available, submit the complete artifact to Plannotator and wait for its approval before continuing. Otherwise, stop in the conversation for explicit human approval rather than claiming an extension validates it.
 
 ## Pi adapter
 

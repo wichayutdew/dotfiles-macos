@@ -10,7 +10,7 @@ import time
 import uuid
 from pathlib import Path
 
-WORKFLOW = {'start': 'collect', 'gate': 'plan', 'stages': {'collect': ('collect.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'collect'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'checkout', 'gaps': 'collect', 'blocked': '$pause', 'handoff': 'plan'}), 'checkout': ('checkout.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'implement', 'blocked': '$pause', 'handoff': 'checkout'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k2.7-code', 'high', {'ready': 'publish', 'blocked': '$pause', 'handoff': 'implement'}), 'publish': ('publish.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'sprint-triage'}
+WORKFLOW = {'start': 'fetch', 'gate': 'plan', 'stages': {'fetch': ('fetch.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'checkout-source', 'blocked': '$pause', 'handoff': 'fetch'}), 'checkout-source': ('checkout-source.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'gaps': 'fetch', 'blocked': '$pause', 'handoff': 'checkout-source'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'implement', 'gaps': 'fetch', 'blocked': '$pause', 'handoff': 'plan'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k2.7-code', 'high', {'ready': 'verify', 'blocked': '$pause', 'handoff': 'implement'}), 'verify': ('verify.md', 'reviewer', 'gateway/grok-4.6', 'high', {'ready': 'deliver', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'verify'}), 'deliver': ('publish.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'deliver'})}, 'name': 'mr-comment'}
 SKILL_DIR = Path(__file__).resolve().parents[1]
 
 
@@ -59,7 +59,7 @@ export default function (pi) {
     await writeFile(`${path}.${process.pid}.tmp`, JSON.stringify(handoff) + "\\n");
     await rename(`${path}.${process.pid}.tmp`, path);
     ctx.shutdown();
-    return { content: [{ type: "text", text: "Handoff saved; Pi is closing." }], details: {} };
+    process.exit(0);
   }});
 }
 '''
@@ -93,7 +93,7 @@ def run_child(command, environment):
         subprocess.run(["herdr", "pane", "run", pane_id, f"fish -c {shlex.quote(script)}"], text=True, capture_output=True, check=True)
         subprocess.run(["herdr", "pane", "wait-output", pane_id, "--match", marker, "--source", "recent-unwrapped"], text=True, capture_output=True, check=True)
     finally:
-        subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True)
+        subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True, check=True)
 
 
 def main():

@@ -1,5 +1,5 @@
 ---
-name: work
+name: act-mkt-work
 description: "Execute a guarded software-work pipeline from a natural-language request: intake, approval-gated planning, workspace preparation, implementation, verification, and publication."
 ---
 

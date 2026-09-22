@@ -59,7 +59,7 @@ export default function (pi) {
     await writeFile(`${path}.${process.pid}.tmp`, JSON.stringify(handoff) + "\\n");
     await rename(`${path}.${process.pid}.tmp`, path);
     ctx.shutdown();
-    return { content: [{ type: "text", text: "Handoff saved; Pi is closing." }], details: {} };
+    process.exit(0);
   }});
 }
 '''
@@ -93,7 +93,7 @@ def run_child(command, environment):
         subprocess.run(["herdr", "pane", "run", pane_id, f"fish -c {shlex.quote(script)}"], text=True, capture_output=True, check=True)
         subprocess.run(["herdr", "pane", "wait-output", pane_id, "--match", marker, "--source", "recent-unwrapped"], text=True, capture_output=True, check=True)
     finally:
-        subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True)
+        subprocess.run(["herdr", "pane", "close", pane_id], text=True, capture_output=True, check=True)
 
 
 def main():

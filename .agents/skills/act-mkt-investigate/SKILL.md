@@ -1,5 +1,5 @@
 ---
-name: investigate
+name: act-mkt-investigate
 description: Investigate a Jira issue or question through scope approval, evidence gathering, validation, and a written report.
 ---
 
