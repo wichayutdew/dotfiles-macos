@@ -1,0 +1,23 @@
+{
+  "skill_name": "act-mkt-sample-activities-offers",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Hey I need to run MSE sanity checks on some Indonesian activities. Can you sample like 20 activity-offer pairs from Indonesia? Focus on the ones with most bookings in the last 60 days so we're testing high-impact stuff.",
+      "expected_output": "CSV file with columns: activity_id, offer_id, city_id, country_id, booking_count, country_name, city_name, category_name. Should contain 20 rows, all from Indonesia (country_name='Indonesia'), ordered by booking_count descending. File should be saved with a descriptive name indicating it's for MSE testing.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm doing content quality validation across Southeast Asia. Need a stratified sample of 100 activities split proportionally between Thailand, Vietnam, Indonesia, and Philippines. Just the activity IDs, no offers needed. Save it as sample-ids.txt for the act-mkt-content-quality-compare skill.",
+      "expected_output": "Two files: (1) CSV with full metadata showing the stratified distribution at activity granularity using columns activity_id, city_id, country_id, booking_count, country_name, city_name, category_name, (2) sample-ids.txt with one activity ID per line (no header). The CSV should show roughly proportional distribution matching booking volume in each country. Total should be about 100 activities.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Quick smoke test - get me the top 15 booked activities from Japan in the last 30 days. I just need to know what they are, their booking counts, and what cities they're in.",
+      "expected_output": "CSV file with activity_id, city_id, country_id, booking_count, country_name, city_name, category_name. Exactly 15 rows, all from Japan, ordered by booking count (highest first). Booking data from the last 30 days only. Summary report printed showing the results and file location.",
+      "files": []
+    }
+  ]
+}
