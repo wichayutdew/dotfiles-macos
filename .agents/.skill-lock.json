@@ -6,9 +6,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman/SKILL.md",
-      "skillFolderHash": "2d9a159619205a175577d6540b1ed64fd73d83b1",
+      "skillFolderHash": "ce6b7ff0b692d2cd445989bf7e6ce74698aa9a57",
       "installedAt": "2026-08-21T18:31:12.191Z",
-      "updatedAt": "2026-09-21T06:01:21.186Z"
+      "updatedAt": "2026-10-05T05:02:06.300Z"
     },
     "brainstorming": {
       "source": "obra/superpowers",
@@ -141,18 +141,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/dietrichgebert/ponytail.git",
       "skillPath": "skills/ponytail-review/SKILL.md",
-      "skillFolderHash": "dc6d9660c4297496a9220de377f6f7df38ab1a53",
+      "skillFolderHash": "6edfcf161c997fdd3089bce4e5682a921fb59b46",
       "installedAt": "2026-08-21T18:43:58.266Z",
-      "updatedAt": "2026-08-21T18:43:58.266Z"
+      "updatedAt": "2026-10-05T05:02:12.579Z"
     },
     "ponytail-audit": {
       "source": "dietrichgebert/ponytail",
       "sourceType": "github",
       "sourceUrl": "https://github.com/dietrichgebert/ponytail.git",
       "skillPath": "skills/ponytail-audit/SKILL.md",
-      "skillFolderHash": "19744a9490abb0f5d0f18c6e39e3a3eb50f4daa1",
+      "skillFolderHash": "f62f3a49debd14effa6d339b309f0bc531b9b232",
       "installedAt": "2026-08-21T18:43:58.283Z",
-      "updatedAt": "2026-08-21T18:43:58.283Z"
+      "updatedAt": "2026-10-05T05:02:14.774Z"
     },
     "caveman-commit": {
       "source": "JuliusBrussee/caveman",
@@ -168,9 +168,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-compress/SKILL.md",
-      "skillFolderHash": "21aa5ecc4fdf9667604102c6ec723030ec4f4b9c",
+      "skillFolderHash": "cdae212426a08bfaffc06c4bda9854e4db20ca21",
       "installedAt": "2026-08-21T18:45:39.190Z",
-      "updatedAt": "2026-09-21T06:01:24.473Z"
+      "updatedAt": "2026-10-05T05:02:09.790Z"
     },
     "caveman-review": {
       "source": "JuliusBrussee/caveman",
@@ -195,45 +195,45 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-investigate/SKILL.md",
-      "skillFolderHash": "6c860b6045c338f717448b98c566a12962c592676a4ea5a1d5f1ca8a12ed679f",
+      "skillFolderHash": "542b303c798c7c7ca0a73983f6d9596043adb6b46937d1e814cde1ed2d4f34ee",
       "installedAt": "2026-09-22T06:04:48.170Z",
-      "updatedAt": "2026-09-23T06:10:08.940Z"
+      "updatedAt": "2026-10-05T05:02:28.304Z"
     },
     "act-mkt-mr-comment": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-comment/SKILL.md",
-      "skillFolderHash": "d4c4316773d402178a5f6cca8460126a4fb2fa84ae658de806278efd176bb9fa",
+      "skillFolderHash": "c66882c1308372574555214d7ce5c676fe16b67eea7a2d5735872858ba570266",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-09-23T06:10:08.947Z"
+      "updatedAt": "2026-10-05T05:05:09.282Z"
     },
     "act-mkt-mr-review": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-review/SKILL.md",
-      "skillFolderHash": "98e7cb25d560797b93be55c8c53c083924b28a16bb7e864cb4d8059af7bfa42b",
+      "skillFolderHash": "1e62eddb8a98207d05815a7c5fe5c6cb60a5fd9170fb3f72cd4f9a7462ccd007",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-09-23T06:10:08.953Z"
+      "updatedAt": "2026-10-05T05:03:23.553Z"
     },
     "act-mkt-sprint-triage": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-sprint-triage/SKILL.md",
-      "skillFolderHash": "ca184313e0f57150044c38ee2310072930854c8e2318f1f1573d4c576987aedf",
+      "skillFolderHash": "be37ddfcc9e4deb518d8ba1ec5fdd7a488619a6273940abccccc69e2087a2e9b",
       "installedAt": "2026-09-22T06:04:48.172Z",
-      "updatedAt": "2026-09-23T06:10:08.984Z"
+      "updatedAt": "2026-10-05T05:03:29.834Z"
     },
     "act-mkt-work": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-work/SKILL.md",
-      "skillFolderHash": "33dfd6d7f8e2de66ccf1fc8fcca9bc3db97fa12c27a6cd2867d610c3124cac8b",
+      "skillFolderHash": "fe0bfdb7690e3d47c4e3b7b25cb3ff2757a1a9b0aa0365e8bc1633f5834545d0",
       "installedAt": "2026-09-22T06:04:48.174Z",
-      "updatedAt": "2026-09-23T06:10:08.997Z"
+      "updatedAt": "2026-10-05T05:03:33.878Z"
     },
     "act-mkt-codebase-search": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
