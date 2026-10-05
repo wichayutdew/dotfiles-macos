@@ -83,16 +83,6 @@ const grokModelConfig = {
   ],
 } as const;
 
-const sonnetModelConfig = {
-  ...reasoningModelConfig,
-  cost: { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 },
-} as const;
-
-const opusModelConfig = {
-  ...reasoningModelConfig,
-  cost: { input: 5, output: 25, cacheRead: 0.5, cacheWrite: 6.25 },
-} as const;
-
 const lunaModelConfig = {
   ...reasoningModelConfig,
   cost: { input: 1, output: 6, cacheRead: 0.1, cacheWrite: 1.25 },
@@ -135,20 +125,6 @@ const solModelConfig = {
   ],
 } as const;
 
-const astraModelConfig = {
-  ...reasoningModelConfig,
-  cost: { input: 10, output: 50, cacheRead: 1, cacheWrite: 12.5 },
-  tiers: [
-    {
-      inputTokensAbove: 272000,
-      input: 20,
-      output: 75,
-      cacheRead: 2,
-      cacheWrite: 25,
-    },
-  ],
-} as const;
-
 const kimiModelConfig = {
   input: ["text"],
   // Verified against Moonshot's Kimi K2.7 Code page (2026-08-22): 256K
@@ -179,18 +155,8 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
     apiKey: "$GENAI_API_KEY",
     models: [
       {
-        id: "claude-sonnet-5",
-        name: "claude-sonnet-5",
-        ...sonnetModelConfig,
-      },
-      // {
-      //   id: "claude-opus-5",
-      //   name: "claude-opus-5",
-      //   ...opusModelConfig,
-      // },
-      {
-        id: "gpt-5.6-luna",
-        name: "gpt-5.6-luna",
+        id: "gpt-6-luna",
+        name: "gpt-6-luna",
         api: "openai-responses",
         ...lunaModelConfig,
       },
@@ -200,26 +166,20 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         api: "openai-responses",
         ...terraModelConfig,
       },
-      // {
-      //   id: "gpt-5.6-sol",
-      //   name: "gpt-5.6-sol",
-      //   api: "openai-responses",
-      //   ...solModelConfig,
-      // },
-      // {
-      //   id: "gpt-6-astra",
-      //   name: "gpt-6-astra",
-      //   api: "openai-responses",
-      //   ...astraModelConfig,
-      // },
+      {
+        id: "gpt-6.1-sol",
+        name: "gpt-6.1-sol",
+        api: "openai-responses",
+        ...solModelConfig,
+      },
       {
         id: "gemini-3.8-flash",
         name: "gemini-3.8-flash",
         ...geminiFlashModelConfig,
       },
       {
-        id: "grok-4.6",
-        name: "grok-4.6",
+        id: "grok-4.7",
+        name: "grok-4.7",
         ...grokModelConfig,
       },
       {
