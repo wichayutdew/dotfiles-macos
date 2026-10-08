@@ -125,6 +125,11 @@ const solModelConfig = {
   ],
 } as const;
 
+const glmModelConfig = {
+  ...reasoningModelConfig,
+  cost: { input: 1.4, output: 4.4, cacheRead: 0.26, cacheWrite: 0 },
+} as const;
+
 const kimiModelConfig = {
   input: ["text"],
   // Verified against Moonshot's Kimi K2.7 Code page (2026-08-22): 256K
@@ -141,6 +146,25 @@ const kimiModelConfig = {
   // output $4.00. Gateway-negotiated rate is unverified; using public rates
   // as the closest known baseline rather than leaving cost at zero.
   cost: { input: 0.95, output: 4, cacheRead: 0.19, cacheWrite: 0 },
+} as const;
+
+const kimiK3ModelConfig = {
+  input: ["text", "image"],
+  contextWindow: 1048576,
+  maxTokens: 1048576,
+  reasoning: true,
+  // K3 always thinks. Map Pi's intermediate levels to its supported
+  // low/high/max values instead of allowing a disabled-thinking request.
+  thinkingLevelMap: {
+    off: null,
+    minimal: "low",
+    medium: "high",
+    xhigh: "max",
+    max: "max",
+  },
+  // K3's documented default cache TTL is five minutes, whose cache-write
+  // price is $3.00 per 1M tokens (the one-hour TTL costs $6.00).
+  cost: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3 },
 } as const;
 
 export default function registerGatewayModels(pi: ExtensionAPI) {
@@ -178,6 +202,11 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         ...geminiFlashModelConfig,
       },
       {
+        id: "glm-5.2",
+        name: "glm-5.2",
+        ...glmModelConfig,
+      },
+      {
         id: "grok-4.7",
         name: "grok-4.7",
         ...grokModelConfig,
@@ -186,6 +215,11 @@ export default function registerGatewayModels(pi: ExtensionAPI) {
         id: "kimi-k2.7-code",
         name: "kimi-k2.7-code",
         ...kimiModelConfig,
+      },
+      {
+        id: "kimi-k3",
+        name: "kimi-k3",
+        ...kimiK3ModelConfig,
       },
       {
         id: "qwen-3.8-27b",
