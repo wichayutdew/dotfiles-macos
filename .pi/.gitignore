@@ -4,6 +4,9 @@ node_modules/
 plannotator-review-status.json
 # secrets
 /agent/auth.json
+/agent/mcp-auth.json
+/agent/backups/mcp-before-env-extension.json
+/agent/backups/mcp-env-before-native-schema.json
 
 # runtime / cache / memory
 /agent/sessions/

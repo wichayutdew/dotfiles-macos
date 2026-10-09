@@ -1,13 +1,11 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "1.1.0",
   "defaultProvider": "gateway",
   "defaultModel": "gpt-6.1-sol",
   "defaultThinkingLevel": "medium",
   "shellPath": "/opt/homebrew/bin/fish",
   "packages": [
-    "npm:pi-zentui",
     "npm:@plannotator/pi-extension",
-    "npm:pi-mcp-adapter",
     "npm:pi-web-access"
   ],
   "terminal": {
@@ -28,7 +26,7 @@
   "transport": "auto",
   "quietStartup": false,
   "outputPad": 1,
-  "theme": "light/dark",
+  "theme": "system",
   "extensions": [
     "/Users/wphongphanpa/.hindsight/coding-agents/dist/pi.js"
   ]

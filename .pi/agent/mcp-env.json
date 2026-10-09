@@ -1,0 +1,103 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "toolExposure": {
+        "resolve-library-id": "direct",
+        "query-docs": "direct"
+      }
+    },
+    "atlassian": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.atlassian.com/v1/mcp/authv2"
+      ],
+      "toolExposure": {
+        "getJiraIssue": "direct"
+      }
+    },
+    "gitlab": {
+      "url": "${GITLAB_MCP}",
+      "toolExposure": {
+        "get_merge_request": "direct",
+        "get_merge_request_diffs": "direct",
+        "get_merge_request_pipelines": "direct"
+      }
+    },
+    "figma": {
+      "url": "https://mcp.figma.com/mcp",
+      "oauth": {
+        "clientId": "${FIGMA_CLIENT_ID}",
+        "clientSecret": "${FIGMA_CLIENT_SECRET}"
+      }
+    },
+    "agoda_skills": {
+      "url": "${AGODA_SKILLS_MCP}",
+      "headers": {
+        "X-Agoda-Skills-Version": "20260224.0.0"
+      }
+    },
+    "glean": {
+      "url": "${GLEAN_MCP}",
+      "toolExposure": {
+        "code_search": "direct",
+        "read_document": "direct",
+        "search": "direct"
+      }
+    },
+    "sourcegraph": {
+      "url": "${SOURCEGRAPH_MCP}",
+      "headers": {
+        "Authorization": "token ${SOURCEGRAPH_TOKEN}"
+      },
+      "toolExposure": {
+        "code_finder": "direct",
+        "commit_search": "direct",
+        "diff_search": "direct",
+        "evaluator": "direct",
+        "keyword_search": "direct",
+        "list_files": "direct",
+        "list_repos": "direct",
+        "nls_search": "direct",
+        "read_file": "direct"
+      }
+    },
+    "grafana": {
+      "url": "${GRAFANA_MCP}",
+      "headers": {
+        "X-Grafana-Org-Id": "1"
+      },
+      "toolExposure": {
+        "query_loki_logs": "direct",
+        "list_datasources": "direct"
+      }
+    },
+    "slack": {
+      "url": "${SLACK_MCP}"
+    },
+    "gh_grep": {
+      "url": "https://mcp.grep.app",
+      "toolExposure": {
+        "searchGitHub": "direct"
+      }
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "!token=$(/bin/sh -c '/opt/homebrew/bin/gh auth token') || exit $?; case \"$token\" in *[![:space:]]*) ;; *) exit 1 ;; esac; printf 'Bearer %s' \"$token\""
+      }
+    },
+    "superset": {
+      "url": "${SUPERSET_MCP}"
+    },
+    "query-writer": {
+      "url": "${QUERY_WRITER_MCP}",
+      "headers": {}
+    }
+  }
+}
