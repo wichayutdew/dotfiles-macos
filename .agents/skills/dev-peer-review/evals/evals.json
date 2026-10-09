@@ -1,0 +1,48 @@
+{
+  "skill_name": "dev-peer-review",
+  "notes": "GitLab peer-review evals. Prompts should be run offline unless the user explicitly authorizes posting. The important discriminator is whether the skill performs independent MR review from the diff plus material MR-body evidence, ignores review threads unless explicitly requested, validates findings within a reasonable effort cap, and drafts no duplicate/speculative comments.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "independent-review-no-thread-inspection",
+      "prompt": "Peer review this GitLab MR and do not post anything: https://gitlab.agodadev.io/Activities/activity-marketing-spark/-/merge_requests/352",
+      "expected_output": "The run fetches MR metadata and diff, uses only the diff plus material MR-body description/evidence/test result summary, does not inspect review threads, drafts only independent peer-review comments, and persists a complete versioned JSON record.",
+      "files": [],
+      "assertions": [
+        "material-input-boundary: report states that only diff plus MR-body description, evidence, and test result summary were considered material",
+        "no-thread-inspection: report states that reviewer, bot, and CodeBuddy threads were not inspected because thread resolution was not requested",
+        "no-thread-actions: report does not classify review comments, draft review-thread replies, or expose apply-suggestion action IDs",
+        "draft-only: report states explicitly that no reply, resolve, approval, merge, suggestion apply, or push was performed",
+        "review-persisted: report includes the absolute path of a schema-version-1 review JSON record under the selected .peer-review store"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "mr-body-template-filter",
+      "prompt": "Review this GitLab MR with a large MR-body template and tell me whether there are correctness or maintainability issues. Do not post: https://gitlab.agodadev.io/bookingapi/booking-creation/-/merge_requests/9106",
+      "expected_output": "The run separates filled MR-body description/evidence/test summary from empty template/checklist text, validates any peer findings with evidence, and avoids treating generic template content as material.",
+      "files": [],
+      "assertions": [
+        "template-filtered: report excludes empty checklists and boilerplate from material MR-body evidence",
+        "evidence-selected: report summarizes only concrete description, evidence, or test result summary as material",
+        "bounded-validation: report validates findings with focused commands or marks them unverified when proof exceeds the effort cap",
+        "draft-only: report states that no GitLab or source-code write was performed",
+        "complete-record: persisted JSON contains identity, reviewer, MR snapshot, sources, and the complete review result"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "large-frontend-review-token-discipline",
+      "prompt": "Peer review this GitLab MR for correctness and maintainability. Keep the effort reasonable and do not post anything: https://gitlab.agodadev.io/full-stack/monoliths/agoda-com-spa-mobile/-/merge_requests/45569",
+      "expected_output": "The run performs independent review from diff plus MR-body material, uses narrow validation before broad tests, separates rejected hypotheses, and drafts only survivor comments.",
+      "files": [],
+      "assertions": [
+        "bounded-effort: report explains the chosen validation effort and avoids broad test runs unless justified",
+        "unique-peer-findings-section: report includes unique peer findings or explicitly states none survived validation",
+        "rejected-hypotheses-section: report includes rejected hypotheses or explicitly states none were rejected",
+        "survivors-only-in-drafts: drafted comments contain only findings marked valid or unverified questions",
+        "atomic-review-record: the completed review is stored at .peer-review/<encoded-project>/<iid>.json and is usable by the summary renderer"
+      ]
+    }
+  ]
+}

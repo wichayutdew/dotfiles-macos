@@ -297,6 +297,15 @@
       "skillFolderHash": "5d7a07a2a6472a76df10a7a4b6d20b41c74b307abc66e52ad0bb9e6de8de015c",
       "installedAt": "2026-10-09T09:47:18.149Z",
       "updatedAt": "2026-10-09T09:47:18.149Z"
+    },
+    "dev-peer-review": {
+      "source": "git@gitlab.agodadev.io:Activities/agent-dev-skills.git",
+      "sourceType": "git",
+      "sourceUrl": "git@gitlab.agodadev.io:Activities/agent-dev-skills.git",
+      "skillPath": "skills/dev-peer-review/SKILL.md",
+      "skillFolderHash": "4ca2e4649c59ddf24b957c6d7b651893593f86fa3aa2c1da89c2519c143290ed",
+      "installedAt": "2026-10-09T16:56:09.229Z",
+      "updatedAt": "2026-10-09T16:56:09.229Z"
     }
   },
   "dismissed": {
