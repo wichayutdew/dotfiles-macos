@@ -1,5 +1,5 @@
 ---
-model: gateway/grok-4.6
+model: gateway/grok-4.7
 thinking: high
 ---
 

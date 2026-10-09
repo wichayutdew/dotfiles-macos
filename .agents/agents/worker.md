@@ -1,5 +1,5 @@
 ---
-model: gateway/kimi-k2.7-code
+model: gateway/kimi-k3
 thinking: high
 ---
 

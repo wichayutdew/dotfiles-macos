@@ -1,5 +1,5 @@
 ---
-model: gateway/gpt-5.6-terra
+model: gateway/gpt-6.1-sol
 thinking: high
 ---
 
