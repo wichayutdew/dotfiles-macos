@@ -10,7 +10,7 @@ import time
 import uuid
 from pathlib import Path
 
-WORKFLOW = {'start': 'fetch', 'gate': 'plan', 'stages': {'fetch': ('fetch.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'review', 'blocked': '$pause', 'handoff': 'fetch'}), 'review': ('findings.md', 'reviewer', 'gateway/grok-4.6', 'high', {'ready': 'plan', 'gaps': 'fetch', 'blocked': '$pause', 'handoff': 'review'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'publish', 'gaps': 'review', 'blocked': '$pause', 'handoff': 'plan'}), 'publish': ('publish-approved.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'mr-review'}
+WORKFLOW = {'start': 'fetch', 'gate': 'plan', 'stages': {'fetch': ('fetch.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'review', 'blocked': '$pause', 'handoff': 'fetch'}), 'review': ('findings.md', 'reviewer', 'gateway/grok-4.7', 'high', {'ready': 'plan', 'gaps': 'fetch', 'blocked': '$pause', 'handoff': 'review'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-6.1-sol', 'high', {'ready': 'publish', 'gaps': 'review', 'blocked': '$pause', 'handoff': 'plan'}), 'publish': ('publish-approved.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'mr-review'}
 SKILL_DIR = Path(__file__).resolve().parents[1]
 
 

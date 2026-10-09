@@ -21,13 +21,13 @@ If Pi or Herd is unavailable, use a fresh subagent when the harness supports sub
 
 ## Stages
 
-| Stage | Prompt | Pi role / model | Outcomes |
-| --- | --- | --- | --- |
-| intake | [intake.md](intake.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → plan; `blocked` → pause; `handoff` → intake |
-| plan | [plan.md](plan.md) | planner — `gateway/gpt-5.6-terra`, high | `ready` → research; `gaps` → intake; `blocked` → pause; `handoff` → plan |
-| research | [research.md](research.md) | planner — `gateway/gpt-5.6-terra`, high | `ready` → validate; `blocked` → pause; `handoff` → research |
-| validate | [validate.md](validate.md) | reviewer — `gateway/grok-4.6`, high | `ready` → write-report; `gaps` → research; `blocked` → pause; `handoff` → validate |
-| write-report | [write-report.md](write-report.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → done; `gaps` → validate; `blocked` → pause; `handoff` → write-report |
+| Stage | Prompt | Outcomes |
+| --- | --- | --- |
+| intake | [intake.md](intake.md) | `ready` → plan; `blocked` → pause; `handoff` → intake |
+| plan | [plan.md](plan.md) | `ready` → research; `gaps` → intake; `blocked` → pause; `handoff` → plan |
+| research | [research.md](research.md) | `ready` → validate; `blocked` → pause; `handoff` → research |
+| validate | [validate.md](validate.md) | `ready` → write-report; `gaps` → research; `blocked` → pause; `handoff` → validate |
+| write-report | [write-report.md](write-report.md) | `ready` → done; `gaps` → validate; `blocked` → pause; `handoff` → write-report |
 
 ## Scope approval gate
 
@@ -43,4 +43,4 @@ When Plannotator is available, submit the complete artifact to Plannotator and w
 
 ## Pi adapter
 
-For one fresh interactive Pi process with the table's model and thinking preferences, run `python3 scripts/run-pi.py --stage <stage> --request "<natural-language request>" [--previous-handoff <path>]`. The adapter launches only that stage in a background horizontal Herd split, waits for the child to persist and signal its handoff, then closes that exact child pane without closing the caller pane. It prints the validated handoff path and contents; the invoking main agent alone reads that result and decides the next stage, retry, block, or approval gate. If Pi or Herd is unavailable, execute the documented stage in the active session instead.
+For one fresh interactive Pi process with the execution settings configured in `scripts/run-pi.py`, run `python3 scripts/run-pi.py --stage <stage> --request "<natural-language request>" [--previous-handoff <path>]`. The adapter launches only that stage in a background horizontal Herd split, waits for the child to persist and signal its handoff, then closes that exact child pane without closing the caller pane. It prints the validated handoff path and contents; the invoking main agent alone reads that result and decides the next stage, retry, block, or approval gate. If Pi or Herd is unavailable, execute the documented stage in the active session instead.

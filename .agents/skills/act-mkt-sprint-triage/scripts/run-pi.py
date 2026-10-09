@@ -10,7 +10,7 @@ import time
 import uuid
 from pathlib import Path
 
-WORKFLOW = {'start': 'collect', 'gate': 'plan', 'stages': {'collect': ('collect.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'collect'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'checkout', 'gaps': 'collect', 'blocked': '$pause', 'handoff': 'plan'}), 'checkout': ('checkout.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'implement', 'blocked': '$pause', 'handoff': 'checkout'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k2.7-code', 'high', {'ready': 'publish', 'blocked': '$pause', 'handoff': 'implement'}), 'publish': ('publish.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'sprint-triage'}
+WORKFLOW = {'start': 'collect', 'gate': 'plan', 'stages': {'collect': ('collect.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'collect'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-6.1-sol', 'high', {'ready': 'checkout', 'gaps': 'collect', 'blocked': '$pause', 'handoff': 'plan'}), 'checkout': ('checkout.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'implement', 'blocked': '$pause', 'handoff': 'checkout'}), 'implement': ('implement.md', 'worker', 'gateway/kimi-k3', 'high', {'ready': 'publish', 'blocked': '$pause', 'handoff': 'implement'}), 'publish': ('publish.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'implement', 'blocked': '$pause', 'handoff': 'publish'})}, 'name': 'sprint-triage'}
 SKILL_DIR = Path(__file__).resolve().parents[1]
 
 

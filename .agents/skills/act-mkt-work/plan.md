@@ -1,11 +1,5 @@
 # Stage: plan
 
-## Pi profile
-
-- Role: `planner`
-- Model: `gateway/gpt-6.1-sol`
-- Thinking: `high`
-
 The Pi adapter supplies the invoking request and previous stage artifact automatically. In a portable session, use the active conversation request and prior artifacts.
 
 ---

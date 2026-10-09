@@ -1,11 +1,5 @@
 # Stage: implement
 
-## Pi profile
-
-- Role: `worker`
-- Model: `gateway/kimi-k3`
-- Thinking: `high`
-
 The Pi adapter supplies the invoking request and previous stage artifact automatically. In a portable session, use the active conversation request and prior artifacts.
 
 ---

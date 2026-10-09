@@ -1,11 +1,5 @@
 # Stage: research
 
-## Pi profile
-
-- Role: `planner`
-- Model: `gateway/glm-5.2`
-- Thinking: `high`
-
 The Pi adapter supplies the invoking request and previous stage artifact automatically. In a portable session, use the active conversation request and prior artifacts.
 
 ---

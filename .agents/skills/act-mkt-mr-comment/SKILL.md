@@ -21,14 +21,14 @@ If Pi or Herd is unavailable, use a fresh subagent when the harness supports sub
 
 ## Stages
 
-| Stage | Prompt | Pi role / model | Outcomes |
-| --- | --- | --- | --- |
-| fetch | [fetch.md](fetch.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → checkout-source; `blocked` → pause; `handoff` → fetch |
-| checkout-source | [checkout-source.md](checkout-source.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → plan; `gaps` → fetch; `blocked` → pause; `handoff` → checkout-source |
-| plan | [plan.md](plan.md) | planner — `gateway/gpt-5.6-terra`, high | `ready` → implement; `gaps` → fetch; `blocked` → pause; `handoff` → plan |
-| implement | [implement.md](implement.md) | worker — `gateway/kimi-k2.7-code`, high | `ready` → verify; `blocked` → pause; `handoff` → implement |
-| verify | [verify.md](verify.md) | reviewer — `gateway/grok-4.6`, high | `ready` → deliver; `gaps` → implement; `blocked` → pause; `handoff` → verify |
-| deliver | [publish.md](publish.md) | scout — `gateway/gemini-3.8-flash`, low | `ready` → done; `gaps` → implement; `blocked` → pause; `handoff` → deliver |
+| Stage | Prompt | Outcomes |
+| --- | --- | --- |
+| fetch | [fetch.md](fetch.md) | `ready` → checkout-source; `blocked` → pause; `handoff` → fetch |
+| checkout-source | [checkout-source.md](checkout-source.md) | `ready` → plan; `gaps` → fetch; `blocked` → pause; `handoff` → checkout-source |
+| plan | [plan.md](plan.md) | `ready` → implement; `gaps` → fetch; `blocked` → pause; `handoff` → plan |
+| implement | [implement.md](implement.md) | `ready` → verify; `blocked` → pause; `handoff` → implement |
+| verify | [verify.md](verify.md) | `ready` → deliver; `gaps` → implement; `blocked` → pause; `handoff` → verify |
+| deliver | [publish.md](publish.md) | `ready` → done; `gaps` → implement; `blocked` → pause; `handoff` → deliver |
 
 ## Comment-plan approval gate
 
@@ -43,4 +43,4 @@ When Plannotator is available, submit the complete artifact to Plannotator and w
 
 ## Pi adapter
 
-For one fresh interactive Pi process with the table's model and thinking preferences, run `python3 scripts/run-pi.py --stage <stage> --request "<natural-language request>" [--previous-handoff <path>]`. The adapter launches only that stage in a background horizontal Herd split, waits for the child to persist and signal its handoff, then closes that exact child pane without closing the caller pane. It prints the validated handoff path and contents; the invoking main agent alone reads that result and decides the next stage, retry, block, or approval gate. If Pi or Herd is unavailable, execute the documented stage in the active session instead.
+For one fresh interactive Pi process with the execution settings configured in `scripts/run-pi.py`, run `python3 scripts/run-pi.py --stage <stage> --request "<natural-language request>" [--previous-handoff <path>]`. The adapter launches only that stage in a background horizontal Herd split, waits for the child to persist and signal its handoff, then closes that exact child pane without closing the caller pane. It prints the validated handoff path and contents; the invoking main agent alone reads that result and decides the next stage, retry, block, or approval gate. If Pi or Herd is unavailable, execute the documented stage in the active session instead.

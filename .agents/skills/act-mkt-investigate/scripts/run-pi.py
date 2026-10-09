@@ -10,7 +10,7 @@ import time
 import uuid
 from pathlib import Path
 
-WORKFLOW = {'start': 'intake', 'gate': 'plan', 'stages': {'intake': ('intake.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'intake'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'research', 'gaps': 'intake', 'blocked': '$pause', 'handoff': 'plan'}), 'research': ('research.md', 'planner', 'gateway/gpt-5.6-terra', 'high', {'ready': 'validate', 'blocked': '$pause', 'handoff': 'research'}), 'validate': ('validate.md', 'reviewer', 'gateway/grok-4.6', 'high', {'ready': 'write-report', 'gaps': 'research', 'blocked': '$pause', 'handoff': 'validate'}), 'write-report': ('write-report.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'validate', 'blocked': '$pause', 'handoff': 'write-report'})}, 'name': 'investigate'}
+WORKFLOW = {'start': 'intake', 'gate': 'plan', 'stages': {'intake': ('intake.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': 'plan', 'blocked': '$pause', 'handoff': 'intake'}), 'plan': ('plan.md', 'planner', 'gateway/gpt-6.1-sol', 'high', {'ready': 'research', 'gaps': 'intake', 'blocked': '$pause', 'handoff': 'plan'}), 'research': ('research.md', 'planner', 'gateway/gpt-6.1-sol', 'high', {'ready': 'validate', 'blocked': '$pause', 'handoff': 'research'}), 'validate': ('validate.md', 'reviewer', 'gateway/grok-4.7', 'high', {'ready': 'write-report', 'gaps': 'research', 'blocked': '$pause', 'handoff': 'validate'}), 'write-report': ('write-report.md', 'scout', 'gateway/gemini-3.8-flash', 'low', {'ready': '$done', 'gaps': 'validate', 'blocked': '$pause', 'handoff': 'write-report'})}, 'name': 'investigate'}
 SKILL_DIR = Path(__file__).resolve().parents[1]
 
 
