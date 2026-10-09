@@ -24,3 +24,4 @@ sprint-triage.yaml
 /.config/gh/hosts.yml
 /.config/fish/conf.d/environment.fish
 /.config/fish/fish_variables
+/.config/herdr/session-snapshots
