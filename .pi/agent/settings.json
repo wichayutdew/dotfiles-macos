@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "1.1.0",
   "defaultProvider": "gateway",
-  "defaultModel": "gpt-6.1-sol",
+  "defaultModel": "glm-5.2",
   "defaultThinkingLevel": "medium",
   "shellPath": "/opt/homebrew/bin/fish",
   "packages": [
