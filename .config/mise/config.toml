@@ -1,9 +1,8 @@
 [tools]
-bun = "latest"
 dotnet = "latest"
 java = "zulu-25"
-node = "25"
+node = "24.15.0"
+pnpm = "10.33.0"
 ruby = "3.4.9"
-rust = "latest"
 sbt = "latest"
 tuist = "latest"
