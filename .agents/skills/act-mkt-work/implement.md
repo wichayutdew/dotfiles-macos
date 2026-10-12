@@ -21,7 +21,7 @@ When approved work remains after the committed feature, return `handoff`; do not
 
 `ready`: every approved implementation slice is complete, with red/green evidence and commits; use exactly `No active-step work remains.` in `remaining`.
 `handoff`: red/green evidence and a commit for one coherent slice; remaining approved work is explicitly listed in `remaining`.
-`blocked`: missing authority, prerequisite, or unrecoverable blocker; include the user question in `remaining`.
+`blocked`: a required authority or prerequisite was not included in the approved plan, or an unrecoverable blocker prevents safe work. Report the exact missing authority/prerequisite or blocker in `remaining`; do not ask a question or continue outside the approved scope.
 
 
 ## Required ready response

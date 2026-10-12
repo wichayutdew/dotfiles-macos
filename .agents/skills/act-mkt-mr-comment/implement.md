@@ -17,7 +17,7 @@ A parent recovery `handoff` is unconfirmed context, not proof that local work or
 
 `ready`: all approved local work and checks are complete, no commit, push, or reply has occurred in this step, and the complete approved publication contract is preserved for `verify` and `deliver`.
 `handoff`: transient tool failure.
-`blocked`: an unapproved command is required.
+`blocked`: a required command is outside the approved plan. Report the exact command requirement in `Remaining`; do not ask for approval or execute it outside the plan-review gate.
 
 
 ## Required ready response

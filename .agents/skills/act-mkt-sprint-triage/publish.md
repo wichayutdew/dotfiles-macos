@@ -10,7 +10,7 @@ Input: `the invoking request`
 Approved plan: `the approved plan artifact from this run`
 Ledger: `{{last.summary}}`
 
-Use `sprint-triage.yaml` in this skill directory. If it is absent, ask the user to create it from `sprint-triage.example.yaml`, replace every placeholder locally, and keep the concrete file uncommitted.
+Use `sprint-triage.yaml` in this skill directory. If the configuration is absent or incomplete, report the exact missing file/keys as `blocked`; do not ask the user to create or complete it and do not infer values.
 
 1. Validate the implementation completed ledger against the configured knowledge-base repository. The current linked worktree, topic branch, base SHA, and commit SHA must equal the recorded values, and the commit must contain the approved paths. Block on a mismatch.
 2. Push without force the recorded topic branch. Create the MR via GitLab MCP against configured `gitlab.targetBranch`, using the approved title and verified host template only. If none is verified, do not block or ask for confirmation: create it without description adjustment, read back its description as the template, then update only the managed region. Re-read the MR and preserve its locator for every later outcome.

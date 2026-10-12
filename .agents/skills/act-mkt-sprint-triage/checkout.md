@@ -9,7 +9,7 @@ Create the knowledge-base worktree and publication branch. Mechanical only.
 Input: `the invoking request`
 Approved plan: `the approved plan artifact from this run`
 
-Use `sprint-triage.yaml` in this skill directory. If it is absent, ask the user to create it from `sprint-triage.example.yaml`, replace every placeholder locally, and keep the concrete file uncommitted. Dates must be `YYYY-MM-DD YYYY-MM-DD`.
+Use `sprint-triage.yaml` in this skill directory. Dates must be `YYYY-MM-DD YYYY-MM-DD`. If the configuration is absent or incomplete, do not ask the user to create or complete it and do not infer values; report the exact missing file/keys as a terminal `blocked` outcome.
 
 1. Validate `knowledgeBase.localRepositoryPath` and `gitlab.targetBranch`.
 2. Open the configured repository only as its clean primary checkout. Capture its target-branch base SHA and block if it has tracked or untracked changes.
@@ -18,4 +18,4 @@ Use `sprint-triage.yaml` in this skill directory. If it is absent, ask the user 
 
 `ready`: `workspace: {cwd: "<worktree-path>", branch: "docs/sprint-triage-<start>-to-<end>", baseSha: "<target-branch SHA>"}`.
 `handoff`: transient mechanical worktree work remains and requires no user input.
-`blocked`: bad dates, missing repository information, or an unsafe Git state requiring user input; put the question in `remaining`.
+`blocked`: bad dates, missing required repository/configuration information, or an unsafe Git state. Report the exact observed blocker in `remaining`; do not ask a question, wait for input, or mutate around a safety check.

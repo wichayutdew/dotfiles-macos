@@ -16,7 +16,7 @@ On restart, rebind that exact worktree and branch. Preserve unrelated work. If s
 `ready`: bound `workspace.cwd` plus manifest.
 `gaps`: source HEAD moved beyond the approved base and the plan must be refreshed.
 `handoff`: transient mechanical workspace work remains and requires no user input.
-`blocked`: the workspace state is unsafe and requires user input; put the question in `remaining`.
+`blocked`: the workspace state is unsafe or cannot be repaired within the approved plan. Report the observed state and exact blocker in `remaining`; do not ask a question, wait for input, or mutate around the safety check.
 
 
 ## Required ready response

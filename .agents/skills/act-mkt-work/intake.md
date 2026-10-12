@@ -19,7 +19,7 @@ Never mutate Jira, Git, remotes, or worktrees.
 
 `ready`: complete source evidence has been retrieved.
 `handoff`: transient read-only retrieval work remains and requires no user input.
-`blocked`: source evidence requires user-provided clarification, access, or authority; put the question in `remaining`.
+`blocked`: required source evidence is unavailable, contradictory, or cannot be accessed safely. Report the exact factual gap in `remaining` without asking a question. Preserve other missing business facts in the intake evidence so the planner can place answerable decisions in `Risks/Decisions Needed` for plan review.
 
 
 ## Required ready response

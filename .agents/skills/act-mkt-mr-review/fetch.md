@@ -16,7 +16,7 @@ Do not summarize, shorten, reword, classify, identify bugs, assess risk, infer c
 
 `ready`: complete evidence.
 `handoff`: transient read-only host retrieval work remains and requires no user input.
-`blocked`: bad URL, unsupported host, incomplete evidence requiring user input, or unavailable required evidence; put the question in `remaining`.
+`blocked`: bad URL, unsupported host, incomplete evidence, or unavailable required evidence prevents a safe review. Report the exact factual limitation in `remaining`; do not ask a question or wait for input.
 
 
 ## Required ready response

@@ -29,7 +29,7 @@ Read the specified file and treat it as the sole authoritative source for ticket
 4. Every ticket has a nonempty unique `ticketLink`, its complete `sourceRow` object, and a `slackThread` object with a positive integer `pagesRead`, `complete: true`, and a complete `messages` array.
 5. Ticket order matches selected-link order. Each message array is in chronological source order and retains every supported returned message field, including source text, author, timestamp, links, and formatting when returned.
 
-Use `sprint-triage.yaml` in this skill directory only after that validation succeeds. If it is absent, ask the user to create it from `sprint-triage.example.yaml`, replace every placeholder locally, and keep the concrete file uncommitted.
+Use `sprint-triage.yaml` in this skill directory only after that validation succeeds. Do not ask the user to create or complete it. If it is absent or incomplete, record the exact missing file/keys in the existing `## Execution contract` and return `blocked` when they prevent a complete, safe plan; never invent configuration values. Put all user-answerable publication decisions in the existing plan artifact fields and do not ask separately.
 
 The approval artifact retains every exact heading required by `SKILL.md`. Its `## Publication fragment` must contain exactly one of these decisions:
 
@@ -43,4 +43,4 @@ When proposing a non-empty fragment, validate the configured Confluence target, 
 `ready`: validated evidence-file source data, a complete approval artifact with either a non-empty fragment or `None`, and the required publication contract are ready for review.
 `gaps`: the collection locator or evidence file is missing, generic/tool-activity-only, malformed, outside the permitted path, unreadable, hash- or byte-count-mismatched, invalid JSON, or incomplete/unverifiable structured collection evidence; it must be recollected before planning can continue. Report the factual failed validation in `remaining`.
 `handoff`: actionable planning work remains and requires no user input.
-`blocked`: unsafe redaction or another user decision is required; put the question in `remaining`.
+`blocked`: unsafe redaction, unavailable required configuration, or another factual condition prevents a complete safe plan. Report the exact blocker in `remaining` without asking a question; include user-answerable publication decisions in the artifact for plan review.

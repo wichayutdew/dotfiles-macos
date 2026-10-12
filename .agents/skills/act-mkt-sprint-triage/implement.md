@@ -20,7 +20,7 @@ Copy that staged report verbatim to the approved `Report path`. Do not regenerat
 
 `ready`: files committed on the recorded branch with the resulting commit SHA.
 `handoff`: actionable implementation work remains and requires no user input.
-`blocked`: a path or hash mismatch requires user input; put the question in `remaining`.
+`blocked`: a path or hash mismatch prevents safe implementation. Report the expected and observed paths/hashes in `remaining`; do not ask a question or bypass the approved integrity check.
 
 
 ## Required ready response

@@ -11,7 +11,7 @@ Evidence: `{{last.summary}}`
 Rejected plan: `{{gate.artifact}}`
 Feedback: `{{gate.feedback}}`
 
-Base each verdict on the current checkout and host evidence. Preserve every unresolved comment identity and anchor; do not plan an unapproved remote action or command.
+Base each verdict on the current checkout and host evidence. Preserve every unresolved comment identity and anchor; do not plan an unapproved remote action or command. Put all user-answerable verdict, implementation, validation, and publication choices in this complete plan artifact for review; do not ask separately. Approval feedback returns to this plan stage and the artifact is re-presented at the same review gate.
 
 For every verdict, provide exactly one response message and exactly one execution-appendix `publication.replies` entry for its existing `discussionId`. An `implement` reply confirms the approved change was applied; a `decline` reply explains the evidence-based reason the suggestion was rejected. For every `implement` verdict, list scoped repository-relative paths and require one non-force push of the checked-out source branch. If any implementation verdict exists, provide one imperative Conventional Commit subject in `publication.commitSubject`. Return `blocked` when the host has no safe way to reply to the existing discussion identity.
 

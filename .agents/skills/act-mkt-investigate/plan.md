@@ -11,11 +11,11 @@ Intake: `{{last.summary}}`
 Rejected plan: `{{gate.artifact}}`
 Feedback: `{{gate.feedback}}`
 
-Base scope, sources, and open questions on the intake evidence. Do not invent system names, access, or investigative results.
+Base scope, sources, and open questions on the intake evidence. Do not invent system names, access, or investigative results. Put every user-answerable clarification or decision in the required `Questions` section of the plan artifact; do not ask separately. Approval feedback returns here and the artifact is re-presented at the same review gate.
 
-`ready`: the complete scope artifact is ready for review.
+`ready`: the complete scope artifact, including any user-answerable open questions in `Questions`, is ready for review.
 `handoff`: transient read failure.
-`blocked`: empty input or required Jira missing.
+`blocked`: intake evidence is absent/unusable or required source evidence is inaccessible, contradictory, or unsafe to assume. Report the factual blocker in `Remaining` without asking a question. A user-answerable missing issue identifier or scope clarification belongs in `Questions` for plan review, not in a separate prompt.
 
 
 ## Required ready response
