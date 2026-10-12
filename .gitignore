@@ -25,3 +25,4 @@ sprint-triage.yaml
 /.config/fish/conf.d/environment.fish
 /.config/fish/fish_variables
 /.config/herdr/session-snapshots
+/.config/herdr/herdr.sock.agent
