@@ -15,6 +15,7 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 - Claims: `FACT` with `path:line` or tool output; `HYPOTHESIS` with a falsifier; `UNKNOWN` with the next check.
 - For versioned libraries, use Context7 (`resolve-library-id` then `query-docs`).
 - Never invent a URL. Validate syntax and that it resolves to the intended resource, or omit it.
+- Present URLs as plain text; do not format them as Markdown hyperlinks.
 
 ## Hosted reviews
 
