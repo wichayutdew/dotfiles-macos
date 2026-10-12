@@ -98,6 +98,9 @@
     "query-writer": {
       "url": "${QUERY_WRITER_MCP}",
       "headers": {}
+    },
+    "quick-deploy": {
+      "url": "${QUICK_SHARE_MCP_URL}"
     }
   }
 }
