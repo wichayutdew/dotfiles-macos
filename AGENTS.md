@@ -47,6 +47,12 @@ Do not fall back to `grep`/`find` because a skill, subagent default, or example 
 
 - In normal chat, launch subagents when they materially improve independent research, review, or implementation work, subject to the active tool and repository rules.
 
+## Explicit skill invocation
+
+- When the user explicitly requests a named skill (for example, `/skill-name` or “use the `<skill-name>` skill”), read its `SKILL.md` before responding or acting, then follow its instructions, sequence, gates, and deliverables. Do not skip, substitute, or treat the skill as optional.
+- This explicit-invocation requirement overrides “Do not open a skill file unless the step YAML lists that skill”; that workflow-child restriction otherwise remains unchanged.
+- A skill name mentioned only in discussion is not an explicit invocation. Continue to follow other applicable skill triggers even when the user has not named a skill.
+
 ## Workflow children
 
 - When executing a declarative workflow step, do not launch subagents.
