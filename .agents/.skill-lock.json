@@ -168,9 +168,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-compress/SKILL.md",
-      "skillFolderHash": "8bfde0c338b80b7a30c6b267ccdeb6fe9dc96a35",
+      "skillFolderHash": "b345d6e5b735d8284311a3b41d7522cdf951ddb3",
       "installedAt": "2026-08-21T18:45:39.190Z",
-      "updatedAt": "2026-10-08T10:49:26.444Z"
+      "updatedAt": "2026-10-15T10:31:08.651Z"
     },
     "caveman-review": {
       "source": "JuliusBrussee/caveman",
@@ -297,6 +297,33 @@
       "skillFolderHash": "5d7a07a2a6472a76df10a7a4b6d20b41c74b307abc66e52ad0bb9e6de8de015c",
       "installedAt": "2026-10-09T09:47:18.149Z",
       "updatedAt": "2026-10-09T09:47:18.149Z"
+    },
+    "plannotator-visual-explainer": {
+      "source": "backnotprop/plannotator",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
+      "skillPath": "apps/skills/extra/plannotator-visual-explainer/SKILL.md",
+      "skillFolderHash": "060525d9a83760cc7cbc3004217c596a76a3e39a",
+      "installedAt": "2026-10-15T10:30:13.520Z",
+      "updatedAt": "2026-10-15T10:30:13.520Z"
+    },
+    "plannotator-setup-goal": {
+      "source": "backnotprop/plannotator",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
+      "skillPath": "apps/skills/extra/plannotator-setup-goal/SKILL.md",
+      "skillFolderHash": "29d5d60c2b8a88c1786d7bbdbbfa37e44b64f6a5",
+      "installedAt": "2026-10-15T10:30:13.544Z",
+      "updatedAt": "2026-10-15T10:30:13.544Z"
+    },
+    "plannotator-compound": {
+      "source": "backnotprop/plannotator",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
+      "skillPath": "apps/skills/extra/plannotator-compound/SKILL.md",
+      "skillFolderHash": "e7cb3bf5836705facedb2f94c6648f269d3f0748",
+      "installedAt": "2026-10-15T10:30:13.562Z",
+      "updatedAt": "2026-10-15T10:30:13.562Z"
     }
   },
   "dismissed": {
