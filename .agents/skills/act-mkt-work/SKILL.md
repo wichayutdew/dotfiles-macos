@@ -41,3 +41,5 @@ Before `plan` can continue with `ready`, obtain explicit approval for an artifac
 - `Execution appendix (machine-readable)`
 
 Obtain explicit human approval of the complete artifact before continuing. Include every user-resolvable question, missing decision, and required authorization in this artifact; do not ask separately. On denial or feedback, revise and re-present the artifact at this gate. After approval, ask no questions.
+
+Plannotator is optional; explicit human approval is required. Save the complete artifact as a Markdown file. If a Plannotator tool or installed CLI is available, use it to present the complete artifact for approval. Otherwise, provide the Markdown file path and explicitly ask the user to review the file and approve in a chat response. Wait for explicit approval through the selected interface before continuing. Silence, dismissal, or a tool failure is not approval; revise and re-present the artifact on feedback.
