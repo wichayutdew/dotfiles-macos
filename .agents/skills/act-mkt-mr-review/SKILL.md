@@ -15,7 +15,7 @@ The only user wait is the complete plan-review gate below. Put every user-answer
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, do not ask a question or wait for user input, and never bypass required evidence, access, authority, or safety checks.
 
-Use the model and thinking level specified for each stage. Model selection does not approve a plan or authorize publication.
+Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Model selection does not approve a plan or authorize publication.
 
 ## Stages
 
