@@ -22,6 +22,9 @@ Existing open review: title is immutable. Change only the interior of one matchi
 
 No markers: append one pair. Mixed, duplicated, or malformed markers: `blocked`. Never replace the whole body. Never approve, merge, or close.
 
-`ready`: push plus permitted create/update.
-`handoff`: transient failure before mutation.
+After push and the permitted review update, inspect CI for the published commit as required by [verify](verify.md). Return `handoff` while required CI is running, and return failures to the implementation/verification loop. A successful push or review creation alone does not mean the work is complete.
+
+`ready`: push plus permitted create/update, and the published commit's required CI pipeline is green.
+`gaps`: a required CI job failed or a required check is missing; return to implement with job evidence.
+`handoff`: required CI is running, or a transient failure prevents confirmation; resume from the existing pushed commit and review.
 `blocked`: unsafe or ambiguous state.

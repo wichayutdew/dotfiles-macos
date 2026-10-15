@@ -26,7 +26,7 @@ Use the model specified for each stage when available; otherwise, use an equival
 | prepare-workspace | [prepare-workspace.md](prepare-workspace.md) | `gateway/gemini-3.8-flash` | low | `ready` → implement; `gaps` → plan; `blocked` → terminal report; `handoff` → prepare-workspace |
 | implement | [implement.md](implement.md) | `gateway/kimi-k3` | high | `ready` → verify; `blocked` → terminal report; `handoff` → implement |
 | verify | [verify.md](verify.md) | `gateway/grok-4.7` | high | `ready` → publish; `gaps` → implement; `blocked` → terminal report; `handoff` → verify |
-| publish | [publish-remote.md](publish-remote.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `blocked` → terminal report; `handoff` → publish |
+| publish | [publish-remote.md](publish-remote.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `gaps` → implement; `blocked` → terminal report; `handoff` → publish |
 
 ## Plan approval gate
 
