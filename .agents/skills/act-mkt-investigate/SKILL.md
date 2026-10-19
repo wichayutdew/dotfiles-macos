@@ -9,13 +9,31 @@ description: Investigate a Jira issue or question through scope approval, eviden
 
 Treat the text that invoked this skill as the authoritative investigation request. Derive Jira, repository, logs, and other integration context from that request and the active workspace.
 
+## Report destination intake
+
+- Before starting the automated stages, check whether the invoking request provides the exact report file path.
+- If it does not, explicitly ask the user: “What exact file path should I use for the investigation report?” Do not infer, invent, or choose a default path. Wait for the answer before continuing with intake.
+- Carry the supplied path unchanged into `# Report destination` in the plan artifact and through report writing. Do not mark the plan `ready` or write the report while the path is missing.
+
+## Workspace policy
+
+- Investigations and report generation are read-only with respect to product code and use the active repository checkout. Never create a Git worktree for an investigation, switch branches, or check out another revision solely for an investigation.
+- Preserve existing checkout state and unrelated changes. Capture branch, `HEAD`, and `git status --short` before any approved local documentation/report write.
+- Keep investigation notes and report artifacts in the approved destination. If product implementation is requested, keep it out of the investigation and route it through the separately approved implementation workflow; do not silently expand scope.
+
 Execute the linked stages sequentially and automatically. Carry the complete invoking request and prior stage artifacts forward; do not replace source evidence with a summary. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
-The only user wait is the complete plan-review gate below. Put every user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, ask no questions and execute the approved routes and publication contract autonomously.
+The only user waits are the intake request for an exact report file path when it is missing, and the complete plan-review gate below. Put every other user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, ask no questions and execute the approved routes and publication contract autonomously.
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, do not ask a question or wait for user input, and never bypass required evidence, access, authority, or safety checks.
 
 Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Model selection does not approve a plan or authorize publication.
+
+## Report format
+
+- Prefer diagrams or tables over prose whenever they communicate the report information clearly.
+- When text is necessary, use only concise bullet points; do not write prose paragraphs.
+- Preserve the approved report headings, evidence citations, and required detail while applying this format.
 
 ## Stages
 
@@ -29,7 +47,7 @@ Use the model specified for each stage when available; otherwise, use an equival
 
 ## Scope approval gate
 
-Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings:
+Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings. `# Report destination` must contain the exact report file path supplied by the user:
 
 - level 1: `Report destination`
 - level 2: `Goal/Acceptance Criteria`
