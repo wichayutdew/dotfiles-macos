@@ -15,14 +15,14 @@ The only user wait is the complete plan-review gate below. Put every user-answer
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
-## Model selection
+## Model selection and task delegation
 
-- Never use a flagship model, including for reviewers, subagents, retries or fallbacks. Lowering its thinking effort does not make a flagship model eligible. Near-flagship means a strong reasoning/coding tier below the provider's flagship, not its top model.
-- Use the cheapest available non-flagship model suitable for the stage: cheap/fast with low effort for retrieval, worktree/branch operations, running known commands, CI polling, formatting and approved publication; mid-tier with medium effort for routine implementation and bounded analysis; near-flagship with high effort for extensive design/planning, difficult diagnosis and substantive regression/performance review.
-- Tables give the starting tier/effort. Escalate routine work to near-flagship/high only when complexity or failed attempts demonstrate that more reasoning is needed. Formatting already validated findings uses cheap/fast/low; reopening technical judgments uses near-flagship/high. For mixed work, resolve the demanding judgment first, then return mechanical follow-up to cheap/fast/low.
-- Resolve tiers from the runtime's verified model catalog; no vendor model name or private routing service is required. Do not blindly inherit the runtime default or an unverified alias. If the suggested tier is unavailable, choose the cheapest suitable verified non-flagship alternative and preserve the task’s effort (for example, mid-tier/low for mechanical Git work when cheap models are unavailable). If no eligible model is available or model selection cannot avoid a flagship/unknown default, report the limitation instead of silently using it.
-- Use the closest supported effort setting. Execute inline unless the user/runtime authorizes another method; model guidance does not authorize delegation, approve a plan or authorize publication.
-
+- Use your judgment to choose an available model and supported thinking effort for each task, balancing complexity, quality, latency and cost. The stage table gives starting guidance, not eligibility requirements; adjust it when the task or results warrant it. Respect an explicit user model choice and actual runtime restrictions.
+- The parent agent coordinates the workflow. Spawn a fresh subagent for each bounded task, including stage work, implementation slices, reviews and recovery tasks. This skill authorizes task delegation; it does not approve a plan or authorize publication. A worker assigned a bounded task completes it and returns evidence to the parent rather than recursively spawning a replacement for itself.
+- When model selection is exposed, choose a suitable model from the available options. When model selection or parent-model introspection is unavailable, launch the subagent with its configured/default model and continue. An unknown parent model, unavailable tier catalog or inability to switch models inline is not a blocker. Do not claim a model identity or tier was verified when it was not.
+- If subagent tools are unavailable or dispatch fails, continue the task inline using the available model and briefly record the fallback. Report a blocker only when a real task prerequisite, runtime restriction or required authorization prevents safe progress.
+- Give each worker the original request, bounded scope, applicable stage prompt, approved plan and approval evidence when required, workspace/base/head, full-source references, relevant checks and expected outcome. The parent dispatches subsequent routes and remains accountable for reviewing diffs, checking evidence and reporting results.
+- Run independent tasks concurrently when they can avoid conflicting edits; run dependent stages and tasks sequentially. Preserve the approval gates, workspace restrictions and publication contract across every handoff.
 
 ## Review focus
 
@@ -40,12 +40,12 @@ With no actionable findings, finish locally with the reviewed SHA, coverage and 
 
 ## Stages
 
-| Stage | Prompt | Model | Thinking | Outcomes |
+| Stage | Prompt | Model guidance | Thinking guidance | Outcomes |
 | --- | --- | --- | --- | --- |
-| fetch | [fetch.md](fetch.md) | cheap/fast | low | `ready` → review; `blocked` → terminal report; `handoff` → fetch |
-| review | [findings.md](findings.md) | near-flagship | high | `ready` → plan; `done` → local report; `gaps` → fetch; `blocked` → terminal report; `handoff` → review |
-| plan | [plan.md](plan.md) | cheap/fast | low | `ready` → plan review, then publish on approval; `refresh` → fetch; `gaps` → review; `blocked` → terminal report; `handoff` → plan |
-| publish | [publish-approved.md](publish-approved.md) | cheap/fast | low | `ready` → done; `done` → local report; `refresh` → fetch; `blocked` → terminal report; `handoff` → publish |
+| fetch | [fetch.md](fetch.md) | fast economical | low | `ready` → review; `blocked` → terminal report; `handoff` → fetch |
+| review | [findings.md](findings.md) | strong reasoning | high | `ready` → plan; `done` → local report; `gaps` → fetch; `blocked` → terminal report; `handoff` → review |
+| plan | [plan.md](plan.md) | fast economical | low | `ready` → plan review, then publish on approval; `refresh` → fetch; `gaps` → review; `blocked` → terminal report; `handoff` → plan |
+| publish | [publish-approved.md](publish-approved.md) | fast economical | low | `ready` → done; `done` → local report; `refresh` → fetch; `blocked` → terminal report; `handoff` → publish |
 
 ## Review approval gate
 

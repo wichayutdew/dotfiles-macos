@@ -27,14 +27,14 @@ The user waits are a missing exact path when local output was selected, and the 
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
-## Model selection
+## Model selection and task delegation
 
-- Never use a flagship model, including for reviewers, subagents, retries or fallbacks. Lowering its thinking effort does not make a flagship model eligible. Near-flagship means a strong reasoning/coding tier below the provider's flagship, not its top model.
-- Use the cheapest available non-flagship model suitable for the stage: cheap/fast with low effort for retrieval, worktree/branch operations, running known commands, CI polling, formatting and approved publication; mid-tier with medium effort for routine implementation and bounded analysis; near-flagship with high effort for extensive design/planning, difficult diagnosis and substantive regression/performance review.
-- Tables give the starting tier/effort. Escalate routine work to near-flagship/high only when complexity or failed attempts demonstrate that more reasoning is needed. Formatting already validated findings uses cheap/fast/low; reopening technical judgments uses near-flagship/high. For mixed work, resolve the demanding judgment first, then return mechanical follow-up to cheap/fast/low.
-- Resolve tiers from the runtime's verified model catalog; no vendor model name or private routing service is required. Do not blindly inherit the runtime default or an unverified alias. If the suggested tier is unavailable, choose the cheapest suitable verified non-flagship alternative and preserve the task’s effort (for example, mid-tier/low for mechanical Git work when cheap models are unavailable). If no eligible model is available or model selection cannot avoid a flagship/unknown default, report the limitation instead of silently using it.
-- Use the closest supported effort setting. Execute inline unless the user/runtime authorizes another method; model guidance does not authorize delegation, approve a plan or authorize publication.
-
+- Use your judgment to choose an available model and supported thinking effort for each task, balancing complexity, quality, latency and cost. The stage table gives starting guidance, not eligibility requirements; adjust it when the task or results warrant it. Respect an explicit user model choice and actual runtime restrictions.
+- The parent agent coordinates the workflow. Spawn a fresh subagent for each bounded task, including stage work, implementation slices, reviews and recovery tasks. This skill authorizes task delegation; it does not approve a plan or authorize publication. A worker assigned a bounded task completes it and returns evidence to the parent rather than recursively spawning a replacement for itself.
+- When model selection is exposed, choose a suitable model from the available options. When model selection or parent-model introspection is unavailable, launch the subagent with its configured/default model and continue. An unknown parent model, unavailable tier catalog or inability to switch models inline is not a blocker. Do not claim a model identity or tier was verified when it was not.
+- If subagent tools are unavailable or dispatch fails, continue the task inline using the available model and briefly record the fallback. Report a blocker only when a real task prerequisite, runtime restriction or required authorization prevents safe progress.
+- Give each worker the original request, bounded scope, applicable stage prompt, approved plan and approval evidence when required, workspace/base/head, full-source references, relevant checks and expected outcome. The parent dispatches subsequent routes and remains accountable for reviewing diffs, checking evidence and reporting results.
+- Run independent tasks concurrently when they can avoid conflicting edits; run dependent stages and tasks sequentially. Preserve the approval gates, workspace restrictions and publication contract across every handoff.
 
 ## Scope and user-owned artifacts
 
@@ -64,14 +64,14 @@ Run the declared [traffic-evidence](traffic-evidence.md) stage after research an
 
 ## Stages
 
-| Stage | Prompt | Model | Thinking | Outcomes |
+| Stage | Prompt | Model guidance | Thinking guidance | Outcomes |
 | --- | --- | --- | --- | --- |
-| intake | [intake.md](intake.md) | cheap/fast | low | `ready` → plan; `blocked` → terminal report; `handoff` → intake |
-| plan | [plan.md](plan.md) | near-flagship | high | `ready` → plan review, then research on approval; `gaps` → intake; `blocked` → terminal report; `handoff` → plan |
-| research | [research.md](research.md) | near-flagship | high | `ready` → traffic-evidence; `refresh` → plan; `blocked` → terminal report; `handoff` → research |
-| traffic-evidence | [traffic-evidence.md](traffic-evidence.md) | mid-tier | medium | `ready` → validate; `blocked` → terminal report; `handoff` → traffic-evidence |
-| validate | [validate.md](validate.md) | near-flagship | high | `ready` → write-report; `gaps` → research; `refresh` → plan; `blocked` → terminal report; `handoff` → validate |
-| write-report | [write-report.md](write-report.md) | cheap/fast | low | `ready` → done; `gaps` → validate; `refresh` → plan; `blocked` → terminal report; `handoff` → write-report |
+| intake | [intake.md](intake.md) | fast economical | low | `ready` → plan; `blocked` → terminal report; `handoff` → intake |
+| plan | [plan.md](plan.md) | strong reasoning | high | `ready` → plan review, then research on approval; `gaps` → intake; `blocked` → terminal report; `handoff` → plan |
+| research | [research.md](research.md) | strong reasoning | high | `ready` → traffic-evidence; `refresh` → plan; `blocked` → terminal report; `handoff` → research |
+| traffic-evidence | [traffic-evidence.md](traffic-evidence.md) | balanced | medium | `ready` → validate; `blocked` → terminal report; `handoff` → traffic-evidence |
+| validate | [validate.md](validate.md) | strong reasoning | high | `ready` → write-report; `gaps` → research; `refresh` → plan; `blocked` → terminal report; `handoff` → validate |
+| write-report | [write-report.md](write-report.md) | fast economical | low | `ready` → done; `gaps` → validate; `refresh` → plan; `blocked` → terminal report; `handoff` → write-report |
 
 ## Scope approval gate
 
