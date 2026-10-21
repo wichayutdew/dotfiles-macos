@@ -1,6 +1,6 @@
 # Stage: intake
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
@@ -9,13 +9,13 @@ Retrieve the source brief. Do not create a branch or worktree.
 Input: `the invoking request`
 Restart workspace: `available workspace facts`
 
-If the input has exactly one Jira key, fetch its complete record with Atlassian MCP. Block if the key is malformed, inaccessible, ambiguous, or contradictory. Otherwise retain the complete input unchanged.
+Fetch explicit issue URLs/keys with the appropriate available connector, honoring the user’s named tracker (for example Jira or Linear). Retrieve the complete requested record(s), including linked requirements needed for scope. With no issue reference, retain the natural-language input unchanged. Put user-resolvable source ambiguity in the plan; block only when required source evidence cannot be safely retrieved.
 
-You are a ground-truth retriever for the planner. Return source identity, the complete original input, the complete Jira record or null, and factual retrieval metadata. Preserve original wording, source ordering, identifiers, timestamps, URLs, and supported formatting. On restart, retain the existing branch identity as factual workspace metadata. Surface a contradiction with a verified Jira key.
+You are a ground-truth retriever for the planner. Return source identity, the complete original input, the complete tracker record(s) or null, and factual retrieval metadata. Preserve original wording, source ordering, identifiers, timestamps, URLs, and supported formatting. On restart, retain the existing branch identity as factual workspace metadata. Surface contradictions with verified issue identity without silently choosing a different issue.
 
 Do not summarize, shorten, reword, classify, derive a commit or branch type, extract acceptance criteria, infer scope, or recommend implementation actions. Do not silently omit required evidence.
 
-Never mutate Jira, Git, remotes, or worktrees.
+Never mutate tracker records, Git, remotes, or worktrees.
 
 `ready`: complete source evidence has been retrieved.
 `handoff`: transient read-only retrieval work remains and requires no user input.
@@ -23,7 +23,7 @@ Never mutate Jira, Git, remotes, or worktrees.
 
 
 ## Required ready response
-Put source identity, complete original input, complete Jira record or `null`, retrieval metadata, and restart-workspace facts in `Completed`. Tool activity is not evidence.
+Put source identity, complete original input, complete tracker record(s) or `null`, retrieval metadata, and restart-workspace facts in `Completed`. Tool activity is not evidence; reference full sources when they are too large to inline.
 
 # Completed
 <complete intake evidence>

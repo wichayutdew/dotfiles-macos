@@ -1,30 +1,30 @@
 # Stage: implement
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
-Apply only approved comment verdicts.
+Apply only approved implement verdicts in the bound workspace.
 
 Input: `the invoking request`
-Approved plan: `the approved plan artifact from this run`
-Feedback: `approval feedback from this run`
+Approved plan/feedback: `the approved artifact and its approval evidence`
 Ledger: `{{last.summary}}`
 
-Run only approved local `workerCommands`. This step owns local file edits and local test/check execution only. Do not commit, amend, push, fetch, pull, invoke `glab`, invoke `gh`, call hosted APIs, or create/update GitLab/GitHub content. Do not stage files: `deliver` alone stages, commits, non-force-pushes, and posts replies. Reply-only plans require no local code change.
+Reconcile actual HEAD, dirty baseline and completed local work before continuing. Reuse existing helpers and follow repository test/layout conventions. Add meaningful regression coverage for the approved behavior; do not add production hooks or UI solely to expose test internals.
 
-A parent recovery `handoff` is unconfirmed context, not proof that local work or a reply is complete. Reconcile the approved verdicts, plan, and ledger before returning a valid outcome; do not infer progress from it.
+Run approved local worker/check commands. This stage edits files and runs local checks only: do not stage, commit, amend, push, fetch/pull, call hosted APIs, or post replies. Delivery owns authorized staging/commit/push/replies. Reply-only and already-addressed entries require no code change.
 
-`ready`: all approved local work and checks are complete, no commit, push, or reply has occurred in this step, and the complete approved publication contract is preserved for `verify` and `deliver`.
-`handoff`: transient tool failure.
-`blocked`: a required command is outside the approved plan. Report the exact command requirement in `Remaining`; do not ask for approval or execute it outside the plan-review gate.
+Do not infer progress from a parent handoff or prior “done” message. Preserve the entire approved publication contract, including declines and no-action entries, through verification.
 
+`ready`: approved local changes and checks are complete; delivery actions have not run.
+`refresh`: source assumptions, scope or required commands changed; fetch current evidence and revise/reuse approval as appropriate.
+`handoff`: transient local failure with exact remaining work.
+`blocked`: safe authorized local implementation is impossible.
 
-## Required ready response
-Put workspace, starting/ending HEAD, current branch, changed paths, exact local commands/outcomes, uncommitted local-change status, and the approved `publication` object verbatim in `Completed`. State explicitly that no files were staged, committed, pushed, or replied to. `publication.replies` must contain exactly one reply for every approved verdict, including declines.
+## Required response
 
 # Completed
-<complete implementation ledger>
+<workspace, starting/ending HEAD, changed paths versus baseline, commands/results, uncommitted status, approved publication contract/reference, confirmation this stage did not stage/commit/push/reply>
 
 # Remaining
-<exact remaining work, or None.>
+<exact local work, or None.>

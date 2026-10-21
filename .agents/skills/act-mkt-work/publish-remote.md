@@ -1,6 +1,6 @@
 # Stage: publish
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
@@ -8,6 +8,10 @@ Push the verified branch and open or update the PR/MR. Prefer MCP over CLI.
 
 Request: `the invoking request`
 Approved plan: `the approved plan artifact from this run`
+
+First reconcile workspace, current remote SHA, existing PR/MR state and completed actions. On a timeout, read remote state before retrying a push/create/update; reuse the existing branch/review and record returned IDs. Do not repeat an ambiguous mutation until its state is established. External movement on an open review returns refresh without overwriting contributor commits. A merged/closed review returns done and stops obsolete delivery with an accurate completed/unconfirmed/remaining report; do not claim undelivered actions completed.
+
+A local-only/no-commit/no-publication contract skips prohibited actions and returns the verified local result.
 
 Derive host, repository, and target from observed `origin`. Validate the approved Conventional Commit title first. Push only with non-force `git push --set-upstream origin <sourceBranch>`.
 
@@ -24,7 +28,9 @@ No markers: append one pair. Mixed, duplicated, or malformed markers: `blocked`.
 
 After push and the permitted review update, inspect CI for the published commit as required by [verify](verify.md). Return `handoff` while required CI is running, and return failures to the implementation/verification loop. A successful push or review creation alone does not mean the work is complete.
 
-`ready`: push plus permitted create/update, and the published commit's required CI pipeline is green.
+`ready`: authorized delivery is read back and current-source required CI passes (or explicit waivers are stated); local-only contracts report verified local work.
 `gaps`: a required CI job failed or a required check is missing; return to implement with job evidence.
+`refresh`: external movement on an open review invalidates delivery; reconcile the plan and its approval before further mutation.
+`done`: review merged/closed; report actual delivery state locally without obsolete push/update actions.
 `handoff`: required CI is running, or a transient failure prevents confirmation; resume from the existing pushed commit and review.
 `blocked`: unsafe or ambiguous state.

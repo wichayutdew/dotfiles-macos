@@ -5,7 +5,7 @@
   :devices
   {:macbook-keyboard [{:is_built_in_keyboard true}]
    :dell-mouse       [{:vendor_id 16700
-                       :product_id 9482
+                       :product_id 12316
                        :is_pointing_device true}]
    :lennovo-mouse       [{:vendor_id 6127
                        :product_id 25088

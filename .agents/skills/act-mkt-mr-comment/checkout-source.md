@@ -1,29 +1,27 @@
 # Stage: checkout-source
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
-Check out the reviewed source branch. Mechanical only.
+Bind the reviewed source branch without disturbing unrelated work.
 
 Input: `the invoking request`
 Evidence: `{{last.summary}}`
 
-Never stash, reset, clean, or delete unrelated files.
+Reuse a suitable existing source checkout/worktree. Compare its origin, branch, HEAD and dirty baseline with fetched source identity. If isolation is needed, use the runtime's worktree facility or a safe isolated checkout. Never stash, reset, clean, delete, or overwrite unrelated files.
 
-`ready`: source branch bound. Include `workspace: {cwd: "<path>"}`.
-`handoff`: transient fetch error.
-`blocked`: dirty unrelated checkout or missing remote.
+Fetch/reconcile incoming commits before edits. Preserve another contributor's commits; do not silently implement an old plan on a newer head. On continuation, distinguish our verified local/pushed commits from external movement using the checkpoint. A merged/closed review has no active source-edit delivery; retain evidence for the planner to report remaining work.
 
+`ready`: workspace is safely bound with current source evidence.
+`gaps`: source/evidence changed or is incomplete; refresh through fetch.
+`handoff`: transient mechanical/fetch failure.
+`blocked`: no safe checkout or reconciliation is possible.
 
-## Required ready response
-Put the complete prior Evidence payload verbatim in `Completed`, followed by bound workspace cwd, branch, and HEAD.
+## Required response
 
 # Completed
-<complete fetched review evidence>
-<workspace cwd, branch, and HEAD>
+<prior evidence references, workspace cwd/origin/branch, fetched and local HEAD, dirty baseline, incoming-commit assessment>
 
 # Remaining
-- None.
-
-When Evidence is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters fetch.
+<exact mechanical work, or None.>

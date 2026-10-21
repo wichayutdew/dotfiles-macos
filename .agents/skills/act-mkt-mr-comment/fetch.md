@@ -1,27 +1,25 @@
 # Stage: fetch
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
-Fetch one GitHub PR or GitLab MR. Read-only. Prefer MCP over CLI.
+Fetch the current GitHub PR or GitLab MR. Read-only; prefer an appropriate MCP capability, with CLI fallback and reason when needed.
 
 Input: `the invoking request`
 
-You are a ground-truth retriever for the planner. Return complete host-native evidence in source order: canonical URL, host, repository, number, source and target branches, remote SHAs, local remote, git status, changed files and diff, plus unresolved comments with IDs, authors, anchors, timestamps, and text. Preserve original wording, identifiers, URLs, and supported formatting. Include only factual retrieval metadata or explicit source omissions.
+Retrieve canonical URL, host/repository/number, open/merged/closed state, source/target branches and SHAs, local origin/status, changed files/diff, checks and all relevant discussion pages. Include replies and general comments explicitly targeted by the user, with IDs, author, timestamp, anchors, resolution state and original text. Preserve prior reply IDs and delivery state from the checkpoint.
 
-Do not summarize, shorten, reword, classify, interpret comments, infer conclusions, or propose response or implementation actions. Return `blocked` rather than silently omitting required evidence.
+Return factual source evidence in source order; planning owns verdicts. Retrieve missing pages/chunks instead of treating a truncated preview as complete. An unresolved flag alone does not establish that a comment still needs a reply.
 
-`ready`: complete evidence.
-`handoff`: transient read failure.
-`blocked`: bad URL, auth, missing MCP/CLI capability, incomplete or unavailable required evidence.
+`ready`: complete current evidence.
+`handoff`: transient retrieval failure; retain fetched pages and remaining cursors.
+`blocked`: identity, access or decision-critical evidence cannot be obtained safely.
 
-
-## Required ready response
-Put all required host-native evidence in `Completed`, preserving it verbatim: identity, branches, SHAs, remote/status, files/diff, and every unresolved comment/anchor. Tool activity is not evidence.
+## Required response
 
 # Completed
-<complete fetched review evidence>
+<complete evidence or full-content references, source/head/state, comment and reply identities, retrieval metadata>
 
 # Remaining
-- None.
+<exact missing retrieval work, or None.>

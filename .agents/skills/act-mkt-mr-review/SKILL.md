@@ -1,6 +1,6 @@
 ---
 name: act-mkt-mr-review
-description: Review a PR or merge request through evidence collection, finding validation, approval, and publication of comments.
+description: Use when reviewing a PR or merge request for introduced regressions, compatibility failures, or performance degradation.
 ---
 
 # MR Review
@@ -9,22 +9,36 @@ description: Review a PR or merge request through evidence collection, finding v
 
 Treat the text that invoked this skill as the authoritative PR/MR review request. Derive the hosted-review URL, repository, branch, and discussion context from that request and the active workspace.
 
-Execute the linked stages sequentially and automatically. Carry the complete invoking request and prior stage artifacts forward; do not replace source evidence with a summary. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
+Execute the linked stages sequentially and automatically. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
-The only user wait is the complete plan-review gate below. Put every user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, ask no questions and execute the approved routes and publication contract autonomously.
+The only user wait is the complete plan-review gate below. Put every user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, execute the approved routes and publication contract autonomously; changed assumptions follow the recovery contract below.
 
-A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, do not ask a question or wait for user input, and never bypass required evidence, access, authority, or safety checks.
+A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
-Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Model selection does not approve a plan or authorize publication.
+Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Use an available equivalent without stalling for an unavailable gateway model. Model selection does not approve a plan, authorize delegation, or authorize publication.
+
+## Review focus
+
+Find concrete introduced regressions and performance degradation by tracing the changed behavior against its baseline or explicit new-feature contract. Leave business preferences, style, naming and speculative architecture nits to the user. Validate impact and avoid duplicate root causes.
+
+With no actionable findings, finish locally with the reviewed SHA, coverage and limits. No approval or summary publication is needed unless the user explicitly requested a published summary.
+
+## Continuation and recovery
+
+- Keep a resumable checkpoint in the conversation or an approved artifact: stage, canonical plan/version or digest, explicit approval evidence, workspace/base/head, full-source references, checks, completed/unconfirmed action IDs and exact remaining work. Template variables denote those artifacts; they do not require a particular orchestrator.
+- Complete evidence may be inline or in stable, readable full-content references. Preserve original source ordering and identities; read missing chunks/pages before deciding. A summary or truncated preview is not source proof. Carry references rather than duplicating entire diffs at every handoff.
+- Resume the same approved artifact/scope after compaction or continuation. Reconcile actual state first; consume an existing Plannotator result/process session before reopening. Feedback revises the same gate; approval advances execution without another nudge.
+- Apply later user corrections throughout scope, checks and publication. An explicit instruction to make a small scoped fix directly takes precedence over a redundant skill gate. Revalidate base/head before edits and publication; refresh stale evidence. Re-present a plan when scope, verdicts, publication actions or base assumptions invalidate its approval. A user-authorized rebase/continuation remains authorized.
+- Follow declared recovery routes automatically. Retry transient failures with bounded backoff and retained progress; repeated failure without new evidence is a factual blocker. Reconcile ambiguous writes before retrying. Never turn recovery into authority for unrelated edits or remote actions.
 
 ## Stages
 
 | Stage | Prompt | Model | Thinking | Outcomes |
 | --- | --- | --- | --- | --- |
 | fetch | [fetch.md](fetch.md) | `gateway/gemini-3.8-flash` | low | `ready` → review; `blocked` → terminal report; `handoff` → fetch |
-| review | [findings.md](findings.md) | `gateway/grok-4.7` | high | `ready` → plan; `gaps` → fetch; `blocked` → terminal report; `handoff` → review |
-| plan | [plan.md](plan.md) | `gateway/gpt-6.1-sol` | high | `ready` → plan review, then publish on approval; `gaps` → review; `blocked` → terminal report; `handoff` → plan |
-| publish | [publish-approved.md](publish-approved.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `blocked` → terminal report; `handoff` → publish |
+| review | [findings.md](findings.md) | `gateway/grok-4.7` | high | `ready` → plan; `done` → local report; `gaps` → fetch; `blocked` → terminal report; `handoff` → review |
+| plan | [plan.md](plan.md) | `gateway/gpt-6.1-sol` | high | `ready` → plan review, then publish on approval; `refresh` → fetch; `gaps` → review; `blocked` → terminal report; `handoff` → plan |
+| publish | [publish-approved.md](publish-approved.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `done` → local report; `refresh` → fetch; `blocked` → terminal report; `handoff` → publish |
 
 ## Review approval gate
 

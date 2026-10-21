@@ -1,39 +1,59 @@
 ---
 name: act-mkt-investigate
-description: Investigate a Jira issue or question through scope approval, evidence gathering, validation, and a written report.
+description: Use when investigating a tracker issue or technical/product question, comparing design alternatives, or revising an evidence-backed RFC, report, or ticket description.
 ---
 
 # Investigate
 
 ## Workflow direction
 
-Treat the text that invoked this skill as the authoritative investigation request. Derive Jira, repository, logs, and other integration context from that request and the active workspace.
+Treat the text that invoked this skill as the authoritative investigation request. Derive tracker, repository, logs, and other integration context from that request and the active workspace.
 
 ## Report destination intake
 
-- Before starting the automated stages, check whether the invoking request provides the exact report file path.
-- If it does not, explicitly ask the user: “What exact file path should I use for the investigation report?” Do not infer, invent, or choose a default path. Wait for the answer before continuing with intake.
-- Carry the supplied path unchanged into `# Report destination` in the plan artifact and through report writing. Do not mark the plan `ready` or write the report while the path is missing.
+- Honor the requested destination: exact local report path, hosted ticket description(s)/fields, or explicit chat-only answer. Reuse the user's canonical destination for revisions. A request declining a local report must not trigger a report-path question.
+- When local output is selected and no canonical path was supplied, ask for the exact path before report writing. Do not invent a path. If destination type is unspecified, put that decision in the scope artifact's Questions at the approval gate.
+- Carry the exact path, hosted identities/fields and dependency order, or chat-only choice under # Report destination. Include external-write authorization in the scope gate. Resolve a missing destination at the scope gate before delivery; a scope artifact may present that decision for review.
 
 ## Workspace policy
 
 - Investigations and report generation are read-only with respect to product code and use the active repository checkout. Never create a Git worktree for an investigation, switch branches, or check out another revision solely for an investigation.
-- Preserve existing checkout state and unrelated changes. Capture branch, `HEAD`, and `git status --short` before any approved local documentation/report write.
+- Preserve existing checkout state and unrelated changes. Capture branch, `HEAD`, and `git status --short` before any approved local documentation/report write. Hosted updates use current saved content/version as their baseline.
 - Keep investigation notes and report artifacts in the approved destination. If product implementation is requested, keep it out of the investigation and route it through the separately approved implementation workflow; do not silently expand scope.
 
-Execute the linked stages sequentially and automatically. Carry the complete invoking request and prior stage artifacts forward; do not replace source evidence with a summary. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
+Execute the linked stages sequentially and automatically. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
-The only user waits are the intake request for an exact report file path when it is missing, and the complete plan-review gate below. Put every other user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, ask no questions and execute the approved routes and publication contract autonomously.
+The user waits are a missing exact path when local output was selected, and the complete scope-review gate below. Put every other user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, execute the approved routes and publication contract autonomously; changed assumptions follow the recovery contract below.
 
-A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, do not ask a question or wait for user input, and never bypass required evidence, access, authority, or safety checks.
+A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
-Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Model selection does not approve a plan or authorize publication.
+Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Use an available equivalent without stalling for an unavailable gateway model. Model selection does not approve a plan, authorize delegation, or authorize publication.
+
+## Scope and user-owned artifacts
+
+- Apply the user's latest explicit scope correction throughout the proposal, tests, metrics, rollout, and stories. Findings expose risks; they do not authorize a redesign or stronger guarantees outside the requested change.
+- Treat the user's current edited file or hosted description as canonical. Read it before revisions; patch it rather than copying an older draft or mirror over it. Preserve unrelated edits.
+- Preserve user-owned API request/response JSON and other finalized contracts byte-for-byte unless the user explicitly requests those changes. Capture a baseline and verify protected blocks after editing; never reconstruct a lost design from guesses.
 
 ## Report format
 
-- Prefer diagrams or tables over prose whenever they communicate the report information clearly.
-- When text is necessary, use only concise bullet points; do not write prose paragraphs.
-- Preserve the approved report headings, evidence citations, and required detail while applying this format.
+- Lead with the customer/product benefit and decision sought. RFC goals/non-goals describe the proposal, not agent-session permissions. Put implementation and observability detail in their own sections.
+- Use diagrams for flows, compact tables for comparisons or numeric results, and concise bullets for explanations. Do not replace every section with tables or pack prose into wide cells.
+- Explain each alternative fully before the comparison: required changes, reused/unchanged components, request/response contract when requested, dataflow, tradeoffs, and dependencies. Use real service names; distinguish existing background from proposed changes.
+- Put evidence beside the supported claim or table row: source revision and file:line, retrieved URL, or exact query/filters/result. Avoid detached evidence IDs that require scrolling to a separate register.
+- Read any user-supplied reference RFC and follow its approved organization/style without copying its owners, approvals, measurements, or requirements. Preserve the approved headings and required detail.
+
+## Traffic evidence
+
+Run the declared [traffic-evidence](traffic-evidence.md) stage after research and before validation. It captures/verifies Grafana MCP backend measurements, Query Writer MCP consumer exposure, graph/access checks, and proof records. If traffic/load/capacity is outside the approved scope, return `ready` with an explicit not-applicable result and the complete research draft unchanged; do not add queries or another approval pause. Reuse valid captured evidence rather than rerunning it by ritual. Numeric observations need executed aggregate results; forecasts stay explicitly conditional.
+
+## Continuation and recovery
+
+- Keep a resumable checkpoint in the conversation or an approved artifact: stage, canonical plan/version or digest, explicit approval evidence, workspace/base/head, full-source references, checks, completed/unconfirmed action IDs and exact remaining work. Template variables denote those artifacts; they do not require a particular orchestrator.
+- Complete evidence may be inline or in stable, readable full-content references. Preserve original source ordering and identities; read missing chunks/pages before deciding. A summary or truncated preview is not source proof. Carry references rather than duplicating entire diffs at every handoff.
+- Resume the same approved artifact/scope after compaction or continuation. Reconcile actual state first; consume an existing Plannotator result/process session before reopening. Feedback revises the same gate; approval advances execution without another nudge.
+- Apply later user corrections throughout scope, checks and publication. An explicit instruction to make a small scoped fix directly takes precedence over a redundant skill gate. Revalidate base/head before edits and publication; refresh stale evidence. Re-present a plan when scope, verdicts, publication actions or base assumptions invalidate its approval. A user-authorized rebase/continuation remains authorized.
+- Follow declared recovery routes automatically. Retry transient failures with bounded backoff and retained progress; repeated failure without new evidence is a factual blocker. Reconcile ambiguous writes before retrying. Never turn recovery into authority for unrelated edits or remote actions.
 
 ## Stages
 
@@ -41,13 +61,14 @@ Use the model specified for each stage when available; otherwise, use an equival
 | --- | --- | --- | --- | --- |
 | intake | [intake.md](intake.md) | `gateway/gemini-3.8-flash` | low | `ready` → plan; `blocked` → terminal report; `handoff` → intake |
 | plan | [plan.md](plan.md) | `gateway/gpt-6.1-sol` | high | `ready` → plan review, then research on approval; `gaps` → intake; `blocked` → terminal report; `handoff` → plan |
-| research | [research.md](research.md) | `gateway/gpt-6.1-sol` | high | `ready` → validate; `blocked` → terminal report; `handoff` → research |
-| validate | [validate.md](validate.md) | `gateway/grok-4.7` | high | `ready` → write-report; `gaps` → research; `blocked` → terminal report; `handoff` → validate |
-| write-report | [write-report.md](write-report.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `gaps` → validate; `blocked` → terminal report; `handoff` → write-report |
+| research | [research.md](research.md) | `gateway/gpt-6.1-sol` | high | `ready` → traffic-evidence; `refresh` → plan; `blocked` → terminal report; `handoff` → research |
+| traffic-evidence | [traffic-evidence.md](traffic-evidence.md) | `gateway/gpt-6.1-sol` | high | `ready` → validate; `blocked` → terminal report; `handoff` → traffic-evidence |
+| validate | [validate.md](validate.md) | `gateway/grok-4.7` | high | `ready` → write-report; `gaps` → research; `refresh` → plan; `blocked` → terminal report; `handoff` → validate |
+| write-report | [write-report.md](write-report.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `gaps` → validate; `refresh` → plan; `blocked` → terminal report; `handoff` → write-report |
 
 ## Scope approval gate
 
-Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings. `# Report destination` must contain the exact report file path supplied by the user:
+Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact headings. `# Report destination` must identify the selected local path, hosted targets/fields, or chat-only output:
 
 - level 1: `Report destination`
 - level 2: `Goal/Acceptance Criteria`

@@ -1,20 +1,43 @@
 # Stage: deliver
 
-Use the invoking request and complete prior stage artifacts from the active conversation or their existing evidence files.
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
 
 ---
 
-Commit, push, and reply to every verified approved review-comment fix. Prefer MCP over CLI.
+Execute only the verified approved delivery contract. Prefer MCP; record CLI fallback reasons.
 
 Input: `the invoking request`
-Approved plan: `the approved plan artifact from this run`
+Approved plan: `the approved artifact and its approval evidence`
 Ledger: `{{last.summary}}`
 
-Before mutating, inspect the bound worktree and reconcile it with the approved `publication` contract. For a code-changing contract: confirm only approved scoped paths changed; stage only those paths; create `publication.commitSubject` if no compliant commit exists; non-force-push `publication.sourceBranch`; post every approved reply to its existing `discussionId`; then re-read the remote branch SHA and discussion notes. For a reply-only or decline-only contract, do not stage, commit, or push; post and confirm every approved reply. A decline reply must explain the approved evidence-based reason for rejection.
+## Reconcile before each mutation
 
-For GitHub reviewer replies use `add_reply_to_pull_request_comment`; use `add_issue_comment` only for a general PR comment. For GitLab, reply to the approved existing discussion identity; do not create a new `/discussions` resource or construct an inline `position` payload. Use `glab` only if GitLab MCP lacks that reply mutation, and record why. Never force-push, resolve, approve, or merge.
+Read current review state, source SHA, workspace and existing replies. Reuse our confirmed commit/push/reply IDs. After a timeout, inspect remote state before retrying; a missing response is not proof the write failed. Match each action by native identity and approved body/marker. If readback is unavailable or ambiguous, retain the unconfirmed action and stop writes until reconciled.
 
-`ready`: all required operations are confirmed: commit SHA and subject plus a matching pushed remote SHA when code changes were required; one reply note ID and discussion ID for every approved reply; and no unrelated staged or committed paths.
-`gaps`: local work does not match the approved verdicts or scoped paths; return the exact gap to implementation.
-`handoff`: transient remote failure after recording completed operations.
-`blocked`: remote moved, commit scope is ambiguous, a discussion identity is missing, or no safe reply capability exists.
+If another contributor advanced the source, return `refresh` without overwriting it. If the review was externally merged/closed, stop obsolete code delivery and report completed/undelivered actions; do not post stale success replies. Newly arrived feedback is an unapproved delta for the next plan, not permission to expand this delivery.
+
+## Code-changing delivery
+
+1. Confirm scoped paths against the dirty baseline. Stage only authorized paths, create `publication.commitSubject` only if no compliant commit exists, and non-force-push `publication.sourceBranch` only when authorized. Read back the remote SHA.
+2. Inspect required CI for that published source, including required downstream jobs. For a merged-result pipeline, verify its association to the current source and record both source SHA and synthetic merge-result SHA. An older green pipeline is not evidence.
+3. Return `handoff` while CI runs. Return `gaps` on failing required jobs with actual job evidence; fix and rerun relevant local checks before repushing. Missing required checks are a gap; inaccessible evidence is a blocker. Explicit waivers remain limitations, never green results.
+4. Once required checks pass (or an explicit user waiver permits delivery with stated limits), post only the still-missing approved replies whose claims are true. Read back each reply ID/body and final remote SHA. If the source moved, refresh rather than claiming current-head success.
+
+Reply-only/decline-only contracts do not stage, commit, push or wait for unrelated CI. Local-only/no-commit contracts skip prohibited delivery actions and report the verified local result.
+
+For GitHub, use the existing review-comment reply capability for inline threads; general comments use the general PR-comment capability with the approved reference. For GitLab, reply to the existing discussion, never create a replacement discussion/inline position. Use CLI only when the appropriate MCP mutation is unavailable. Never force-push, resolve threads, approve or merge.
+
+`ready`: every authorized operation is read back; code delivery includes matching pushed SHA and current-source required CI results/explicit waivers; each actionable reply has a confirmed ID; no unrelated paths were staged/committed.
+`gaps`: local mismatch or required check fails/is missing; return evidence to implement.
+`refresh`: external source movement or changed contract requires fetch/plan reconciliation.
+`done`: review externally merged/closed; report the actual completed/undelivered ledger without obsolete delivery.
+`handoff`: CI running, transient failure or pending readback; retain per-action state.
+`blocked`: commit scope, identity, authority or remote state cannot be reconciled safely.
+
+## Required response
+
+# Completed
+<commit/push/CI/reply IDs and readbacks, or verified local-only result; completed, unconfirmed and undelivered actions distinguished>
+
+# Remaining
+<exact pending CI/actions or blocker, or None.>
