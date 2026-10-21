@@ -101,6 +101,11 @@
     },
     "quick-deploy": {
       "url": "${QUICK_SHARE_MCP_URL}"
+    },
+    "linear": {
+			"source": "custom",
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"]
     }
   }
 }
