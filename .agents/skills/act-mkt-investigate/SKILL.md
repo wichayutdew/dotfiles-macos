@@ -27,7 +27,14 @@ The user waits are a missing exact path when local output was selected, and the 
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
-Use the model specified for each stage when available; otherwise, use an equivalent model available in the current environment with comparable capability for that stage. Preserve the specified thinking level, using the closest supported equivalent if the selected model uses different effort labels. Use an available equivalent without stalling for an unavailable gateway model. Model selection does not approve a plan, authorize delegation, or authorize publication.
+## Model selection
+
+- Never use a flagship model, including for reviewers, subagents, retries or fallbacks. Lowering its thinking effort does not make a flagship model eligible. Near-flagship means a strong reasoning/coding tier below the provider's flagship, not its top model.
+- Use the cheapest available non-flagship model suitable for the stage: cheap/fast with low effort for retrieval, worktree/branch operations, running known commands, CI polling, formatting and approved publication; mid-tier with medium effort for routine implementation and bounded analysis; near-flagship with high effort for extensive design/planning, difficult diagnosis and substantive regression/performance review.
+- Tables give the starting tier/effort. Escalate routine work to near-flagship/high only when complexity or failed attempts demonstrate that more reasoning is needed. Formatting already validated findings uses cheap/fast/low; reopening technical judgments uses near-flagship/high. For mixed work, resolve the demanding judgment first, then return mechanical follow-up to cheap/fast/low.
+- Resolve tiers from the runtime's verified model catalog; no vendor model name or private routing service is required. Do not blindly inherit the runtime default or an unverified alias. If the suggested tier is unavailable, choose the cheapest suitable verified non-flagship alternative and preserve the task’s effort (for example, mid-tier/low for mechanical Git work when cheap models are unavailable). If no eligible model is available or model selection cannot avoid a flagship/unknown default, report the limitation instead of silently using it.
+- Use the closest supported effort setting. Execute inline unless the user/runtime authorizes another method; model guidance does not authorize delegation, approve a plan or authorize publication.
+
 
 ## Scope and user-owned artifacts
 
@@ -59,12 +66,12 @@ Run the declared [traffic-evidence](traffic-evidence.md) stage after research an
 
 | Stage | Prompt | Model | Thinking | Outcomes |
 | --- | --- | --- | --- | --- |
-| intake | [intake.md](intake.md) | `gateway/gemini-3.8-flash` | low | `ready` → plan; `blocked` → terminal report; `handoff` → intake |
-| plan | [plan.md](plan.md) | `gateway/gpt-6.1-sol` | high | `ready` → plan review, then research on approval; `gaps` → intake; `blocked` → terminal report; `handoff` → plan |
-| research | [research.md](research.md) | `gateway/gpt-6.1-sol` | high | `ready` → traffic-evidence; `refresh` → plan; `blocked` → terminal report; `handoff` → research |
-| traffic-evidence | [traffic-evidence.md](traffic-evidence.md) | `gateway/gpt-6.1-sol` | high | `ready` → validate; `blocked` → terminal report; `handoff` → traffic-evidence |
-| validate | [validate.md](validate.md) | `gateway/grok-4.7` | high | `ready` → write-report; `gaps` → research; `refresh` → plan; `blocked` → terminal report; `handoff` → validate |
-| write-report | [write-report.md](write-report.md) | `gateway/gemini-3.8-flash` | low | `ready` → done; `gaps` → validate; `refresh` → plan; `blocked` → terminal report; `handoff` → write-report |
+| intake | [intake.md](intake.md) | cheap/fast | low | `ready` → plan; `blocked` → terminal report; `handoff` → intake |
+| plan | [plan.md](plan.md) | near-flagship | high | `ready` → plan review, then research on approval; `gaps` → intake; `blocked` → terminal report; `handoff` → plan |
+| research | [research.md](research.md) | near-flagship | high | `ready` → traffic-evidence; `refresh` → plan; `blocked` → terminal report; `handoff` → research |
+| traffic-evidence | [traffic-evidence.md](traffic-evidence.md) | mid-tier | medium | `ready` → validate; `blocked` → terminal report; `handoff` → traffic-evidence |
+| validate | [validate.md](validate.md) | near-flagship | high | `ready` → write-report; `gaps` → research; `refresh` → plan; `blocked` → terminal report; `handoff` → validate |
+| write-report | [write-report.md](write-report.md) | cheap/fast | low | `ready` → done; `gaps` → validate; `refresh` → plan; `blocked` → terminal report; `handoff` → write-report |
 
 ## Scope approval gate
 
