@@ -1,0 +1,11 @@
+# Create the approved backlog
+
+Require explicit approval of the complete current draft and tracker destination before the first mutation. Read the approval and draft from the checkpoint; do not infer authorization from the report being accepted or the user originally asking for a breakdown.
+
+1. Discover current tracker tools and verify the selected workspace/team/project, supported object types, hierarchy, and required fields. Resolve missing required fields before writes; do not invent values or silently substitute a different object type. If the approved mapping cannot be created with available capabilities, report the limitation and return to refinement.
+2. Read existing matching items and any IDs recorded on earlier attempts. Reuse only items confirmed as this approved draft's prior creations or explicitly selected by the user. A similar title alone does not authorize updating or reparenting an existing item. Raise likely duplicates before creating replacements.
+3. Create the approved parent first and read back its identity/content. Create each still-missing approved story with its description, brief implementation steps, acceptance criteria, and verified parent link. Resolve draft dependency labels to confirmed IDs as supported by the approved mapping; do not put invented IDs in links.
+4. Read back each created item's content, destination, and parent relationship. Record the draft-label-to-ID/URL mapping immediately. After an ambiguous timeout, inspect the tracker before retrying. Do not blindly create duplicates; retain unresolved actions and stop dependent writes until reconciled.
+5. Finish with the confirmed parent/story links and exact remaining work, if any. Partial creation resumes from recorded identities; do not delete successful items as an automatic rollback or claim missing items were created.
+
+Creation approval covers only the reviewed content, hierarchy, destination, and metadata. New requirements or material changes return to refinement and approval. Transient failures may be retried with retained progress and bounded backoff; persistent access/capability failures require a factual blocker rather than bypassing the gate.

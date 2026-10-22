@@ -324,6 +324,15 @@
       "skillFolderHash": "e7cb3bf5836705facedb2f94c6648f269d3f0748",
       "installedAt": "2026-10-15T10:30:13.562Z",
       "updatedAt": "2026-10-15T10:30:13.562Z"
+    },
+    "act-mkt-breakdown": {
+      "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/skills.git",
+      "sourceType": "git",
+      "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/skills.git",
+      "skillPath": "skills/act-mkt-breakdown/SKILL.md",
+      "skillFolderHash": "087f6172a759c6c8ff47006d2df6be1fd50d59b57f42dca663e4a263f80f1d47",
+      "installedAt": "2026-10-22T13:38:18.853Z",
+      "updatedAt": "2026-10-22T13:38:18.853Z"
     }
   },
   "dismissed": {
@@ -335,6 +344,7 @@
     "codex",
     "cursor",
     "droid",
+    "fx",
     "gemini-cli",
     "github-copilot",
     "kilo",

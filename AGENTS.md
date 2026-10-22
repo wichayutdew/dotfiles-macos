@@ -1,65 +1,60 @@
 # Global Agent Rules
 
-Produce minimal-diff, evidence-backed changes that follow local repository conventions.
+Make the smallest coherent change, follow local conventions, and support claims with evidence.
 
-## Search
+## Working rules
 
-Always use `rg` or `rg --files` via Bash.
+- Use `rg` or `rg --files` for searches. Never use `grep` or `find`.
+- Before repo edits, capture the branch, `HEAD`, and `git status --short`. Preserve unrelated changes.
+- Establish the goal, acceptance criteria, and verification method. Ask only for information unavailable from existing evidence.
+- Cite relevant files or tool results. Distinguish confirmed facts from hypotheses and unknowns.
+- For versioned library documentation, use Context7: resolve the library, then query its docs.
+- Verify URLs before sharing them; use plain text URLs.
+- Keep secrets out of output. Push, merge, or change external services only with authority for that action.
+- Use one writer per file. Add tests when they provide meaningful coverage, not merely to satisfy TDD.
 
-Never use `grep`. Never use `find`. Never use the `grep` or `find` tools.
-Do not fall back to `grep`/`find` because a skill, subagent default, or example says so.
+## Planning and approval
 
-## Grounding
+- Save plans under `~/repositories/personal/plans/plannotator/`.
+- For implementation, reuse a suitable linked worktree or create one under `~/repositories/worktrees/`.
+- Obtain Plannotator approval before editing product code.
+- After approval, complete all in-scope work and verification without asking for routine approval again.
+- Stop only for missing required information, credentials, authority, an out-of-scope decision, or a failure that available evidence cannot resolve.
 
-- Capture branch, `HEAD`, and `git status --short` before mutating a repo. Preserve unrelated checkouts.
-- Claims: `FACT` with `path:line` or tool output; `HYPOTHESIS` with a falsifier; `UNKNOWN` with the next check.
-- For versioned libraries, use Context7 (`resolve-library-id` then `query-docs`).
-- Never invent a URL. Validate syntax and that it resolves to the intended resource, or omit it.
-- Present URLs as plain text; do not format them as Markdown hyperlinks.
+<!-- plannotator:blocking-plan-review:start -->
+### Blocking plan review
 
-## Hosted reviews
+Run the saved plan through an explicit gate before ending the turn:
 
-- Prefer GitHub/GitLab MCP over `gh`/`glab`. Use CLI only when the matching MCP cannot do the job, and record why.
-- New PR/MR bodies must follow the repository or host description template. Fill only template fields. Never invent a free-form description.
-- If no repository or host template is verified, create the PR/MR without changing its description. Read back the created description; treat it as the template, then update only the workflow-owned marker region.
-- Existing PR/MR: title is immutable. Change only the workflow-owned marker region, or append one if markers are absent. Never replace the whole body.
+```bash
+~/.local/bin/plannotator annotate "<plan-path>" --gate --json --require-approval
+```
 
-## Planning and gates
+- Expand `~/` before quoting the plan path.
+- Wait until the process exits. If the tool returns a session ID, keep waiting on that session. Do not end the turn, abandon the process, or open duplicate reviews while a decision is pending.
+- `approved` + exit `0`: incorporate notes and proceed with approved work.
+- `annotated` + exit `1`: revise the plan and submit it again before implementation.
+- `dismissed`, invalid/missing JSON, or failure: do not implement; report the outcome.
+- Do not use `--hook` or rely on an end-of-turn hook for this transition.
+- If using a structured gate tool with an `artifact` field, pass the complete Markdown text; the CLI above takes a file path.
+<!-- plannotator:blocking-plan-review:end -->
 
-- Always draft plans under `/Users/wphongphanpa/repositories/personal/plans/plannotator`
-- Reuse an existing linked worktree; otherwise, always create a new worktree under `/Users/wphongphanpa/repositories/worktrees`.
-- Submit the complete Markdown text as the gate `artifact`. Never submit a path.
-- Do not edit product code before Plannotator approval. Once a complete plan is approved, execute every in-scope task through verification without requesting further routine approval.
+## PRs and merge requests
 
-## Implementation
+- Prefer GitHub/GitLab MCP. Use `gh`/`glab` when the MCP cannot perform the action, and state why.
+- New descriptions: use only verified repository or host template fields. If no template is available, create without supplying a description, read back the host-generated description, and edit only the workflow-owned marker region.
+- Existing PRs/MRs: preserve the title and text outside workflow-owned markers. Append a marker region if needed.
 
-- One writer. Smallest coherent change.
-- TDD only when the test has an assessable benefit. Never add a test solely to satisfy TDD.
-- Never push, merge, or mutate external services without the current step's authority. Never print secrets.
+## Skills and delegation
 
-## Execution discipline
+- When explicitly asked to use a skill, read its `SKILL.md` and follow its sequence, gates, and deliverables. A passing mention is not an invocation.
+- Use subagents when independent work benefits from delegation and the active rules permit it.
+- During declarative workflow steps, do not launch subagents. Read only skills listed in the step YAML unless the user explicitly invokes another skill.
 
-- Before implementation, establish the goal, observable acceptance criteria, and verification method. Ask only for information that cannot be determined from available evidence.
-- When an approved plan provides the needed decisions and authority, continue autonomously through all in-scope implementation and verification work. Stop only for a genuine blocker: unavailable required information, an out-of-scope decision, missing authority for an external mutation, missing credentials, or a failure that cannot be resolved from available evidence.
-- When unblocked, take the next concrete tool or edit action. Do not emit progress-only promises such as "I will" or "next I will" between actionable steps.
-- When context pressure risks reliable execution, preserve the goal, acceptance criteria, verification method, current repository state, and next concrete action through compaction or `/clean-execute <plan.md>`.
+## Execution and communication
 
-## Subagents
-
-- In normal chat, launch subagents when they materially improve independent research, review, or implementation work, subject to the active tool and repository rules.
-
-## Explicit skill invocation
-
-- When the user explicitly requests a named skill (for example, `/skill-name` or “use the `<skill-name>` skill”), read its `SKILL.md` before responding or acting, then follow its instructions, sequence, gates, and deliverables. Do not skip, substitute, or treat the skill as optional.
-- This explicit-invocation requirement overrides “Do not open a skill file unless the step YAML lists that skill”; that workflow-child restriction otherwise remains unchanged.
-- A skill name mentioned only in discussion is not an explicit invocation. Continue to follow other applicable skill triggers even when the user has not named a skill.
-
-## Workflow children
-
-- When executing a declarative workflow step, do not launch subagents.
-- Use `blocked` only for a genuine blocker: required information or a decision absent from the approved plan, missing authority for an external mutation, missing credentials, or a failure that cannot be resolved from available evidence. Do not use `blocked` for routine implementation, verification, or in-scope decisions after plan approval. Never use `retry`, `handoff`, or a next-step outcome to ask the user a question.
-- Use `retry` only for a transient failure that can be retried without new user input.
-- Do not open a skill file unless the step YAML lists that skill.
-- Format all human-facing output—including summaries, plans, reports, comments, and replies—for scanning: short headings, then one distinct fact, action, or metadata value per bullet or paragraph. Never pack unrelated values into one line or emit a dense prose wall.
-- When a schema needs several related fields, use a bullet list with one `field`: `value` per row. Put machine-readable data under `## Machine-readable handoff` in a fenced `json` block. It must be valid JSON with no prose inside it.
-- Chat: terse. Plans, contracts, and review replies: clear professional prose.
+- Take the next concrete action when unblocked. Avoid progress messages that only promise future work.
+- Before compaction, preserve the goal, acceptance criteria, verification method, repo state, and next action.
+- Keep chat concise and reports easy to scan. Use headings and bullets where useful.
+- Put machine-readable handoffs under `## Machine-readable handoff` in a valid fenced JSON block.
+- In workflows, use `blocked` only for genuine blockers and `retry` only for transient failures needing no user input. Do not disguise questions as `retry`, `handoff`, or next-step outcomes.
