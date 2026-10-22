@@ -10,3 +10,5 @@ Each story must include:
 - Dependencies or sequencing when needed, referring to stable draft labels such as `S1` and `S2` until real tracker IDs exist.
 
 Cover implementation, rollout, monitoring, and risk mitigation when the report requires them; do not manufacture a standard set of chores for every feature. Keep story boundaries practical and avoid duplicates or stories that merely restate another story's acceptance criteria. Do not invent estimates, assignees, dates, priority, or commitments the user has not chosen.
+
+Read the complete draft for report coverage, observable acceptance criteria, dependencies, and duplicates, then immediately continue to [review and refine](review.md). A completed draft is not the end of this workflow.

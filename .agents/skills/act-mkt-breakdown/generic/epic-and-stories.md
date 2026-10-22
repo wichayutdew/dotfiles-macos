@@ -29,4 +29,4 @@ State prerequisite draft stories or existing tracker items; omit if none.
 Repeat the story sections for each proposed story. Draft labels are local references, not claimed tracker IDs.
 
 ## Questions and creation approval
-State unresolved report/backlog/destination decisions. Once resolved, present the final complete epic/stories and destination and ask for explicit approval to create them. No work items have been created yet.
+State unresolved report/backlog/destination decisions. Once resolved, state: "Approving this proposal authorizes creating exactly the epic/stories above with the listed metadata and relationships in <tracker and workspace/team/project>." Use the real destination, then submit the complete document through [the review procedure](plannotator-review.md). No work items have been created yet.
