@@ -39,6 +39,7 @@ alias so 'source ~/.config/fish/config.fish'
 alias cl 'clear'
 alias ce 'idea .'
 alias wf 'wifitui'
+alias wt 'cd ~/repositories/worktrees'
 
 # ---- SHORT_HAND_ALIASES ----
 alias v 'nvim'
