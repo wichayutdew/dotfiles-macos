@@ -1,0 +1,33 @@
+# Stage: plan
+
+Build the plan with this skill’s [plan template](../generic/plan-template.md). The template defines the artifact structure; this prompt defines how to produce it.
+
+Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
+
+---
+
+Plan the work from intake. Read-only for product code: do not create a branch or worktree. To inspect code in the primary or any other repository, sync it read-only into `workspace.root` per [Local code access](../generic/local-code-access.md) and search with `rg`.
+
+Authoritative work request: `the invoking request`
+Intake/recovery handoff: `{{last.summary}}`
+Rejected plan: `{{gate.artifact}}`
+Feedback: `{{gate.feedback}}`
+
+Inspect origin, base HEAD, target branch, and the host description template (`rg --files <repo> | rg -i 'merge_request_templates|pull_request_template'`). Base every planned change, validation command, and publication value on observed evidence.
+
+Inspect the closest existing client/query, utility, service, test and verification command before proposing another one. State what will be reused/extended and why any new abstraction is needed. Preserve the user's explicit semantics and numeric/operational bounds; do not add speculative guarantees.
+
+Map each contract change to observable acceptance and verification: executable API/request collections and realistic response fixtures where applicable; browser interaction and actual downloaded bytes/format for changed UI/save flows. Match assertions to the test layer, preserve repository test layout, and use established commands rather than inventing new tooling.
+
+Branch: `<type>/<KEY>` or `<type>/<semantic-kebab-summary>`. No random suffix or run id.
+
+Workspace: `workspace.workId` = the tracker key from intake exactly as returned (e.g. `ACTMKT-123`, `ENG-42`; with several keys, the primary one named in the request). With no tracker key, use the branch name with `/` replaced by `-` (e.g. `fix-wallet-cache-ttl`) and set `workspace.workIdSource: branch`. `workspace.root` = `~/repositories/worktrees/<workId>/`. List every repository the ticket needs in `repositories[]`: index 0 is `role: primary` (git worktree at `<root>/<repo-name>`, the only editable repo); others are `role: reference` (clone at `<root>/<repo-name>`, read-only, pinned `rev`). Put these values in the Execution appendix:
+
+Before `ready`, put every user-answerable missing fact, decision, required authorization, and publication choice in the artifact's `Risks/Decisions Needed` section. Do not ask these separately or invent answers. Approval feedback returns to this plan stage and the artifact is re-presented at the same review gate.
+
+`ready`: the complete plan artifact and publication metadata, including all open decision questions, are ready for review.
+`gaps`: intake evidence is incomplete; name the missing fields.
+`handoff`: actionable planning work remains and requires no user input.
+`blocked`: required evidence or authority is unavailable, contradictory, or unsafe to assume. Report the exact factual blocker in `remaining` without asking a question. Put user-answerable decisions in the plan artifact for review instead.
+
+When Intake evidence is absent or incomplete, return `gaps` with exact missing fields so the workflow re-enters intake.

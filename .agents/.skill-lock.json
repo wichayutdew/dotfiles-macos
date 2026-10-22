@@ -15,9 +15,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/brainstorming/SKILL.md",
-      "skillFolderHash": "abe5c2fed8c215d4b86b77be1d8a7d0b0562651c",
+      "skillFolderHash": "3d8a23691e919f5acfd31d45f76bdc168d24ca1b",
       "installedAt": "2026-08-21T18:33:12.269Z",
-      "updatedAt": "2026-10-11T14:27:15.313Z"
+      "updatedAt": "2026-10-22T11:29:09.155Z"
     },
     "dispatching-parallel-agents": {
       "source": "obra/superpowers",
@@ -33,9 +33,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/executing-plans/SKILL.md",
-      "skillFolderHash": "ef38c6c33e88e4248018dab6f03fc1ceda916ba0",
+      "skillFolderHash": "1374506e051a95c35f04654ebde9c5d845d7c7cb",
       "installedAt": "2026-08-21T18:33:12.280Z",
-      "updatedAt": "2026-10-11T14:27:18.004Z"
+      "updatedAt": "2026-10-22T11:29:11.800Z"
     },
     "finishing-a-development-branch": {
       "source": "obra/superpowers",
@@ -69,9 +69,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/subagent-driven-development/SKILL.md",
-      "skillFolderHash": "a9ec528b252e536a404fd0522e32cec31094d669",
+      "skillFolderHash": "98c875856cf40765616a4565f09b437f0c58992b",
       "installedAt": "2026-08-21T18:33:12.301Z",
-      "updatedAt": "2026-10-11T14:27:23.074Z"
+      "updatedAt": "2026-10-22T11:29:14.135Z"
     },
     "systematic-debugging": {
       "source": "obra/superpowers",
@@ -132,9 +132,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/obra/superpowers.git",
       "skillPath": "skills/writing-skills/SKILL.md",
-      "skillFolderHash": "f761162236b19330da62b22ad0da20f5dac7c6ab",
+      "skillFolderHash": "660ede63b84ce5d07ef28cccc2973165e2ca06e2",
       "installedAt": "2026-08-21T18:33:12.347Z",
-      "updatedAt": "2026-09-20T15:41:34.940Z"
+      "updatedAt": "2026-10-22T11:29:16.458Z"
     },
     "ponytail-review": {
       "source": "dietrichgebert/ponytail",
@@ -195,27 +195,27 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-investigate/SKILL.md",
-      "skillFolderHash": "7886355633ae6513c5ae2a4d120a0de0ac6e84d9c99498bc51fed622e09c54b6",
+      "skillFolderHash": "02051862bf311bfa1ba34e315297cbcc3e7b73f547abc433149bc6562bffb814",
       "installedAt": "2026-09-22T06:04:48.170Z",
-      "updatedAt": "2026-10-21T14:09:47.363Z"
+      "updatedAt": "2026-10-22T11:29:19.275Z"
     },
     "act-mkt-mr-comment": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-comment/SKILL.md",
-      "skillFolderHash": "1f8489aba700be6d26fc3af97ba9e92a1f56261fd6c731da2dfafdb12c96abe0",
+      "skillFolderHash": "be7c1cb8f3b9f934ae588ba98e77d7026aacc6bba1cef89a114272c04d7cf4bb",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-10-21T14:09:49.457Z"
+      "updatedAt": "2026-10-22T11:29:21.767Z"
     },
     "act-mkt-mr-review": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-review/SKILL.md",
-      "skillFolderHash": "61acb4e242bfda687b838643a424252444c13d0342b9779eedfff395b9e7a130",
+      "skillFolderHash": "7bf08fdadfe95b6ad6dd870823ab29f1ec1acf995268047fbeb99f308d350929",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-10-21T14:09:51.617Z"
+      "updatedAt": "2026-10-22T11:29:24.578Z"
     },
     "act-mkt-sprint-triage": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
@@ -231,9 +231,9 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-work/SKILL.md",
-      "skillFolderHash": "be747f46ab878f0ba19da32b4163090ed8a8707f9a988c50d64f94f183999334",
+      "skillFolderHash": "dc32792eb900374700cd4379eb7064452894f1aec4a5a3834d844824006efa81",
       "installedAt": "2026-09-22T06:04:48.174Z",
-      "updatedAt": "2026-10-21T14:09:53.858Z"
+      "updatedAt": "2026-10-22T11:29:27.103Z"
     },
     "act-mkt-codebase-search": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",

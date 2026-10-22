@@ -5,6 +5,12 @@ description: Use when addressing, validating, or responding to PR or merge-reque
 
 # MR Comment
 
+Run `scripts/...` commands from this skill root (beside `SKILL.md`) or use absolute paths. Markdown links are relative to their containing document.
+
+## Local resources and cleanup
+
+This package includes its own [local code access](generic/local-code-access.md), [host CLI](generic/host-cli.md), and [cleanup script and instructions](generic/cleanup.md); no sibling skill installation is required. Track every newly created clone/worktree. When the user says “clean everything up”, take the cleanup-only route and delete all tracked local resources, including recent clones, using the shipped cleanup helper. Carry the cleanup ledger path in every checkpoint; do not enroll reused existing checkouts.
+
 ## Workflow direction
 
 Treat the text that invoked this skill as the authoritative review-comment request. Derive the hosted-review URL, repository, branch, and unresolved-discussion context from that request and the active workspace.
@@ -36,21 +42,16 @@ A `blocked` outcome is terminal only when safe continuation is impossible: repor
 
 | Stage | Prompt | Model guidance | Thinking guidance | Outcomes |
 | --- | --- | --- | --- | --- |
-| fetch | [fetch.md](fetch.md) | fast economical | low | `ready` → checkout-source; `blocked` → terminal report; `handoff` → fetch |
-| checkout-source | [checkout-source.md](checkout-source.md) | fast economical | low | `ready` → plan; `gaps` → fetch; `blocked` → terminal report; `handoff` → checkout-source |
-| plan | [plan.md](plan.md) | strong reasoning | high | `ready` → plan review, then implement on approval; `done` → local report; `gaps` → fetch; `blocked` → terminal report; `handoff` → plan |
-| implement | [implement.md](implement.md) | balanced | medium | `ready` → verify; `refresh` → fetch; `blocked` → terminal report; `handoff` → implement |
-| verify | [verify.md](verify.md) | balanced | medium | `ready` → deliver; `gaps` → implement; `refresh` → fetch; `blocked` → terminal report; `handoff` → verify |
-| deliver | [publish.md](publish.md) | fast economical | low | `ready` → done; `done` → local report; `gaps` → implement; `refresh` → fetch; `blocked` → terminal report; `handoff` → deliver |
+| fetch | [fetch.md](workflows/fetch.md) | fast economical | low | `ready` → checkout-source; `blocked` → terminal report; `handoff` → fetch |
+| checkout-source | [checkout-source.md](workflows/checkout-source.md) | fast economical | low | `ready` → plan; `gaps` → fetch; `blocked` → terminal report; `handoff` → checkout-source |
+| plan | [plan.md](workflows/plan.md) | strong reasoning | high | `ready` → plan review, then implement on approval; `done` → local report; `gaps` → fetch; `blocked` → terminal report; `handoff` → plan |
+| implement | [implement.md](workflows/implement.md) | balanced | medium | `ready` → verify; `refresh` → fetch; `blocked` → terminal report; `handoff` → implement |
+| verify | [verify.md](workflows/verify.md) | balanced | medium | `ready` → deliver; `gaps` → implement; `refresh` → fetch; `blocked` → terminal report; `handoff` → verify |
+| deliver | [publish.md](workflows/publish.md) | fast economical | low | `ready` → done; `done` → local report; `gaps` → implement; `refresh` → fetch; `blocked` → terminal report; `handoff` → deliver |
 
 ## Comment-plan approval gate
 
-Before `plan` can continue with `ready`, obtain explicit approval for an artifact with these exact level-2 headings:
-
-- `Comments`
-- `Implementation plan`
-- `Validation`
-- `Execution appendix (machine-readable)`
+Build the complete artifact using this skill’s [plan template](generic/plan-template.md), preserving its required headings and fields. Before `plan` continues with `ready`, present that full artifact for approval.
 
 Obtain explicit human approval of the complete artifact before continuing. Include every current comment verdict, implementation choice, validation decision, and exact actionable publication reply in this artifact; do not ask separately. On denial or feedback, revise and re-present the artifact at this gate. After approval, ask no questions.
 
