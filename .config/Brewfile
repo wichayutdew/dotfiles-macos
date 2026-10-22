@@ -42,9 +42,13 @@ brew 'fish'
 cask 'postman'
 cask 'ghostty'
 cask 'font-jetbrains-mono'
+brew 'bitwarden-cli'
+brew 'gh'
+brew 'glab'
 
 # AI
 brew 'pi-coding-agent'
+cask 'chatgpt'
 
 # Agoda essentials
 cask 'orbstack'
@@ -59,4 +63,4 @@ cask 'spotify'
 cask 'raindropio'
 cask 'zen'
 cask 'obsidian'
-cask 'chatgpt'
+cask 'bitwarden'
