@@ -326,13 +326,13 @@
       "updatedAt": "2026-10-15T10:30:13.562Z"
     },
     "act-mkt-breakdown": {
-      "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/skills.git",
+      "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
-      "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/skills.git",
+      "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-breakdown/SKILL.md",
       "skillFolderHash": "cd7b3b557d4fc761fa76e1c489dd67dadd2d10012ac77611130f874840c0443b",
       "installedAt": "2026-10-22T13:38:18.853Z",
-      "updatedAt": "2026-10-22T14:27:24.297Z"
+      "updatedAt": "2026-10-23T14:46:21.621Z"
     }
   },
   "dismissed": {

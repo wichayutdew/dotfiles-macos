@@ -1,6 +1,5 @@
 ---
 name: plannotator-visual-explainer
-disable-model-invocation: true
 description: >
   Generate self-contained HTML visualizations with Plannotator theming. Use for implementation
   plans, PR explainers, architecture diagrams, data tables, slide decks, and any visual
