@@ -7,7 +7,13 @@
 <Scope boundaries and behavior outside this change.>
 
 ## Implementation Steps and Tests
-<Scoped changes, existing code to reuse, dependencies, and relevant local checks within the requested test scope.>
+<Scoped changes and existing code to reuse. Group coherent tasks and explain independence or necessary serialization.>
+
+| Task / deliverable | Depends on | Exclusive writable paths | Interface prerequisites | Checks / exclusive resources | Testing approach and rationale | Concurrency group |
+| --- | --- | --- | --- | --- | --- | --- |
+| <ID and coherent result> | <IDs or none> | <paths owned by this task> | <stable contracts or prerequisite results> | <commands, shared services/build outputs, combined reruns> | <TDD with benefit, or relevant validation> | <ready together or sequential reason> |
+
+<Parent scheduling: normally 2–3 independent ready workers, bounded by runtime capacity; parent owns shared-file integration and Git/index mutations. Record any explicit test mandates.>
 
 ## Validation
 <Acceptance verification, applicable current-source CI, and any explicit waivers/limitations.>

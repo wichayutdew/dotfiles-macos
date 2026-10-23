@@ -17,6 +17,10 @@ Inspect origin, base HEAD, target branch, and the host description template (`rg
 
 Inspect the closest existing client/query, utility, service, test and verification command before proposing another one. State what will be reused/extended and why any new abstraction is needed. Preserve the user's explicit semantics and numeric/operational bounds; do not add speculative guarantees.
 
+Include an execution table in `Implementation Steps and Tests`: task ID and coherent deliverable, dependencies, exclusive writable paths, interface prerequisites, verification commands, testing approach with rationale, and intended concurrency group. Plan for 2–3 concurrent ready implementers within available runtime capacity. Establish changing shared contracts before their consumers; serialize overlapping paths or shared check resources. Group small related edits rather than creating a worker per tiny edit. If work is tightly coupled, state why sequential execution is appropriate. The parent owns shared-file integration and Git/index operations. Identify checks that need exclusive resources or a combined-tree rerun.
+
+Choose TDD where a failing behavioral test has an assessable benefit; mechanical docs/config edits use relevant validation without a forced red-green cycle. Carry explicit user/repository testing mandates into the plan. Apply this skill’s execution policy rather than importing conflicting generic serial/TDD workflows.
+
 Map each contract change to observable acceptance and verification: executable API/request collections and realistic response fixtures where applicable; browser interaction and actual downloaded bytes/format for changed UI/save flows. Match assertions to the test layer, preserve repository test layout, and use established commands rather than inventing new tooling.
 
 Branch: `<type>/<KEY>` or `<type>/<semantic-kebab-summary>`. No random suffix or run id.

@@ -231,9 +231,9 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-work/SKILL.md",
-      "skillFolderHash": "dc32792eb900374700cd4379eb7064452894f1aec4a5a3834d844824006efa81",
+      "skillFolderHash": "f9359e4e80195312e57efb64c41d754f1409d8c7cbba836a8e4594adcf87872b",
       "installedAt": "2026-09-22T06:04:48.174Z",
-      "updatedAt": "2026-10-22T11:29:27.103Z"
+      "updatedAt": "2026-10-23T11:12:19.941Z"
     },
     "act-mkt-codebase-search": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
@@ -303,9 +303,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/backnotprop/plannotator.git",
       "skillPath": "apps/skills/extra/plannotator-visual-explainer/SKILL.md",
-      "skillFolderHash": "060525d9a83760cc7cbc3004217c596a76a3e39a",
+      "skillFolderHash": "48b1d39f317db181b75c8c4dafba6b78bb8f17a4",
       "installedAt": "2026-10-15T10:30:13.520Z",
-      "updatedAt": "2026-10-15T10:30:13.520Z"
+      "updatedAt": "2026-10-23T11:12:51.808Z"
     },
     "plannotator-setup-goal": {
       "source": "backnotprop/plannotator",

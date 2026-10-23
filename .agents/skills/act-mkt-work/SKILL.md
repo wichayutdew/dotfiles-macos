@@ -15,7 +15,7 @@ This package includes its own [local code access](generic/local-code-access.md),
 
 Treat the text that invoked this skill as the authoritative work request. Derive repository, Git, tracker, and hosted-review context from that request and the active workspace. Inspect code, in this or any other repository, only through local clones searched with `rg` per [Local code access](generic/local-code-access.md). Use `glab`/`gh` for every MR/PR and CI read or write per [Host CLI](generic/host-cli.md). All work for one ticket lives under `~/repositories/worktrees/<workId>/` (layout in [prepare-workspace](workflows/prepare-workspace.md)).
 
-Execute the linked stages sequentially and automatically. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
+Execute the linked lifecycle stages in order and automatically; within implementation, schedule independent tasks concurrently using this skill’s execution policy below. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
 The only user wait is the complete plan-review gate below. Put every user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, execute the approved routes and publication contract autonomously; changed assumptions follow the recovery contract below.
 
@@ -29,6 +29,16 @@ A `blocked` outcome is terminal only when safe continuation is impossible: repor
 - If subagent tools are unavailable or dispatch fails, continue the task inline using the available model and briefly record the fallback. Report a blocker only when a real task prerequisite, runtime restriction or required authorization prevents safe progress.
 - Give each worker the original request, bounded scope, applicable stage prompt, approved plan and approval evidence when required, `workspace.root` and `repositories[]` (cwd/base/head), full-source references, relevant checks and expected outcome. The parent dispatches subsequent routes and remains accountable for reviewing diffs, checking evidence and reporting results.
 - Run independent tasks concurrently when they can avoid conflicting edits; run dependent stages and tasks sequentially. Preserve the approval gates, workspace restrictions and publication contract across every handoff.
+
+## Implementation execution policy
+
+This skill supplies the complete scheduling, testing and review policy for its stages. Use it directly rather than importing a generic implementation workflow that requires serial implementers, a review gate before each next task, one-feature handoffs, or blanket TDD. Explicit user and repository requirements remain binding; include any required exceptions or decisions in the plan gate.
+
+- Plan tasks with dependencies, exclusive writable paths, stable interface prerequisites, verification commands and a testing rationale. Group small related edits into coherent tasks; parallelize only genuinely independent work.
+- After approval and workspace preparation, the parent normally runs 2–3 ready implementation workers concurrently, bounded by available runtime capacity. A task is ready when its prerequisites are verified and its writable paths, interface changes and check resources do not conflict with running tasks. Keep coupled work sequential; an independent task can run while another task is reviewed.
+- Give each worker exclusive file ownership inside the bound primary worktree. The parent owns shared-file integration and Git/index mutations. Reference repositories remain read-only. Workers report changed paths and verification evidence; the parent reconciles the combined tree before independent verification.
+- Choose TDD for behavioral changes where a failing test usefully proves the intended correction or contract. Mechanical documentation/configuration edits use relevant validation; do not invent tests, force a red-green cycle, or request a routine TDD exception for them. Record the choice and assessable benefit per task. Honor explicit user/repository test requirements.
+- Review task results as they arrive, keep unrelated ready work moving, and run the required combined verification after integration. Do not impose a new human approval gate between approved tasks. Preserve the existing plan and publication gates.
 
 ## Continuation and recovery
 
