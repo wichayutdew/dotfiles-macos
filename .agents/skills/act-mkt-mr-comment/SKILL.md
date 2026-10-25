@@ -13,11 +13,11 @@ This package includes its own [local code access](generic/local-code-access.md),
 
 ## Workflow direction
 
-Treat the text that invoked this skill as the authoritative review-comment request. Derive the hosted-review URL, repository, branch, and unresolved-discussion context from that request and the active workspace.
+Treat the invoking request and later user steering as the authoritative review-comment request. Derive the hosted-review URL, repository, branch, and unresolved-discussion context from that request and the active workspace.
 
 Execute the linked stages sequentially and automatically. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
-The only user wait is the complete plan-review gate below. Put every user-answerable question, missing decision, required authorization, and publication choice in the plan artifact before presenting it. Revise and re-present at that same gate until explicitly approved. After approval, execute the approved routes and publication contract autonomously; changed assumptions follow the recovery contract below.
+Collect known user decisions, required authorizations and publication choices in the complete plan-review gate below. After approval, continue every authorized route without routine reconfirmation. If a new material decision or required user action prevents dependent work, raise only that item through the applicable review or clarification route and continue independent approved work. Preserve explicit user exceptions within their stated scope; changed assumptions follow the recovery contract below.
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.
 
@@ -30,12 +30,16 @@ A `blocked` outcome is terminal only when safe continuation is impossible: repor
 - Give each worker the original request, bounded scope, applicable stage prompt, approved plan and approval evidence when required, workspace/base/head, full-source references, relevant checks and expected outcome. The parent dispatches subsequent routes and remains accountable for reviewing diffs, checking evidence and reporting results.
 - Run independent tasks concurrently when they can avoid conflicting edits; run dependent stages and tasks sequentially. Preserve the approval gates, workspace restrictions and publication contract across every handoff.
 
+## Fix execution policy
+
+Group related fixes into coherent tasks with scoped paths, applicable repository guidance, dependencies and a testing rationale. Use regression tests where they establish the correction and relevant existing validation for mechanical changes. Honor explicit test requirements and waivers. Run independent ready groups concurrently within runtime capacity, with exclusive file ownership and no conflicting check resources; serialize shared interfaces, resources and mutations. The parent owns integration and Git/index operations, reviews the combined result and reruns checks invalidated by later changes.
+
 ## Continuation and recovery
 
-- Keep a resumable checkpoint in the conversation or an approved artifact: stage, canonical plan/version or digest, explicit approval evidence, workspace/base/head, full-source references, checks, completed/unconfirmed action IDs and exact remaining work. Template variables denote those artifacts; they do not require a particular orchestrator.
+- Keep one resumable task record in the conversation or an approved artifact: current requirements and boundaries, accepted decisions, stage, canonical plan/version or digest, explicit approval evidence, workspace/base/head, full-source references, checks, completed/unconfirmed action IDs and exact remaining work. Template variables denote those artifacts; they do not require a particular orchestrator.
 - Complete evidence may be inline or in stable, readable full-content references. Preserve original source ordering and identities; read missing chunks/pages before deciding. A summary or truncated preview is not source proof. Carry references rather than duplicating entire diffs at every handoff.
 - Resume the same approved artifact/scope after compaction or continuation. Reconcile actual state first; consume an existing Plannotator result/process session before reopening. Feedback revises the same gate; approval advances execution without another nudge.
-- Apply later user corrections throughout scope, checks and publication. An explicit instruction to make a small scoped fix directly takes precedence over a redundant skill gate. Revalidate base/head before edits and publication; refresh stale evidence. Re-present a plan when scope, verdicts, publication actions or base assumptions invalidate its approval. A user-authorized rebase/continuation remains authorized.
+- Apply later user corrections and related additions to the same task record, scope, checks and publication contract. When another workflow becomes relevant, integrate its necessary steps into that task without restarting completed stages, duplicating active work or expanding authorization. An explicit instruction to make a small scoped fix directly takes precedence over a redundant skill gate. Revalidate base/head before edits and publication; refresh stale evidence. Re-present affected scope when requirements, verdicts, publication actions or base assumptions invalidate its approval; continue unaffected approved work when its prerequisites remain valid. A user-authorized rebase/continuation remains authorized.
 - Follow declared recovery routes automatically. Retry transient failures with bounded backoff and retained progress; repeated failure without new evidence is a factual blocker. Reconcile ambiguous writes before retrying. Never turn recovery into authority for unrelated edits or remote actions.
 
 ## Stages
@@ -53,6 +57,6 @@ A `blocked` outcome is terminal only when safe continuation is impossible: repor
 
 Build the complete artifact using this skill’s [plan template](generic/plan-template.md), preserving its required headings and fields. Before `plan` continues with `ready`, present that full artifact for approval.
 
-Obtain explicit human approval of the complete artifact before continuing. Include every current comment verdict, implementation choice, validation decision, and exact actionable publication reply in this artifact; do not ask separately. On denial or feedback, revise and re-present the artifact at this gate. After approval, ask no questions.
+Obtain explicit human approval of the complete artifact before continuing. Include every current comment verdict, implementation choice, validation decision, and exact actionable publication reply in this artifact; do not ask separately. On denial or feedback, revise and re-present the artifact at this gate. After approval, continue under the task record and recovery rules above.
 
-Plannotator is optional; explicit human approval is required. Save the complete artifact as a Markdown file. If a Plannotator tool or installed CLI is available, use it to present the complete artifact for approval. Otherwise, provide the Markdown file path and explicitly ask the user to review the file and approve in a chat response. Wait for explicit approval through the selected interface before continuing. Silence, dismissal, or a tool failure is not approval; revise and re-present the artifact on feedback.
+Follow this skill’s [approval review procedure](generic/plannotator-review.md) to present the complete artifact, await the final decision and take the next authorized action. It defines Plannotator execution, permitted fallback when tooling is absent, revision handling and approval scope. A running session or tool failure is not approval.

@@ -2,8 +2,8 @@
 
 Read the complete current draft against the user's request, latest feedback, and selected template. This is a focused content check, not a new user approval gate.
 
-- Every material question is answered, or its evidence gap is explicit. Claims and citations agree; observed facts, assumptions, recommendations, and unknowns remain distinct.
-- RFCs explain feature flow and goals, implementation, rollout/rollback, monitoring, and risks at a useful level. Investigation results explain the subject in detail without forcing irrelevant engineering sections. Honor the user's own template over default headings.
+- Every material question is answered, or its evidence gap is explicit. Claims and citations agree; observations, inferences, assumptions, recommendations, and unknowns remain distinct. Source coverage and access limits are stated where material, superseded information is reconciled, and claimed execution/delivery has supporting evidence.
+- RFCs explain feature flow and goals, implementation, rollout/rollback, monitoring, and risks at a useful level. Investigation results explain the subject in detail without forcing irrelevant engineering sections. Honor the user's requested depth, format, destination and template over default headings; a narrow request does not require unrelated report sections.
 - Alternatives and recommendations follow the latest scope. No invented ticket mappings, measurements, metrics, API contracts, approvals, or decisions. Proposed monitoring is labeled proposed, not already deployed.
 - When measured load is relevant, check [traffic evidence](../generic/traffic-evidence.md): source/emitter, filters, window/timezone, units, executed query/result, and derivations. Keep proxies and modeled demand separate from observations. No telemetry does not mean zero usage.
 - Preserve the current user-edited report, unrelated content, and finalized contracts. Do not replace an edited document with a stale mirror.

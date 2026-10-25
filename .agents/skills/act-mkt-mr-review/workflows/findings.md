@@ -4,16 +4,16 @@ Use the invoking request and complete source evidence, inline or through the evi
 
 ---
 
-Review the fetched change for actionable improvements, introduced regressions and performance degradation. Do not publish or edit product code.
+Review the fetched change for demonstrated introduced regressions, compatibility failures, security or data-loss risks, performance degradation, or violations of an explicit new-feature contract. Do not publish or edit product code.
 
 Input: `the invoking request`
 Evidence: `{{last.summary}}`
 
-CI does not gate this stage: review the available code now and report relevant CI context without waiting for green checks. Suggestions must identify a concrete correctness, compatibility, maintainability, or performance benefit in the changed code; keep speculative/style-only preferences excluded.
+CI does not gate this stage: review the available code now and report relevant CI context without waiting for green checks. Findings must establish an introduced failure or explicit contract violation with a concrete trigger, impact and evidence. A standalone maintainability or stylistic benefit is not a finding.
 
 ## Review method
 
-- In the local clone from fetch (`~/repositories/mr-review/<repo-name>`, detached at head), compare base and head with `git diff <base_sha>...<head_sha>` and `git show <base_sha>:<path>`. Trace changed code into callers, consumers, response models, configuration and tests with `rg` (search guidance in [Local code access](../generic/local-code-access.md)); a diff alone is insufficient. When a caller/consumer lives in another repository, sync it into `~/repositories/mr-review/<other-repo>` per [Local code access](../generic/local-code-access.md) at its default-branch HEAD, and record repo and SHA with the finding's evidence.
+- In the local clone from fetch (`~/repositories/mr-review/<repo-name>`, detached at head), compare base and head with `git diff <base_sha>...<head_sha>` and `git show <base_sha>:<path>`. Trace changed code into callers, consumers, response models, configuration and tests with `rg` (search guidance in [Local code access](../generic/local-code-access.md)); a diff alone is insufficient. When a caller/consumer lives in another repository, sync it into `~/repositories/mr-review/<other-repo>` per [Local code access](../generic/local-code-access.md) at the revision relevant to the supported contract or intended rollout, and record that association plus repo and SHA with the finding's evidence. If only default-branch HEAD is available, state that limitation; it alone does not establish compatibility with the reviewed change.
 - Prioritize broken supported behavior, compatibility/schema drift, auth/session boundaries, stale asynchronous results, pagination/completeness, empty/error paths, and introduced security or data-loss failures. For new functionality, use its explicit contract rather than inventing prior behavior.
 - Follow performance mechanisms affected by this change: per-item I/O, lost batching/concurrency/connection reuse, query/index changes, repeated rendering/refetches, blocking, cache behavior, unbounded work/memory, retry/timeout budgets and fan-out. Select relevant checks; do not perform a whole-repository audit.
 - Validate suspicions with a focused reproduction/test, source trace, or measured comparison. Check realistic fixtures against actual selected fields and request/response contracts; green CI alone does not disprove a defect.

@@ -32,7 +32,7 @@ Always prepare the working outline from [the plan template](generic/plan-templat
 
 ## Report choice
 
-Honor the user's template or reference document. Otherwise choose a suitable starting point:
+Match the requested depth, format and destination; keep a short question or narrow document revision proportionate. Honor the user's template or reference document. Otherwise choose a suitable starting point:
 
 - [RFC](generic/rfc.md): a proposal/decision covering feature flow, goals, implementation, rollout, monitoring, and risks.
 - [Investigation result](generic/investigation-result.md): a detailed explanation answering technical or general questions, with findings, evidence, and limits.
@@ -49,7 +49,7 @@ Accepting the report does not authorize implementing it, creating tickets, or au
 
 ## Sources, destinations, and permissions
 
-- Use available sources suited to the question: supplied material, local code, internal knowledge, public primary sources, or relevant telemetry. A code repository and traffic measurements are not required for every investigation. Put evidence next to the claim; distinguish observations, proposals, assumptions, and unknowns.
+- Use available sources suited to the question: supplied material, local code, internal knowledge, public primary sources, or relevant telemetry. A code repository and traffic measurements are not required for every investigation. Put evidence next to the claim; distinguish observations, inferences, proposals, assumptions, and unknowns. State relevant source coverage, revisions and access limits; reconcile superseded information against the latest supported evidence and user direction. An assistant assertion alone does not establish an executed result.
 - Keep chat as the default delivery destination and honor an explicit local report path or existing document destination. Save the complete report as a local review artifact for Plannotator; this does not authorize a hosted write or replace the canonical destination. Read current content before revisions and preserve unrelated user edits and finalized request/response contracts.
 - Drafting/reviewing does not authorize hosted writes. Before an external update, show the concrete content and destination and obtain approval for that write, unless the user already authorized those exact changes. Read back saved content before claiming delivery.
 - Product code stays read-only. Use the active checkout without branch switching; for another repo use [local code access](generic/local-code-access.md) and the helpers in `scripts/`. Record newly created clones per [cleanup](generic/cleanup.md); “clean everything up” takes that cleanup-only route. Never enroll a reused existing checkout.
@@ -57,4 +57,4 @@ Accepting the report does not authorize implementing it, creating tickets, or au
 
 ## Continuation
 
-Retain the request, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, acceptance state, and any confirmed/unconfirmed hosted writes. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.
+Keep one current task record: latest request and boundaries, accepted decisions, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, completed/remaining work, acceptance state, and any confirmed/unconfirmed hosted writes. Incorporate relevant steps from another workflow without restarting completed research or changing the requested deliverable or authorization. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.

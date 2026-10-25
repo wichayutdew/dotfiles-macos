@@ -1,7 +1,7 @@
 # Review plan
 
 ## Reviews
-<Reviewed base/head, coverage and limitations. For each finding: severity, path/line, trigger, impact, evidence/verification limits, and exact proposed comment. Or: No actionable findings.>
+<Reviewed base/head, applicable consumer revisions/conditions, source coverage and limitations. For each finding: severity, path/line, trigger, baseline or explicit contract, impact, evidence with artifact/revision/environment checked, verification limits, and exact proposed comment. Or: No actionable findings.>
 
 ## Publication contract
 <Host/project/review identity, expected head, GitLab diff refs when applicable, and concrete actions.json path. Or: None, with the no-action rationale.>

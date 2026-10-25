@@ -4,8 +4,8 @@ Use this procedure whenever the workflow reaches review, including after feedbac
 
 ## Prepare and launch
 
-1. Read the latest canonical document and preserve user edits. Save the complete current artifact, not an outline or summary. Reuse its canonical local file when there is one; otherwise save a local Markdown review copy under `~/repositories/personal/plans/plannotator/`. Retain the canonical source/destination and the exact reviewed version in the continuation record. A local review copy does not authorize hosted publication.
-2. Include the review purpose described below in the document. Resolve any required input first, while continuing independent drafting/research.
+1. Read the latest canonical document and preserve user edits. Save the complete current artifact, not an outline or summary. Reuse its canonical local file when it already contains suitable review context. For a narrow edit or a document whose requested content excludes review metadata, save a separate complete local review copy under `~/repositories/personal/plans/plannotator/`. Retain the canonical source/destination and the exact reviewed version in the continuation record. A local review copy does not authorize hosted publication.
+2. State the review purpose described below in the review copy or invocation context; keep process metadata out of the canonical document when it is outside the requested content. Resolve any required input first, while continuing independent drafting/research.
 3. Discover an available Plannotator tool or CLI. If using a tool, it must support an explicit approval gate and a final decision. For CLI, prefer the installed executable (`command -v plannotator`, or `~/.local/bin/plannotator` when present). Expand home paths to absolute paths before quoting. Run the equivalent of:
 
    ```bash

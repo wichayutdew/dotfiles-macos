@@ -14,9 +14,11 @@ Prior artifact/feedback: `{{gate.artifact}}` / `{{gate.feedback}}`
 
 Reconcile all relevant comments with current code, replies and the checkpoint. Distinguish new/changed or reopened feedback from already-addressed feedback. An older unresolved thread with a confirmed adequate reply needs no identical reply; new follow-up text still needs assessment.
 
-For each comment record identity/anchor, evidence, and an `implement`, `decline`, or `already-addressed` verdict. Validate suggestions rather than accepting them blindly. Reuse existing code/helpers/tests where suitable and keep fixes within approved scope.
+For each comment record identity/anchor, evidence, and an `implement`, `decline`, or `already-addressed` verdict. Validate suggestions rather than accepting them blindly. Record applicable repository guidance and existing candidate paths/symbols: fit or gap, reuse/extension/new-code decision, and owning responsibility. Keep fixes within approved scope.
 
 For each actionable implement/decline verdict, provide one exact response and one `publication.replies` entry with its native discussion/comment ID and reply type. Inline feedback uses its existing discussion; a general comment uses the host's general-comment capability. Already-addressed/no-action entries have evidence but no new reply. An implement reply may claim only checks that delivery will actually confirm.
+
+Group related fixes into coherent tasks. For each changing group, record dependencies, prerequisites with verified readiness or remaining assumptions, affected interfaces/consumers, owned paths and proportionate checks with rationale. Run independent ready groups concurrently when file ownership and check resources do not conflict; the parent owns integration and Git/index operations. Preserve an active task’s working context and approved progress when incorporating these verdicts.
 
 For code changes, list scoped paths, local worker/check commands, required CI and one imperative Conventional Commit `publication.commitSubject`, source branch and non-force push action. Honor explicit local-only/no-commit restrictions by disabling those delivery actions. Include all implementation, validation and publication choices in the complete approval artifact; feedback revises that artifact at the same gate.
 
