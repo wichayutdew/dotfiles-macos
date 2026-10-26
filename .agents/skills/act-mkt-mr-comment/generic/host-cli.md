@@ -1,6 +1,6 @@
 # Host CLI (GitLab `glab`, GitHub `gh`)
 
-Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/update and CI. Do not use GitLab/GitHub MCP tools; use MCP only when the needed CLI is missing or unauthenticated, and record why. Run commands with `bash` (scripts are bash; they do not depend on the interactive shell).
+Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/update and CI. Do not use GitLab/GitHub MCP tools; use MCP only when the needed CLI is missing or unauthenticated, and record why. Run shell helpers with `bash` and Python helpers with `python3`; they do not depend on the interactive shell.
 
 ## Preflight (once per run)
 
@@ -15,15 +15,16 @@ Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/u
 
 ## Scripts
 
-Paths below are relative to the skill root containing `SKILL.md`. Run stage commands from that root, not from `workflows/` or `generic/`.
+Paths below are relative to the skill root containing `SKILL.md`. Use absolute helper paths or run stage commands from that root, not from `workflows/` or `generic/`. Changing helper cwd never changes the inherited task root.
 
 | Script | Use |
 | --- | --- |
-| `scripts/repo-sync.sh` | clone/fetch/pin a local clone ([Local code access](local-code-access.md)) |
+| `scripts/task-workspace.py` | validate the inherited manifest with `--check`; recreate only approved missing resources at inherited paths ([Task workspace](task-workspace.md)) |
+| `scripts/repo-sync.sh` | clone/fetch/pin dedicated inspection clones only; never repin an inherited editable worktree ([Local code access](local-code-access.md)) |
 | `scripts/cleanup-workspaces.py` | register/list/preview/delete workflow-created resources ([Cleanup](cleanup.md)) |
 | `scripts/ci-wait.sh` | poll the pipeline/checks for one SHA until terminal or timeout |
 
-Exit codes shared by the scripts: `0` ok · `1` failed check/CI · `2` still running / timeout (→ `handoff`) · `3` unsafe or ambiguous state (→ `blocked`) · `10` head moved (→ `refresh`) · `11` merged/closed (→ `done`).
+Exit codes shared by the scripts: `0` ok · `1` failed check/CI · `2` still running / timeout (→ `handoff`) · `3` unsafe or ambiguous state (→ `blocked`) · `10` head moved (→ `refresh`) · `11` merged/closed (retire that review entry; → `done` only when no active delivery remains).
 
 ## Common commands
 

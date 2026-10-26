@@ -28,8 +28,16 @@
 <Concrete worker/check/publication commands and verified repository identities. Retain current scope/decisions, approval or scoped exception evidence, completed actions and remaining work in one task record. An approved existing context retains its actual paths and relevant prior edits; the layout below is the new-workspace default.>
 
 ```yaml
-workspace: {workId: <tracker-key-or-branch-derived-id>, workIdSource: <tracker-or-branch>, root: <absolute-ticket-root>}
+workspace: {launchDirectory: <absolute-invoking-cwd>, workId: <ticket-id-or-short-summary>, workIdSource: <tracker-or-summary>, root: <launchDirectory/workId>}
 repositories:
-  - {name: <repo>, role: primary, origin: <url>, primaryCheckout: <existing-checkout-or-null>, cwd: <ticket-root/repo>, baseBranch: <branch>, baseHead: <sha>, sourceBranch: <branch>}
-  - {name: <repo>, role: reference, origin: <url>, cwd: <ticket-root/repo>, rev: <sha-or-ref>}
+  - {name: <unique-name>, role: primary, origin: <url>, primaryCheckout: <existing-clone-or-null>, cwd: <root/name>, baseBranch: <branch>, baseHead: <sha>, sourceBranch: <branch>}
+  - {name: <unique-name>, role: editable, origin: <url>, primaryCheckout: <existing-clone-or-null>, cwd: <root/name>, baseBranch: <branch>, baseHead: <sha>, sourceBranch: <branch>}
+  - {name: <unique-name>, role: reference, origin: <url>, primaryCheckout: <existing-clone-or-null>, cwd: <root/name>, rev: <pinned-sha>}
+publication:
+  repositories: [<per-repository actions, source/target identities, title/template and authorization>]
+contextArtifact: <root/.task-context.json>
+cleanupLedger: <absolute-ledger-path>
+reviews: [<canonical URL, host/project/number, sourceOrigin/targetOrigin, sourceBranch/sourceHead, target branch, confirmed commit/push/CI/reply IDs>]
 ```
+
+Preserve this complete task record and its absolute artifact path in the same session for `act-mkt-mr-comment`; that workflow reuses the root and repository bindings. Store the helper input as JSON using the schema in [Task workspace](task-workspace.md); YAML above is the plan presentation, not helper input.

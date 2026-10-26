@@ -4,7 +4,7 @@ Keep repositories available for review until the user requests cleanup. A reques
 
 ## Track creation
 
-`repo-sync.sh` and `ticket-workspace.sh` automatically record only resources they create, immediately after creation. Reused existing checkouts are never newly enrolled. For a worktree or clone created by another Git command, immediately record it with this skill's shipped helper:
+`task-workspace.py`, `repo-sync.sh` and the legacy `ticket-workspace.sh` automatically record only resources they create, immediately after creation. Track newly acquired `.sources` backing clones and linked worktrees separately; cleanup removes linked worktrees before their backing clones. Reused existing checkouts are never newly enrolled. For a worktree or clone created by another Git command, immediately record it with this skill's shipped helper:
 
 ```bash
 python3 scripts/cleanup-workspaces.py register --kind worktree <new-worktree-path>

@@ -1,37 +1,32 @@
 # Stage: prepare-workspace
 
-Use the invoking request and complete source evidence, inline or through the evidence references defined in SKILL.md.
+Use the invoking request, approved plan and complete source references carried in the task record.
 
----
+Create or rebind all approved repository worktrees using [task workspace](../generic/task-workspace.md). Mechanical only: do not infer additional repositories or change approved bases.
 
-Create or reuse the approved ticket workspace. Mechanical only.
+For a new task, use the captured `workspace.launchDirectory`, ticket-ID-or-summary `workId` and absolute root from the approved manifest. Run with an absolute helper path so changing into the skill directory cannot change the task location:
 
-Approved plan: `the approved plan artifact from this run`
-Restart workspace: `available workspace facts`
+```bash
+python3 /absolute/skill/scripts/task-workspace.py /absolute/approved-workspace.json
+```
 
-When the plan binds an existing working context, verify its path, origin, branch, base/HEAD and relevant uncommitted state against the approved record, then reuse it in place. Preserve required prior work and unrelated edits. Record the actual root and repository paths; do not create another workspace merely to fit the default layout. On continuation, revalidate that same binding before resuming. The helper route below applies to new or already helper-managed ticket layouts.
+Each `primary` or `editable` entry becomes a linked branch worktree at its recorded cwd. A verified local checkout supplies Git storage without switching it; missing clones are acquired under `<root>/.sources/<name>`. References remain read-only at pinned revisions. Register newly created backing clones and worktrees with the shipped cleanup helper. Keep partial resources and their ledger on failure; do not delete them or overwrite conflicts to retry.
 
-Use `publication.sourceBranch` at `repositories[0].baseHead`. Branch is `<type>/<KEY>` or `<type>/<semantic-kebab-summary>`. Never append the run id.
+For an explicitly approved existing context, validate actual paths, origins, branches, base/HEAD and relevant prior edits manually and retain them in place; do not force a different layout. Preserve dirty dependency work, and do not silently replace it with the clean remote base.
 
-Create or reuse the whole ticket layout with one call. It makes `~/repositories/worktrees/<workId>/<repo-name>` a worktree of `primaryCheckout` on `sourceBranch` (a direct clone when `primaryCheckout` is null), syncs each read-only reference repo via [`repo-sync.sh`](../scripts/repo-sync.sh), and prints `{root, repositories:[{name, role, cwd, head, branch}]}`:
+On continuation of a helper-managed task, run the same manifest with `--check`: no creation, checkout, fetch, ledger registration or state update. Check every repository against its branch/base or pinned reference SHA and the recorded dirty baseline. Our verified local commits after the base are expected progress; external movement that invalidates assumptions returns `gaps`. Origin, path, branch-in-use or unsafe ownership conflicts return `blocked`; never reset/stash or steal a branch checked out elsewhere.
 
-    bash scripts/ticket-workspace.sh <workId> <origin> <baseBranch> <baseHead> <sourceBranch> [--primary-checkout <primaryCheckout>] [--ref <origin>#<rev>]...
+Persist the prepared manifest, cleanup ledger and source evidence references in `<root>/.task-context.json`; carry that absolute path in the session. Keep it updated through implementation and publication so the later comment workflow can locate this exact workspace.
 
-Exit `3` (path exists as something else, origin or branch mismatch, branch checked out in another worktree) → `blocked`; never remove or overwrite that path. Create nothing directly under `~/repositories/worktrees/` other than the `<workId>/` folder.
-
-For a helper-managed layout on restart, run the same command with `--check` (creates nothing): exit `0` rebinds, `3` → `blocked`, `10` (baseHead no longer an ancestor of HEAD) → `gaps`. Compare the printed heads and primary `dirty` count with the checkpoint's dirty baseline. Our recorded implementation commits after baseHead are expected progress, not an automatic reason to replan. If external source/base movement invalidates assumptions, return `gaps` before editing; refresh the plan and approval as needed. Preserve unrelated work and never reset/stash it to make the workspace fit.
-
-`ready`: bound `workspace.root` and every `repositories[i].cwd` plus manifest.
-`gaps`: external movement or missing evidence invalidates the approved workspace/base assumptions.
-`handoff`: transient mechanical workspace work remains and requires no user input.
-`blocked`: the workspace state is unsafe or cannot be repaired within the approved plan. Report the observed state and exact blocker in `remaining`; do not ask a question, wait for input, or mutate around the safety check.
-
+`ready`: all approved repository paths are safely bound and recorded.
+`gaps`: missing evidence or external changes invalidate the approved assumptions.
+`handoff`: transient mechanical preparation remains; preserve completed resources and exact remaining entries.
+`blocked`: unsafe path, origin, branch, ownership or unresolvable revision; report the factual conflict.
 
 ## Required ready response
-Put `workspace.workId`/`workIdSource`/`root`, and per repository: name, role, cwd, origin, primaryCheckout (primary), source/base branch, base HEAD or rev, current HEAD, and verbatim dirty baseline in `Completed`.
 
 # Completed
-<complete workspace manifest>
+<workspace.launchDirectory/workId/workIdSource/root, context-artifact path, cleanup ledger, and per-repository name/role/cwd/origin/backing checkout/base branch/base SHA/source branch/current HEAD/verbatim dirty baseline; retained existing-context exceptions and full source references>
 
 # Remaining
 <exact remaining work, or None.>

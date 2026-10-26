@@ -4,14 +4,14 @@ Keep repositories available for review until the user requests cleanup. A reques
 
 ## Track creation
 
-`repo-sync.sh` and `ticket-workspace.sh` automatically record only resources they create, immediately after creation. Reused existing checkouts are never newly enrolled. For a worktree or clone created by another Git command, immediately record it with this skill's shipped helper:
+`repo-sync.sh` and `task-workspace.py` automatically record only resources they create, immediately after creation. Legacy `ticket-workspace.sh` in packages that include it retains the same creation-ledger contract. Register backing clones and linked worktrees separately so cleanup removes worktrees before their owned backing clones. Reused existing checkouts are never newly enrolled. For a worktree or clone created by another Git command, immediately record it with this skill's shipped helper:
 
 ```bash
 python3 scripts/cleanup-workspaces.py register --kind worktree <new-worktree-path>
 python3 scripts/cleanup-workspaces.py register --kind clone <new-clone-path>
 ```
 
-Run only the matching command, and only for a resource just created by this workflow. Never register a pre-existing primary checkout or reusable repository merely because it was inspected. Record the ledger path with the workspace checkpoint. For runtime-managed worktrees, retain the runtime attachment/identity too; use its native archive/remove facility during cleanup so its application metadata stays consistent, then reconcile the ledger with the helper.
+Run only the matching command, and only for a resource just created by this workflow. Never register a pre-existing primary checkout or reusable repository merely because it was inspected. Record the ledger path with the canonical `<root>/.task-context.json` checkpoint and retain it across work-to-comment continuation; helper-owned `<root>/.task-workspace.json` is separate mechanical state. For runtime-managed worktrees, retain the runtime attachment/identity too; use its native archive/remove facility during cleanup so its application metadata stays consistent, then reconcile the ledger with the helper.
 
 The four repository workflows share `~/.local/state/act-mkt/workspaces.json` by default, even when skills are installed separately. Set `ACT_MKT_CLEANUP_LEDGER` to an absolute path **outside the resources being deleted** for an isolated task or environment; use that same value in every worker and after resuming. `--ledger <path>` before the subcommand is an equivalent explicit override. The ledger tracks creation, not directory ages; do not sweep arbitrary recently modified directories.
 

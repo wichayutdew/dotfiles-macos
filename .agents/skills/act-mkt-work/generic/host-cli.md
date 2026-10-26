@@ -15,14 +15,15 @@ Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/u
 
 ## Scripts
 
-Paths below are relative to the skill root containing `SKILL.md`. Run stage commands from that root, not from `workflows/` or `generic/`.
+Paths below are relative to the skill root containing `SKILL.md`. Use absolute script paths or run stage commands from that root, not from `workflows/` or `generic/`. Capture the invoking directory first; changing cwd to run helpers must not change `workspace.launchDirectory`.
 
 | Script | Use |
 | --- | --- |
 | `scripts/repo-sync.sh` | clone/fetch/pin a local clone ([Local code access](local-code-access.md)) |
 | `scripts/cleanup-workspaces.py` | register/list/preview/delete workflow-created resources ([Cleanup](cleanup.md)) |
 | `scripts/ci-wait.sh` | poll the pipeline/checks for one SHA until terminal or timeout |
-| `scripts/ticket-workspace.sh` | create / `--check` the ticket workspace (primary worktree + reference clones) |
+| `scripts/task-workspace.py` | prepare / read-only `--check` of every approved repository in the JSON [task manifest](task-workspace.md) |
+| `scripts/ticket-workspace.sh` | legacy single-primary layout compatibility only; new tasks use `task-workspace.py` |
 | `scripts/update-managed-region.sh` | replace only the `ai-only` region of an MR/PR description |
 
 Exit codes shared by the scripts: `0` ok · `1` failed check/CI · `2` still running / timeout (→ `handoff`) · `3` unsafe or ambiguous state (→ `blocked`) · `10` head moved (→ `refresh`) · `11` merged/closed (→ `done`).
