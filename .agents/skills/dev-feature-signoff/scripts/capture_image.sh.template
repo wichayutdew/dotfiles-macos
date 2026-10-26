@@ -1,0 +1,95 @@
+#!/bin/bash
+# Auto-generated screenshot capture script (template)
+# JIRA: {jira_id}
+# Generated: {timestamp}
+#
+# HOW TO USE: Copy to .sdd/output/signoff/{jira_id}/scripts/capture_image.sh,
+# fill the ACTIVITIES array from the document sanity table, then chmod +x.
+#   ./capture_image.sh --test-only   # first activity only (test-first)
+#   ./capture_image.sh               # all activities (batch)
+
+set -e
+cd "$(dirname "$0")/.."
+mkdir -p media
+
+TEST_ONLY=false
+if [[ "$1" == "--test-only" ]]; then
+  TEST_ONLY=true
+fi
+
+# One entry per activity: "{activity_id}|{city_id}|{url_A}|{url_B}"
+declare -a ACTIVITIES=(
+  "{activity_id_1}|{city_id_1}|{url_A_1}|{url_B_1}"
+  "{activity_id_2}|{city_id_2}|{url_A_2}|{url_B_2}"
+)
+
+TOTAL_ACTIVITIES=${#ACTIVITIES[@]}
+
+if [ "$TEST_ONLY" = true ]; then
+  echo "🧪 Test Mode: Capturing first activity only..."
+  LIMIT=1
+else
+  echo "🚀 Batch Mode: Capturing all activities..."
+  LIMIT=$TOTAL_ACTIVITIES
+fi
+
+echo "Activities: $LIMIT"
+echo "Variants: A, B"
+echo "Platform: Desktop (1920×1080)"
+echo ""
+
+# Open browser once (reuse for all captures)
+playwright-cli open
+
+COUNT=0
+SUCCESS=0
+FAILED=0
+
+for i in "${!ACTIVITIES[@]}"; do
+  if [ $i -ge $LIMIT ]; then
+    break
+  fi
+
+  IFS='|' read -r ACT_ID CITY_ID URL_A URL_B <<< "${ACTIVITIES[$i]}"
+  COUNT=$((COUNT + 1))
+
+  echo "[$COUNT/$LIMIT] Capturing Activity $ACT_ID..."
+
+  # Variant A
+  if playwright-cli goto "$URL_A" && \
+     playwright-cli resize 1920 1080 && \
+     sleep 5 && \
+     playwright-cli screenshot --filename="media/${ACT_ID}_A_desktop.png"; then
+    echo "  ✅ Variant A captured"
+    SUCCESS=$((SUCCESS + 1))
+  else
+    echo "  ❌ Variant A failed"
+    FAILED=$((FAILED + 1))
+  fi
+
+  # Variant B
+  if playwright-cli goto "$URL_B" && \
+     playwright-cli resize 1920 1080 && \
+     sleep 5 && \
+     playwright-cli screenshot --filename="media/${ACT_ID}_B_desktop.png"; then
+    echo "  ✅ Variant B captured"
+    SUCCESS=$((SUCCESS + 1))
+  else
+    echo "  ❌ Variant B failed"
+    FAILED=$((FAILED + 1))
+  fi
+
+  echo ""
+done
+
+# Close browser
+playwright-cli close
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ Capture complete!"
+echo "Success: $SUCCESS"
+echo "Failed: $FAILED"
+echo "Screenshots: media/"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+exit 0
