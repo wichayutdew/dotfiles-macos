@@ -34,6 +34,22 @@ Add custom environment variables to `~/.config/fish/conf.d/environment.fish`:
 set -gx SECRET_NAME ${SECRET}
 ```
 
+## Update Installed Tools
+
+Run `update` in Fish to execute these commands in order:
+
+```fish
+brew upgrade
+mise upgrade
+npx skills update
+```
+
+Missing tools are skipped. If an update fails, the remaining commands still run and
+`update` returns a nonzero exit status. Commands keep their normal prompts and
+output. Run from the directory whose configuration you intend to use: mise and
+skills retain their normal current-directory scope, and mise respects configured
+version ranges.
+
 ## System Shortcuts
 
 | Shortcut | Action |
