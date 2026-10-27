@@ -17,6 +17,10 @@ Continue independent work while resolving material questions. Missing optional s
 
 Before yielding or finishing, check every remaining step: execute any step that is ready, and launch the required review yourself when its artifact is ready. Do not end with an offer to continue, ask whether to run the next required step, or rely on an automatic Stop hook. A running Plannotator session must be awaited in this turn until it exits.
 
+## Task directory
+
+Every new investigation creates a ticket-ID-plus-description directory (description only without a ticket) under the captured invocation directory. Follow [task directory](generic/task-directory.md) during intake; persist the plan, local report and `.task-context.json` there. Revisions reuse the absolute root. A later `act-mkt-breakdown` request inherits that directory and adds its own plan/draft without replacing investigation artifacts. Explicit canonical report destinations remain authoritative.
+
 ## Workflow
 
 | Step | Instructions | Next |
@@ -57,4 +61,4 @@ Accepting the report does not authorize implementing it, creating tickets, or au
 
 ## Continuation
 
-Keep one current task record: latest request and boundaries, accepted decisions, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, completed/remaining work, acceptance state, and any confirmed/unconfirmed hosted writes. Incorporate relevant steps from another workflow without restarting completed research or changing the requested deliverable or authorization. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.
+Persist one current task record at `<workspace.root>/.task-context.json` per [task directory](generic/task-directory.md), including the absolute root and plan/report/review paths. Keep it current with: latest request and boundaries, accepted decisions, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, completed/remaining work, acceptance state, and any confirmed/unconfirmed hosted writes. Incorporate relevant steps from another workflow without restarting completed research or changing the requested deliverable or authorization. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.

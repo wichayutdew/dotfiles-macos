@@ -11,4 +11,4 @@ Each story must include:
 
 Cover implementation, rollout, monitoring, and risk mitigation when the report requires them; do not manufacture a standard set of chores for every feature. Keep story boundaries practical and avoid duplicates or stories that merely restate another story's acceptance criteria. Do not invent estimates, assignees, dates, priority, or commitments the user has not chosen.
 
-Read the complete draft for report coverage, observable acceptance criteria, dependencies, and duplicates, then immediately continue to [review and refine](review.md). A completed draft is not the end of this workflow.
+Save the complete draft at `<workspace.root>/breakdown-draft.md` and update the breakdown fields of `.task-context.json`, preserving investigation state and any explicit canonical draft destination. Read the complete draft for report coverage, observable acceptance criteria, dependencies, and duplicates, then immediately continue to [review and refine](review.md). A completed draft is not the end of this workflow.

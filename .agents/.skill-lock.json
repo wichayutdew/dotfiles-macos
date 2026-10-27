@@ -195,9 +195,9 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-investigate/SKILL.md",
-      "skillFolderHash": "d79148199c0f233766101768b29aa0e0900d0207e89d6f7ca2d0161af3af458c",
+      "skillFolderHash": "a0805ccbe1850ec94a09bc57f9485a9caeac206456db5861c44fa4cf46a3cbd5",
       "installedAt": "2026-09-22T06:04:48.170Z",
-      "updatedAt": "2026-10-25T15:03:18.700Z"
+      "updatedAt": "2026-10-27T03:58:36.943Z"
     },
     "act-mkt-mr-comment": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
@@ -330,9 +330,9 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-breakdown/SKILL.md",
-      "skillFolderHash": "cd7b3b557d4fc761fa76e1c489dd67dadd2d10012ac77611130f874840c0443b",
+      "skillFolderHash": "782160b5f0b26875eef769d204410d6f6158406c274d1f6904489ad86a69cfe3",
       "installedAt": "2026-10-22T13:38:18.853Z",
-      "updatedAt": "2026-10-23T14:46:21.621Z"
+      "updatedAt": "2026-10-27T03:58:41.493Z"
     },
     "dev-add-experiment": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",

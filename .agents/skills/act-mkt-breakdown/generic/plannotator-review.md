@@ -4,7 +4,7 @@ Use this procedure whenever the workflow reaches review, including after feedbac
 
 ## Prepare and launch
 
-1. Read the latest canonical document and preserve user edits. Save the complete current artifact, not an outline or summary. Reuse its canonical local file when there is one; otherwise save a local Markdown review copy under `~/repositories/personal/plans/plannotator/`. Retain the canonical source/destination and the exact reviewed version in the continuation record. A local review copy does not authorize hosted publication.
+1. Read the latest canonical document and preserve user edits. Save the complete current artifact, not an outline or summary. Reuse its canonical local file when there is one; otherwise save a local Markdown review copy under the inherited `workspace.root` per [task directory](task-directory.md). Explicit user/AGENTS-required review locations take precedence. Persist the actual review path/version and decision in `.task-context.json`. Retain the canonical source/destination and the exact reviewed version in the continuation record. A local review copy does not authorize hosted publication.
 2. Include the review purpose described below in the document. Resolve any required input first, while continuing independent drafting/research. Do not submit unresolved tracker destinations as a creation proposal.
 3. Discover an available Plannotator tool or CLI. If using a tool, it must support an explicit approval gate and a final decision. For CLI, prefer the installed executable (`command -v plannotator`, or `~/.local/bin/plannotator` when present). Expand home paths to absolute paths before quoting. Run the equivalent of:
 

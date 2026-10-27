@@ -9,6 +9,9 @@
 ## Report format and destination
 <Requested format and depth; supplied template or suitable report structure; chat or the existing canonical file/document; any separately authorized hosted writes.>
 
+## Task directory and artifacts
+<Required: workspace.launchDirectory/workId/workIdSource/description/root, absolute contextPath, investigation-plan.md path, canonical report destination/version, local report path, review artifact path and current acceptance state. Preserve inherited root and explicit destinations.>
+
 ## Investigation steps
 <Evidence gathering, reasoning, relevant alternative comparisons, and report approach.>
 

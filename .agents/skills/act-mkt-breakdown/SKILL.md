@@ -17,6 +17,10 @@ Continue independent work while resolving material questions. Missing optional s
 
 Before yielding or finishing, check every remaining step: execute any step that is ready, and launch the required review yourself when its artifact is ready. Do not end with an offer to continue, ask whether to run the next required step, or rely on an automatic Stop hook. A running Plannotator session must be awaited in this turn until it exits.
 
+## Task directory
+
+Recover the preceding investigation's absolute root and `.task-context.json` using [task directory](generic/task-directory.md), even when invoked elsewhere. Save `breakdown-plan.md` and `breakdown-draft.md` in that same directory, preserving investigation artifacts and context. Standalone reports remain supported with the fallback directory contract in that guide.
+
 ## Workflow steps
 
 Follow these step prompts in order, preserving their approval and permission requirements.
@@ -31,6 +35,6 @@ Follow these step prompts in order, preserving their approval and permission req
 
 Only after the creation gate, follow [create.md](workflows/create.md). Create exactly the approved epic/stories or explicitly approved equivalent using the connected tracker; do not also publish reports, create branches, implement code, change existing issue status, or notify others.
 
-Keep a simple record of the source report, latest draft, feedback resolved, pending questions, explicit creation approval, and created/confirmed/unconfirmed IDs. On continuation, reconcile actual tracker state before resuming. Report verified created links and any remaining failures; a partially created backlog is not complete.
+Persist `<workspace.root>/.task-context.json`, preserving investigation state and adding the breakdown plan/draft paths and a record of the source report, latest draft, feedback resolved, pending questions, explicit creation approval, and created/confirmed/unconfirmed IDs. On continuation, reconcile actual tracker state before resuming. Report verified created links and any remaining failures; a partially created backlog is not complete.
 
-No CI waiting or repository workspace is needed for report-to-backlog drafting. Choose an available model/effort suitable for the task and respect user/runtime constraints; no mandatory per-step delegation is needed.
+No CI waiting or Git worktree is needed for report-to-backlog drafting; the shared artifact directory is required. Choose an available model/effort suitable for the task and respect user/runtime constraints; no mandatory per-step delegation is needed.

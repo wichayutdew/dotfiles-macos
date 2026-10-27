@@ -7,4 +7,4 @@ The report is ready for user review. Execute [the Plannotator review procedure](
 - **Accepted/satisfied:** finish with the accepted report or its path/link and material remaining limitations. Acceptance covers the report only; do not create an epic, stories, or implementation work.
 - **Later breakdown request:** use the accepted/current report as input for backlog drafting. Its acceptance does not approve tracker creation; the breakdown has its own explicit creation gate.
 
-Retain the report reference/version, feedback resolved, open limitations, and acceptance evidence for continuation.
+Persist the report reference/version, feedback resolved, open limitations, review result and acceptance evidence in `<workspace.root>/.task-context.json`. Finish with the accepted report, absolute task root and context path so a later breakdown reuses this directory.

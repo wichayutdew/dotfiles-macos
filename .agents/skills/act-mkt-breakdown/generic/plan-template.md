@@ -3,6 +3,9 @@
 ## Source report
 <Canonical report reference/version, relevant decisions, and unresolved assumptions.>
 
+## Task directory and artifacts
+<Required: inherited workspace.launchDirectory/workId/workIdSource/description/root and absolute contextPath; breakdown-plan.md and breakdown-draft.md paths; canonical draft/review references and versions. Preserve investigation artifacts and record standalone directory creation only when there is no inherited context.>
+
 ## Goal and scope
 <Outcome, report boundaries, and work already completed.>
 

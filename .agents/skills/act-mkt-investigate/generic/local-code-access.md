@@ -4,7 +4,7 @@ Inspect code only in local Git clones searched with `rg`. Do not use Sourcegraph
 
 ## Location
 
-- `<root>` is set by the calling skill: work uses `workspace.root`; mr-review uses `~/repositories/mr-review`; other workflows use a dedicated task directory under `~/repositories/<skill-name>/<task-id>/`. Reuse an already bound checkout without syncing it when its branch/revision must stay unchanged.
+- `<root>` is set by the calling skill: work and investigate use their bound `workspace.root`; mr-review uses `~/repositories/mr-review`; other workflows use a dedicated task directory under `~/repositories/<skill-name>/<task-id>/`. Reuse an already bound checkout without syncing it when its branch/revision must stay unchanged.
 - `<repo-name>` = last segment of the remote project path (`.../act-mkt.git` → `act-mkt`). If two needed repos share a name, use `<group>__<repo>`.
 - `<dir>` = `<root>/<repo-name>`.
 

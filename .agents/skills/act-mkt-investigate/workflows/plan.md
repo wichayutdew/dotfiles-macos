@@ -1,6 +1,6 @@
 # Plan the investigation
 
-After intake, prepare a concise working plan using the [investigation plan template](../generic/plan-template.md). Ground it in the request, selected report format, current canonical report, sources, and latest user feedback.
+After intake, prepare and save `<workspace.root>/investigation-plan.md`, recording its absolute path in `.task-context.json`. Prepare this concise working plan using the [investigation plan template](../generic/plan-template.md). Ground it in the request, selected report format, current canonical report, sources, and latest user feedback.
 
 Outline the questions, scope, evidence gathering, and report approach before research/drafting. A general question need not involve repositories, implementation, rollout, or telemetry. Keep material unknowns explicit and continue independent work while clarifying them.
 
