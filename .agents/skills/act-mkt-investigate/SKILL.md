@@ -9,6 +9,10 @@ Run `scripts/...` commands from this skill root (beside `SKILL.md`) or use absol
 
 Produce an evidence-backed report and refine it with the user until they are satisfied. The request may be an idea, feature proposal, technical question, general question, or an existing report to revise; a tracker issue is optional.
 
+## Concise output
+
+Lead each user-facing report or response with a concise summary; use short bullets where they make the result easier to scan. Keep decision-critical facts, evidence links, material limitations and required handoffs. Honor explicitly requested detail and required artifact or machine-readable formats; keep supporting evidence available without copying it wholesale into every deliverable.
+
 ## Execute the whole workflow
 
 Read each linked step prompt before executing it. Track the current step, completed outputs, remaining steps, and review decision in the continuation record. Follow the listed order and advance to the next step immediately when its prerequisites are met; a progress update, working outline, completed research, or saved draft is not a handoff or completion condition.

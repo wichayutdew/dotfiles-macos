@@ -1,5 +1,7 @@
 # Epic and stories draft
 
+Keep descriptions, steps and criteria concise and use short bullets. Link to audience-accessible evidence or summarize essential evidence when unavailable; retain material requirements and failure cases without repeating the same criterion.
+
 Source report: <canonical report reference and version>
 Creation destination: <tracker and workspace/team/project>
 Hierarchy: <actual supported parent/child object types proposed for approval>

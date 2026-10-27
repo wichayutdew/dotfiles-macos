@@ -7,6 +7,10 @@ description: Use when reviewing a PR or merge request for introduced regressions
 
 Run `scripts/...` commands from this skill root (beside `SKILL.md`) or use absolute paths. Markdown links are relative to their containing document.
 
+## Concise output
+
+Lead each user-facing report or response with a concise summary; use short bullets where they make the result easier to scan. Keep decision-critical facts, evidence links, material limitations and required handoffs. Honor explicitly requested detail and required artifact or machine-readable formats; keep supporting evidence available without copying it wholesale into every deliverable.
+
 ## Local resources and cleanup
 
 This package includes its own [local code access](generic/local-code-access.md), [host CLI](generic/host-cli.md), and [cleanup script and instructions](generic/cleanup.md); no sibling skill installation is required. Track every newly created clone/worktree. When the user says “clean everything up”, take the cleanup-only route and delete all tracked local resources, including recent clones, using the shipped cleanup helper. Carry the cleanup ledger path in every checkpoint; do not enroll reused existing checkouts.
