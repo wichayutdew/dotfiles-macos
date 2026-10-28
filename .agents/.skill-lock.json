@@ -217,15 +217,6 @@
       "installedAt": "2026-09-22T06:04:48.171Z",
       "updatedAt": "2026-10-27T09:03:32.661Z"
     },
-    "act-mkt-sprint-triage": {
-      "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
-      "sourceType": "git",
-      "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
-      "skillPath": "skills/act-mkt-sprint-triage/SKILL.md",
-      "skillFolderHash": "16a10118e7ec2f00af31edf3a2b2c049aea80b9f810192ca33c756eaa99beef2",
-      "installedAt": "2026-09-22T06:04:48.172Z",
-      "updatedAt": "2026-10-15T11:19:00.806Z"
-    },
     "act-mkt-work": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
