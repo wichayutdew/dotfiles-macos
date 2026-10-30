@@ -1,15 +1,20 @@
 # Host CLI (GitLab `glab`, GitHub `gh`)
 
-Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/update and CI. Do not use GitLab/GitHub MCP tools; use MCP only when the needed CLI is missing or unauthenticated, and record why. Run shell helpers with `bash` and Python helpers with `python3`; they do not depend on the interactive shell.
+Use the CLI for all PR/MR metadata, diffs, discussions, comments, MR/PR create/update and CI. Do not use GitLab/GitHub MCP tools; use MCP only when the needed CLI is missing or the preflight below confirms it is unauthenticated, and record why. Run shell helpers with `bash` and Python helpers with `python3`; they do not depend on the interactive shell.
 
 ## Preflight (once per run)
 
-- `glab auth status --hostname <host>` / `gh auth status --hostname <host>`. Unauthenticated → `blocked` with the login command for the user (`glab auth login --hostname <host>`); never handle tokens.
+- Run `glab auth status` to discover the configured GitLab endpoint and account; use `gh auth status --hostname <host>` for GitHub.
+- If sandbox restrictions prevent network access or hide existing credentials, retry the read-only authentication check outside the sandbox through the execution tool's approved escalation mechanism (for example, `sandbox_permissions: "require_escalated"`). A sandbox failure alone does not establish that the user needs to log in.
+- When authentication succeeds outside the sandbox, run subsequent authorized host CLI commands and required helper scripts/Git operations in that working environment. Escalation does not expand the task's scope or authorize remote writes beyond the existing publication contract.
+- If escalation is denied or unavailable, report that access restriction separately from authentication failure; do not bypass it through another tool. Request login only when the accessible environment confirms missing or invalid authentication (`glab auth login --hostname <verified-host>`). Keep network failures distinct from authentication failures.
+- Let the CLI use existing credentials; never extract, print, copy or persist tokens or dump the environment.
 - `python3`, `jq`, `git`, `rg` must be on `PATH`.
 
 ## Addressing
 
-- Pass the host explicitly (`--hostname <host>` for `glab api`/`gh api`; `-R <host>/<project>` for `glab mr …`/`gh pr …`) so commands work from any directory.
+- Preserve the original PR/MR URL as the review identity. When a configured CodeMaster proxy serves a different GitLab hostname, verify the requested project's path and external URL through a read-only project metadata query before using that proxy; do not infer the mapping from authentication success alone.
+- Pass the verified host explicitly (`--hostname <host>` for `glab api`/`gh api`; `-R <host>/<project>` for `glab mr …`/`gh pr …`) where supported. If the CLI rejects a configured proxy's `host:port`, use its verified configured default or repository context and an explicit project API path; do not drop the port or substitute an unverified host.
 - GitLab API project id = URL-encoded full path: `jq -rn --arg p '<group/sub/repo>' '$p|@uri'`.
 - Paginate and merge: `glab api --paginate … | jq -s add`; `gh api --paginate … | jq -s add`.
 

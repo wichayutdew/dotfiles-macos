@@ -69,11 +69,11 @@ Always use `cloudId: "agoda.atlassian.net"` and `fields.project.key: "ACT"` for 
 
 ## Acceptance Criteria
 
-[Each criterion must be independently testable. Given/When/Then format. At least one happy path + one edge case.]
+[Written with the `dev-write-acceptance-criteria` skill. One observable outcome per AC, labelled with its verifier (UI / API / Data). Happy path plus empty / invalid / error / sibling cases where they apply.]
 
-- [ ]
-- [ ]
-- [ ] (edge case)
+- [ ] **AC-1 (UI)** Given …, when …, then ….
+- [ ] **AC-2 (API)** Given …, when …, then ….
+- [ ] **AC-3 (UI, edge: empty)** Given …, when …, then ….
 
 ## Technical Notes (optional)
 
@@ -109,7 +109,7 @@ Fill the template sections. Replace the `[bracketed guidance]` with actual conte
 
 - **Context**: Predecessor ticket + user/business motivation. 2-3 sentences max.
 - **What Needs to Happen**: Numbered concrete changes with exact file paths and function/component names.
-- **Acceptance Criteria**: Given/When/Then format. At least one happy path + one edge case.
+- **Acceptance Criteria**: Invoke the `dev-write-acceptance-criteria` skill with the ticket's Context, What Needs to Happen, designs, and experiment setup, and use its output for this section. Move anything it rejects as a non-AC: implementation and process items (docs, dashboards, closing experiments) go to Technical Notes, scope exclusions go to Out of Scope. If it reports open questions (unknown event name, fixture, threshold), surface them to DJ instead of writing placeholders.
 - **Technical Notes**: CMS IDs, feature flags, affected services, dependencies with status.
 - **Out of Scope**: Explicitly name what this ticket does NOT cover to prevent scope creep.
 - **Links**: Related tickets, designs, discussions.
@@ -133,7 +133,7 @@ Pass the description as a plain Markdown string to `editJiraIssue` or `createJir
 
 - **Wiki markup**: `h3.`, `{{code}}`, `*bold*` store as raw text - always use Markdown
 - **ADF JSON**: Never pass a JSON object as the description field
-- **Vague ACs**: "The feature works correctly" is not testable - name the URL, param, or component state
+- **Vague ACs**: "The feature works correctly" is not testable. Write ACs with the `dev-write-acceptance-criteria` skill and run its self-check before pushing
 - **Missing file paths**: "Update the search component" is incomplete - name the exact file
 - **Skipping Out of Scope**: Without it, tickets grow during review - always define the boundary
 - **Following the global dev-jira-ticket skill**: It targets a different project (Prowler) and uses wiki markup - ignore it for ACT tickets
