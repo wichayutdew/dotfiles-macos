@@ -38,9 +38,6 @@ vim.keymap.set("n", "//", ":noh<CR>")
 vim.keymap.set("n", "<leader>wv", ":vsplit<CR>", { desc = "Split vertically" })
 vim.keymap.set("n", "<leader>wh", ":split<CR>", { desc = "Split horizontally" })
 
---------------------- CUSTOM SHORTCUTS ---------------------
-require("shortcut")()
-
 --------------------- AUTOCMDS ---------------------
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
@@ -121,3 +118,4 @@ require("plugins.telescope")()
 require("plugins.mini")()
 require("plugins.ui")()
 require("plugins.extra")()
+require("plugins.shortcut")()

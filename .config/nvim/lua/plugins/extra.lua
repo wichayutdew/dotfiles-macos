@@ -2,7 +2,7 @@
 return function()
 	require("leetcode").setup({
 		arg = "leetcode.nvim",
-		lang = "kotlin",
+		lang = "rust",
 		storage = {
 			home = vim.fn.stdpath("data") .. "/leetcode",
 			cache = vim.fn.stdpath("cache") .. "/leetcode",
