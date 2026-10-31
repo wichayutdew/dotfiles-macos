@@ -1,5 +1,7 @@
 # Breakdown plan
 
+Lead with the intended outcome. Use a compact story table for scope and dependencies, with short bullets for drafting details and open decisions. Add a small Mermaid dependency diagram when it makes sequencing clearer. Retain every required artifact and tracker field.
+
 ## Source report
 <Canonical report reference/version, relevant decisions, and unresolved assumptions.>
 

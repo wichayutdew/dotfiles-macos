@@ -1,33 +1,33 @@
 # <Feature or idea> RFC
 
 ## Summary and decision sought
-State the customer/product benefit and the proposal or decision being considered.
+State the benefit and proposed decision in one or two sentences.
 
 ## Background and current behavior
-Explain the problem and relevant existing behavior with evidence.
+Use short bullets for the problem and current behavior, with evidence beside each claim.
 
 ## Goals and non-goals
-Describe the intended outcomes and explicit scope boundaries.
+List outcomes and explicit scope boundaries as short bullets.
 
 ## Feature flow and proposed design
-Walk through the user/system flow, relevant components, contracts, and failure paths. Add a focused diagram when it helps.
+Prefer a small Mermaid diagram for the user/system flow, with concise bullets for contracts and failure paths. If the destination cannot render Mermaid, use a short numbered flow.
 
 ## Alternatives and tradeoffs
-Explain realistic alternatives, then compare their impact and recommend an approach.
+Compare realistic alternatives, impact and tradeoffs in a compact table; state the recommendation in one sentence.
 
 ## Implementation plan
-Describe the main changes, dependencies, sequencing, and validation approach at report level. Do not create a story backlog here.
+Use a compact table for main changes, dependencies, sequence and validation at report level. Do not create a story backlog here.
 
 ## Rollout and rollback plan
-Describe rollout phases, eligibility/flags if relevant, verification, and rollback conditions/approach. Mark unconfirmed choices.
+Use a compact table for rollout phases, eligibility/flags if relevant, verification and rollback conditions/actions. Mark unconfirmed choices.
 
 ## Monitoring plan
-Describe the signals, success/failure criteria, observability gaps, and proposed alerts. Separate existing instrumentation from proposed additions.
+Use a compact table for signals, success/failure criteria, gaps and proposed alerts. Distinguish existing instrumentation from proposed additions.
 
 ## Potential risks
-Describe risks, likely impact, mitigations, and unresolved dependencies or decisions.
+Use a compact table for risks, impact, mitigations and unresolved dependencies or decisions.
 
 ## Open questions and evidence limits
-List questions still requiring user input or evidence and distinguish them from agreed decisions.
+List short bullets for questions requiring user input or evidence; distinguish agreed decisions.
 
-Put sources next to the claims they support. Adapt this template to the user's preferred format.
+Put sources beside claims. Use each table or diagram to replace equivalent prose; add short bullets only for needed nuance. Adapt this template to the user's preferred format.

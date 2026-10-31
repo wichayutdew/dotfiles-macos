@@ -2,7 +2,7 @@
 
 Use [the epic/story template](../generic/epic-and-stories.md), adapting the user's preferred format. Propose one epic for the coherent outcome, with independently understandable stories in dependency order. If the report spans unrelated outcomes, surface that split for user review rather than creating extra epics automatically.
 
-Write epic and story descriptions, implementation steps and acceptance criteria as concise, outcome-focused bullets. Include each necessary decision, dependency and observable failure case once; link to evidence accessible to the intended readers instead of copying long research, SQL or tables into tickets. If no accessible link exists, include essential evidence concisely; do not publish a local report without authorization. A complete proposal includes all decision-critical content, not the full source report. Honor explicit requests for detail.
+Open with a compact story/scope/dependency table. Add a small Mermaid diagram when sequencing needs explanation; use a short numbered flow if the destination cannot render Mermaid. Write epic and story descriptions, implementation steps and acceptance criteria as concise, outcome-focused bullets. Include each necessary decision, dependency and observable failure case once; link to evidence accessible to the intended readers instead of copying long research, SQL or tables into tickets. If no accessible link exists, include essential evidence concisely; do not publish a local report without authorization. A complete proposal includes all decision-critical content, not the full source report. Honor explicit requests for detail.
 
 Each story must include:
 

@@ -1,5 +1,7 @@
 # Review-comment plan
 
+Lead with the response/fix summary. Use compact tables for comment verdicts, fix groups and validation; short bullets for reasoning. Add a small Mermaid diagram when dependencies or interactions need explanation. Preserve exact replies and machine-readable fields.
+
 ## Comments
 <Canonical review and source repository identity, native comment/discussion identity and anchor, evidence, implement/decline/already-addressed verdict, reasoning, and exact actionable reply. No new reply for already-addressed entries.>
 

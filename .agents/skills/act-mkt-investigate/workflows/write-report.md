@@ -1,6 +1,6 @@
 # Present the report
 
-Present the complete validated report or its readable canonical reference. Chat is the default delivery destination; use the user's exact local file or existing document when requested. Save a complete local review artifact using [the review procedure](../generic/plannotator-review.md), while retaining the canonical destination.
+Present the complete validated report or its readable canonical reference. Lead with the answer or proposed decision; use tables for findings/comparisons, small Mermaid diagrams for flows, and short bullets for details. Follow the selected report template, preserving evidence and limits. Use a short numbered flow when the destination cannot render Mermaid; let visuals replace equivalent prose. Chat is the default delivery destination; use the user's exact local file or existing document when requested. Save a complete local review artifact using [the review procedure](../generic/plannotator-review.md), while retaining the canonical destination.
 
 Read the latest saved report before updating it. Reconcile concurrent edits and preserve unrelated content and finalized contracts. Save the local report/review copy under the bound task root and update `.task-context.json` per [task directory](../generic/task-directory.md); preserve any explicit canonical destination. Save only the report and workflow plan/context artifacts; do not stage, commit, or modify product code as part of an investigation.
 

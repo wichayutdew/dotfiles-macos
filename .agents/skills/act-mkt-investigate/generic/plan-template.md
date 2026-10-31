@@ -1,5 +1,7 @@
 # Investigation plan
 
+Lead with the question or decision in one sentence. Use compact tables for questions, research steps, sources and unknowns; short bullets for context. Add a small Mermaid diagram when it clarifies the flow or relationships. Retain all required task and evidence fields.
+
 ## Goal and questions
 <Idea/feature/question, desired understanding or decision, and questions the report must answer.>
 

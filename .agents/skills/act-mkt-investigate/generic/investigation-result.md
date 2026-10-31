@@ -1,21 +1,21 @@
 # <Subject> — Investigation result
 
 ## Summary
-Answer the main question and explain the practical conclusion.
+Answer the main question and state the practical conclusion in one or two sentences.
 
 ## Questions and scope
-State what was investigated, the audience/context, and relevant boundaries.
+Use short bullets for the questions, audience/context and boundaries.
 
 ## Detailed explanation
-Explain the feature, idea, technical system, or general topic step by step. Describe the relevant flow or concepts with concrete examples when helpful.
+Prefer a small Mermaid diagram for flows or relationships, and concise bullets for steps, concepts and necessary examples. If the destination cannot render Mermaid, use a short numbered flow. Use short prose only for nuance the structured explanation cannot convey.
 
 ## Findings and evidence
-Answer each question with supporting reasoning and sources. Distinguish current facts, assumptions, alternatives, and unknowns.
+Use a compact question/finding/evidence table. Distinguish current facts, assumptions, alternatives and unknowns; put any necessary reasoning in short bullets.
 
 ## Implications and recommendations
-Explain what the findings mean and any justified next steps; recommendations do not authorize implementation or ticket creation.
+List concise implications and justified next steps; recommendations do not authorize implementation or ticket creation.
 
 ## Limitations and open questions
-State missing evidence, uncertainty, and decisions still needed.
+List missing evidence, uncertainty and decisions as short bullets.
 
-Put citations beside claims. Adapt the sections to the subject; omit engineering plans irrelevant to the question.
+Put citations beside claims. Tables and diagrams replace equivalent prose. Adapt the sections to the subject; omit engineering plans irrelevant to the question.

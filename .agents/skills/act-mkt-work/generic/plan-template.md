@@ -1,5 +1,7 @@
 # Work plan
 
+Lead with a one-sentence outcome. Use compact tables for acceptance criteria, tasks, validation and risks; short bullets for remaining details. Add a small Mermaid diagram for meaningful dependencies or flow. Keep every required field and machine-readable block; link supporting evidence instead of repeating it.
+
 ## Goal/Acceptance Criteria
 <Current requested outcome and observable completion criteria, including relevant conditions and affected consumers.>
 

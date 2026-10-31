@@ -11,7 +11,14 @@ Produce an evidence-backed report and refine it with the user until they are sat
 
 ## Concise output
 
-Lead each user-facing report or response with a concise summary; use short bullets where they make the result easier to scan. Keep decision-critical facts, evidence links, material limitations and required handoffs. Honor explicitly requested detail and required artifact or machine-readable formats; keep supporting evidence available without copying it wholesale into every deliverable.
+Apply this format to plans, reports, reviews, replies and chat responses:
+
+- Lead with the answer, verdict or decision in one short sentence.
+- Prefer compact tables for comparisons, findings, tasks, risks and validation results; keep cells brief.
+- Prefer a small Mermaid diagram for flows, dependencies or interactions when it makes the relationships clearer. If the destination cannot render Mermaid, use a concise numbered flow or bullets.
+- Put necessary detail in short bullets, one point each. Use short prose only for nuance that needs it; keep simple answers to a sentence or a few bullets.
+- Let each table or diagram replace the equivalent prose. Include only visuals that explain the content.
+- Preserve technical facts, evidence links, material limitations, required handoffs and complete required artifact or machine-readable fields. Honor explicitly requested detail; link supporting evidence instead of repeating it. Use plain, concise language without requiring a separate brevity skill.
 
 ## Execute the whole workflow
 

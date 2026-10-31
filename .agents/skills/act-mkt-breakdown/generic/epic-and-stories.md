@@ -1,6 +1,6 @@
 # Epic and stories draft
 
-Keep descriptions, steps and criteria concise and use short bullets. Link to audience-accessible evidence or summarize essential evidence when unavailable; retain material requirements and failure cases without repeating the same criterion.
+Start with a compact story/scope/dependency table; add a small Mermaid diagram when sequencing needs explanation. If the destination cannot render Mermaid, use a short numbered flow. Keep each story's descriptions, steps and criteria in concise bullets. Link to audience-accessible evidence or summarize essential evidence when unavailable; retain material requirements and failure cases without repeating the same criterion.
 
 Source report: <canonical report reference and version>
 Creation destination: <tracker and workspace/team/project>
