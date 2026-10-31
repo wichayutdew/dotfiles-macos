@@ -195,36 +195,36 @@
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-investigate/SKILL.md",
-      "skillFolderHash": "ccd79b426cf5eaa9a485e5f370ce7d9ee63b5fb59abc17e94b8f37f78e64ed9b",
+      "skillFolderHash": "9b0a99e500e9c422eda48e550c0182bb020cc485c9de47c29902b05a4ef8b08c",
       "installedAt": "2026-09-22T06:04:48.170Z",
-      "updatedAt": "2026-10-30T05:05:36.387Z"
+      "updatedAt": "2026-10-31T15:40:17.428Z"
     },
     "act-mkt-mr-comment": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-comment/SKILL.md",
-      "skillFolderHash": "18625f0459018e1e662164db908ab6426972988fcc714e827dc765625d348bbc",
+      "skillFolderHash": "10fbdba39bd33e542dbc5e07ed079f3f02ae7b0b04fca19cb3cd5b444b2c670e",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-10-30T05:05:38.497Z"
+      "updatedAt": "2026-10-31T15:40:19.804Z"
     },
     "act-mkt-mr-review": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-review/SKILL.md",
-      "skillFolderHash": "92cf04a454c94aa4e9d51be99f4481819291c770b5cb230aa148d9e1a3ece5aa",
+      "skillFolderHash": "64d70994d9ad2121a553a8b2c38a89892d78744931a2972601d6a521894f90c2",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-10-30T05:05:40.834Z"
+      "updatedAt": "2026-10-31T15:40:23.760Z"
     },
     "act-mkt-work": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-work/SKILL.md",
-      "skillFolderHash": "7d74c58dd93da5767f10bc152040f0d1b51f6b34e4740b9e1ecafa92e4caa8ee",
+      "skillFolderHash": "9a71837c00e6239e8aed33f66913f1cecf375ae9179014e5da9decaabff64665",
       "installedAt": "2026-09-22T06:04:48.174Z",
-      "updatedAt": "2026-10-30T05:05:42.875Z"
+      "updatedAt": "2026-10-31T15:40:25.913Z"
     },
     "act-mkt-codebase-search": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
@@ -312,18 +312,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/backnotprop/plannotator.git",
       "skillPath": "apps/skills/extra/plannotator-compound/SKILL.md",
-      "skillFolderHash": "e7cb3bf5836705facedb2f94c6648f269d3f0748",
+      "skillFolderHash": "73dcebd303714bcc3fbdffae162068435eb49d97",
       "installedAt": "2026-10-15T10:30:13.562Z",
-      "updatedAt": "2026-10-15T10:30:13.562Z"
+      "updatedAt": "2026-10-31T15:40:38.631Z"
     },
     "act-mkt-breakdown": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-breakdown/SKILL.md",
-      "skillFolderHash": "b33002a0bd1a30de21cf956348c75b07b7acc93a9f3bcbb1ade082491798e051",
+      "skillFolderHash": "bdeb48ac3c75003c725664b7d81a7358934a63c357bcfb627e1c3e50fa030d2b",
       "installedAt": "2026-10-22T13:38:18.853Z",
-      "updatedAt": "2026-10-27T09:03:37.349Z"
+      "updatedAt": "2026-10-31T15:40:27.732Z"
     },
     "dev-add-experiment": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
