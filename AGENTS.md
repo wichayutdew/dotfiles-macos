@@ -27,6 +27,9 @@ Make the smallest coherent change, follow local conventions, and support claims 
 Submit the complete saved plan through Plannotator Inbox with an explicit approval request and the plan attached. Record the pending review and notify the user with its reference, then end the turn without polling or waiting. Do not edit product code until explicit approval of the current plan is received. On a later response, incorporate feedback and resubmit if needed; after approval, proceed with authorized work. Silence, submission, or tool failure is not approval. If Inbox is unavailable, report the blocker and plan path.
 <!-- plannotator:blocking-plan-review:end -->
 
+For all Plannotator review and approval requests, use the same Plannotator Inbox service and its `send_message` tool; attach the complete artifact, request a decision in a `:::question` block, record the thread reference, notify the user, and end the turn without polling. Reuse the existing Inbox thread for the same work stream, and use a separate thread for a different work stream. Do not launch a blocking Plannotator CLI review or infer approval from submission. If the Inbox is unavailable, report the blocker and artifact path. Explicit user instructions for a different review interface take precedence.
+
+
 ## PRs and merge requests
 
 - Prefer GitHub/GitLab MCP. Use `gh`/`glab` when the MCP cannot perform the action, and state why.
