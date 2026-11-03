@@ -22,21 +22,9 @@ Make the smallest coherent change, follow local conventions, and support claims 
 - Stop only for missing required information, credentials, authority, an out-of-scope decision, or a failure that available evidence cannot resolve.
 
 <!-- plannotator:blocking-plan-review:start -->
-### Blocking plan review
+### Plannotator plan review
 
-Run the saved plan through an explicit gate before ending the turn:
-
-```bash
-~/.local/bin/plannotator annotate "<plan-path>" --gate --json --require-approval
-```
-
-- Expand `~/` before quoting the plan path.
-- Wait until the process exits. If the tool returns a session ID, keep waiting on that session. Do not end the turn, abandon the process, or open duplicate reviews while a decision is pending.
-- `approved` + exit `0`: incorporate notes and proceed with approved work.
-- `annotated` + exit `1`: revise the plan and submit it again before implementation.
-- `dismissed`, invalid/missing JSON, or failure: do not implement; report the outcome.
-- Do not use `--hook` or rely on an end-of-turn hook for this transition.
-- If using a structured gate tool with an `artifact` field, pass the complete Markdown text; the CLI above takes a file path.
+Submit the complete saved plan through Plannotator Inbox with an explicit approval request and the plan attached. Record the pending review and notify the user with its reference, then end the turn without polling or waiting. Do not edit product code until explicit approval of the current plan is received. On a later response, incorporate feedback and resubmit if needed; after approval, proceed with authorized work. Silence, submission, or tool failure is not approval. If Inbox is unavailable, report the blocker and plan path.
 <!-- plannotator:blocking-plan-review:end -->
 
 ## PRs and merge requests
