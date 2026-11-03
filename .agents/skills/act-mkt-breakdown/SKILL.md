@@ -24,9 +24,9 @@ Apply this format to plans, reports, reviews, replies and chat responses:
 
 Read each linked step prompt before executing it. Track the current step, completed outputs, remaining steps, and review decision in the continuation record. Follow the listed order and advance to the next step immediately when its prerequisites are met; a progress update, working outline, completed research, or saved draft is not a handoff or completion condition.
 
-Continue independent work while resolving material questions. Missing optional sources become explicit limitations. Wait only for required user input, a running human review, an explicit pause/cancellation, or a factual blocker that prevents further authorized work. State the exact blocker and retained progress. Honor explicit user/AGENTS requirements for additional approval gates.
+Continue independent work while resolving material questions. Missing optional sources become explicit limitations. Pause dependent work for required user input, review, an explicit pause/cancellation, or a factual blocker that prevents further authorized work. State the exact blocker and retained progress. Honor explicit user/AGENTS requirements for additional approval gates.
 
-Before yielding or finishing, check every remaining step: execute any step that is ready, and launch the required review yourself when its artifact is ready. Do not end with an offer to continue, ask whether to run the next required step, or rely on an automatic Stop hook. A running Plannotator session must be awaited in this turn until it exits.
+Before finishing, execute any independent ready step. When the review artifact is ready, submit it through Plannotator Inbox, notify the user, and end the turn without waiting for a decision.
 
 ## Task directory
 

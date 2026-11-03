@@ -6,4 +6,4 @@ Read the latest saved report before updating it. Reconcile concurrent edits and 
 
 For a hosted destination, drafting and user review alone do not authorize publication. Show the exact content/destination and obtain any missing write approval, honor existing authorization, then read back saved content and identity. After a timeout, reconcile current content before retrying. Report local/unpublished drafts separately from confirmed hosted updates.
 
-On a revision, summarize material changes and present the updated report, not merely a progress note. Immediately continue to [review and refine](review-report.md) and launch Plannotator yourself; presenting or saving the report does not complete this step.
+On a revision, summarize material changes and present the updated report, not merely a progress note. Immediately continue to [review and refine](review-report.md) and submit the review through Plannotator Inbox, notify the user, and end the turn.
