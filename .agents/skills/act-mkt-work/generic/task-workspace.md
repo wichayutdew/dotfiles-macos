@@ -10,11 +10,11 @@ Every repository needing changes gets a `primary` or `editable` branch worktree.
 
 ## Manifest and preparation
 
-Save the initial approved JSON manifest outside the new task root (for example beside the reviewed plan), leaving only discovery clones in `.sources` before first preparation, and invoke the helper by absolute path:
+Establish `<root>/.artifacts/` during intake and save the plan, initial JSON manifest and supporting files there. Before preparation, only `.artifacts`, `.task-context.json`, and discovery clones in `.sources` may exist in the task root. An existing `.artifacts` directory requires a `.task-context.json` whose `workspace` launch directory, work ID, work ID source and root match the manifest; never adopt an unidentified directory. Save any externally required review copy separately, and invoke the helper by absolute path:
 
 ```bash
-python3 /absolute/skill/scripts/task-workspace.py /absolute/workspace-manifest.json
-python3 /absolute/skill/scripts/task-workspace.py /absolute/workspace-manifest.json --check
+python3 /absolute/skill/scripts/task-workspace.py /absolute/task-root/.artifacts/workspace-manifest.json
+python3 /absolute/skill/scripts/task-workspace.py /absolute/task-root/.artifacts/workspace-manifest.json --check
 ```
 
 Example shape (replace example identities/revisions with verified values):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Track workflow-created Git resources and delete them on explicit cleanup."""
 import argparse
+from contextlib import ExitStack
 import fcntl
 import json
 import os
@@ -112,6 +113,82 @@ def preflight(entries):
     return ordered
 
 
+def index_path():
+    return Path(os.environ.get("ACT_MKT_CLEANUP_INDEX", str(Path.home() / ".local/state/act-mkt/task-ledgers.json"))).expanduser().resolve()
+
+
+def index_ledger(ledger):
+    index = index_path()
+    index.parent.mkdir(parents=True, exist_ok=True)
+    with index.with_suffix(index.suffix + ".lock").open("a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        data = json.loads(index.read_text()) if index.exists() else {"version": 1, "ledgers": []}
+        if data.get("version") != 1 or not isinstance(data.get("ledgers"), list):
+            raise ValueError("unsupported cleanup index")
+        if str(ledger) not in data["ledgers"]:
+            data["ledgers"].append(str(ledger))
+            descriptor, temporary = tempfile.mkstemp(dir=index.parent, prefix=".index-")
+            try:
+                with os.fdopen(descriptor, "w") as output:
+                    json.dump(data, output, indent=2)
+                os.replace(temporary, index)
+            finally:
+                if os.path.exists(temporary):
+                    os.unlink(temporary)
+
+
+def all_ledgers(args, legacy):
+    index = index_path()
+    index.parent.mkdir(parents=True, exist_ok=True)
+    with index.with_suffix(index.suffix + ".lock").open("a") as index_lock:
+        fcntl.flock(index_lock, fcntl.LOCK_EX)
+        data = json.loads(index.read_text()) if index.exists() else {"version": 1, "ledgers": []}
+        if data.get("version") != 1 or not isinstance(data.get("ledgers"), list):
+            raise ValueError("unsupported cleanup index")
+        paths = sorted({legacy, *(Path(p) for p in data["ledgers"])})
+        records = {}
+        with ExitStack() as stack:
+            for ledger in paths:
+                if not ledger.exists():
+                    if ledger != legacy:
+                        raise ValueError(f"indexed cleanup ledger is missing: {ledger}")
+                    continue
+                if ledger.is_symlink():
+                    raise ValueError(f"symlink ledger: {ledger}")
+                lock = stack.enter_context(ledger.with_suffix(ledger.suffix + ".lock").open("a"))
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                item = json.loads(ledger.read_text())
+                if item.get("version") != 1 or not isinstance(item.get("resources"), list):
+                    raise ValueError("unsupported cleanup ledger")
+                records[ledger] = item["resources"]
+            entries = [entry for group in records.values() for entry in group]
+            if len({entry["path"] for entry in entries}) != len(entries):
+                raise ValueError("resource appears in multiple cleanup ledgers")
+            if args.command == "list":
+                return {"ledgers": [str(p) for p in records], "resources": entries}
+            if any(ledger.is_relative_to(Path(entry["path"])) for ledger in records for entry in entries):
+                raise ValueError("cleanup ledger must live outside resources being deleted")
+            ordered = preflight(entries)
+            deleted = []
+            if args.apply:
+                for entry in ordered:
+                    validate(entry)
+                    if entry["kind"] == "worktree":
+                        subprocess.run(["git", "--git-dir", entry["commonDir"], "worktree", "remove", "--force", entry["path"]], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    else:
+                        shutil.rmtree(entry["path"])
+                    deleted.append(entry["path"])
+                    for ledger, group in records.items():
+                        if entry in group:
+                            group.remove(entry)
+                            save(ledger, group)
+                            break
+                for ledger, group in records.items():
+                    save(ledger, [entry for entry in group if Path(entry["path"]).exists()])
+            return {"ledgers": [str(p) for p in records], "dryRun": not args.apply,
+                    "wouldDelete": [entry["path"] for entry in ordered], "deleted": deleted}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, default=Path(os.environ.get(
@@ -126,6 +203,13 @@ def main():
     clean.add_argument("--apply", action="store_true")
     args = parser.parse_args()
     ledger = args.ledger.expanduser().resolve()
+    default_selection = "ACT_MKT_CLEANUP_LEDGER" not in os.environ and not any(arg == "--ledger" or arg.startswith("--ledger=") for arg in sys.argv[1:])
+    if default_selection and args.command in ("list", "clean"):
+        legacy = Path(os.environ.get("ACT_MKT_CLEANUP_LEGACY_LEDGER", str(ledger))).expanduser().resolve()
+        print(json.dumps(all_ledgers(args, legacy), indent=2))
+        return
+    if args.command == "register" and os.environ.get("ACT_MKT_REGISTER_LEDGER") == "1":
+        index_ledger(ledger)
     ledger.parent.mkdir(parents=True, exist_ok=True)
     # Shared across skill copies and concurrent workers; never truncate the lock file.
     with ledger.with_suffix(ledger.suffix + ".lock").open("a") as lock:

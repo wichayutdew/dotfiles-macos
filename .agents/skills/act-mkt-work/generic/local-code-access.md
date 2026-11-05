@@ -34,4 +34,4 @@ Start with `rg --files` to discover paths, then use `rg -n` for content. Narrow 
 
 - Record every repo used as evidence: url, `dir`, searched SHA.
 - Clones made for inspection are read-only: never commit, push, stash, reset or clean them.
-- New clones and side worktrees are automatically registered in the shared cleanup ledger. Keep them until the user requests cleanup; then follow [Workspace cleanup](cleanup.md). Existing reused checkouts are not enrolled.
+- New clones and side worktrees are automatically registered in the task cleanup ledger. Keep them until the user requests cleanup; then follow [Workspace cleanup](cleanup.md). Existing reused checkouts are not enrolled.

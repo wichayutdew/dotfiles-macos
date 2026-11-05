@@ -22,6 +22,10 @@ Apply this format to plans, reports, reviews, replies and chat responses:
 
 This package includes its own [local code access](generic/local-code-access.md), [host CLI](generic/host-cli.md), and [cleanup script and instructions](generic/cleanup.md); no sibling skill installation is required. Track every newly created clone/worktree. When the user says “clean everything up”, take the cleanup-only route and delete all tracked local resources, including recent clones, using the shipped cleanup helper. Carry the cleanup ledger path in every checkpoint; do not enroll reused existing checkouts.
 
+## Task artifact location
+
+Recover the preceding work task’s absolute root before writing any files; do not create a second root. Keep all task-specific plans, manifests, references, evidence, reports, scratch files, review actions and cleanup records under `<root>/.artifacts/`, and repository checkouts under `<root>`. Use the inherited `cleanupLedger` in every worker; for a new task-local ledger also set `ACT_MKT_REGISTER_LEDGER=1`. Record the root and ledger in the task checkpoint and reuse them on continuation. Never place task files beside the task root. A user-specified canonical destination or an instruction requiring an external review copy remains authoritative; record it and keep a local copy in the root. Do not move existing tasks or override their recorded paths.
+
 ## Workflow direction
 
 Treat the invoking request and later user steering as the authoritative review-comment request. This skill follows `act-mkt-work` creating the PR/MR in the same session. First recover that work task's canonical `<root>/.task-context.json` checkpoint and [workspace manifest](generic/task-workspace.md): absolute task root, repository paths, source branches/heads, review URLs, dirty baselines, cleanup ledger and completed publication IDs. Reuse that same directory and its worktrees even when this skill is invoked from another directory. The launch directory is not repository or review identity evidence; do not create another task root or choose an unrelated checkout.

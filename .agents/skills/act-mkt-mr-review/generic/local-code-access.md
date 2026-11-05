@@ -4,7 +4,7 @@ Inspect code only in local Git clones searched with `rg`. Do not use Sourcegraph
 
 ## Location
 
-- `<root>` is set by the calling skill: work uses `workspace.root`; mr-review uses `~/repositories/mr-review`; other workflows use a dedicated task directory under `~/repositories/<skill-name>/<task-id>/`. Reuse an already bound checkout without syncing it when its branch/revision must stay unchanged.
+- `<root>` is set by the calling skill: work uses `workspace.root`; mr-review uses `<root>/.sources`; other workflows use a dedicated task directory under `~/repositories/<skill-name>/<task-id>/`. Reuse an already bound checkout without syncing it when its branch/revision must stay unchanged.
 - `<repo-name>` = last segment of the remote project path (`.../act-mkt.git` → `act-mkt`). If two needed repos share a name, use `<group>__<repo>`.
 - `<dir>` = `<root>/<repo-name>`.
 
@@ -34,4 +34,4 @@ Start with `rg --files` to discover paths, then use `rg -n` for content. Narrow 
 
 - Record every repo used as evidence: url, `dir`, searched SHA.
 - Clones made for inspection are read-only: never commit, push, stash, reset or clean them.
-- New clones and side worktrees are automatically registered in the shared cleanup ledger. Keep them until the user requests cleanup; then follow [Workspace cleanup](cleanup.md). Existing reused checkouts are not enrolled.
+- New clones and side worktrees are automatically registered in the task cleanup ledger. Keep them until the user requests cleanup; then follow [Workspace cleanup](cleanup.md). Existing reused checkouts are not enrolled.

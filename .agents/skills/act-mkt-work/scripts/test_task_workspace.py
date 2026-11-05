@@ -55,6 +55,68 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn(result.returncode,(3,10),result.stderr)
         return result
 
+    def test_early_artifacts_and_local_ledger(self):
+        self.repository('service')
+        root = Path(self.manifest['workspace']['root'])
+        (root / '.artifacts').mkdir(parents=True)
+        (root / '.artifacts' / 'plan.md').write_text('plan')
+        (root / '.task-context.json').write_text(json.dumps({'workspace': self.manifest['workspace']}))
+        self.env.pop('ACT_MKT_CLEANUP_LEDGER')
+        self.env['ACT_MKT_CLEANUP_INDEX'] = str(self.path / 'index.json')
+        self.env['ACT_MKT_CLEANUP_LEGACY_LEDGER'] = str(self.path / 'legacy.json')
+        result = self.invoke()
+        self.assertEqual(result['cleanupLedger'], str(root / '.artifacts' / 'cleanup-ledger.json'))
+        self.assertEqual((root / '.artifacts' / 'plan.md').read_text(), 'plan')
+        self.assertTrue((root / '.artifacts' / 'cleanup-ledger.json.lock').exists())
+        self.invoke('--check')
+        cleanup = self.run_command(sys.executable, SCRIPT.with_name('cleanup-workspaces.py'), 'clean', '--all', '--apply', check=False)
+        self.assertEqual(cleanup.returncode, 0, cleanup.stderr)
+        self.assertFalse(Path(result['repositories'][0]['cwd']).exists())
+
+    def test_global_cleanup_preflights_all_indexed_ledgers(self):
+        self.env['ACT_MKT_CLEANUP_INDEX'] = str(self.path / 'index.json')
+        self.env['ACT_MKT_CLEANUP_LEGACY_LEDGER'] = str(self.path / 'legacy.json')
+        self.env.pop('ACT_MKT_CLEANUP_LEDGER')
+        _, one = self.repository('first')
+        first = self.invoke()
+        self.manifest['workspace'].update(workId='second-task', root=str(self.launch / 'second-task'))
+        self.manifest['repositories'] = []
+        _, two = self.repository('second')
+        second = self.invoke()
+        marker = Path(self.git(two['cwd'], 'rev-parse', '--absolute-git-dir')) / 'act-mkt-cleanup-token'
+        token = marker.read_text()
+        marker.write_text('changed')
+        helper = SCRIPT.with_name('cleanup-workspaces.py')
+        blocked = self.run_command(sys.executable, helper, 'clean', '--all', '--apply', check=False)
+        self.assertNotEqual(blocked.returncode, 0)
+        self.assertTrue(Path(one['cwd']).exists())
+        self.assertTrue(Path(two['cwd']).exists())
+        marker.write_text(token)
+        self.run_command(sys.executable, helper, 'clean', '--all', '--apply')
+        self.assertFalse(Path(one['cwd']).exists())
+        self.assertFalse(Path(two['cwd']).exists())
+        self.assertTrue(Path(first['cleanupLedger']).exists())
+        self.assertTrue(Path(second['cleanupLedger']).exists())
+
+    def test_unidentified_artifacts_are_not_adopted(self):
+        _, spec = self.repository('service')
+        root = Path(self.manifest['workspace']['root'])
+        (root / '.artifacts').mkdir(parents=True)
+        (root / '.artifacts' / 'plan.md').write_text('unrelated')
+        self.invoke(success=False)
+        self.assertFalse(Path(spec['cwd']).exists())
+        (root / '.task-context.json').write_text(json.dumps({'workspace': {'root': '/other'}}))
+        self.invoke(success=False)
+        self.assertEqual((root / '.artifacts' / 'plan.md').read_text(), 'unrelated')
+
+    def test_symlink_artifact_directory_is_rejected(self):
+        _, spec = self.repository('service')
+        root = Path(self.manifest['workspace']['root'])
+        root.mkdir()
+        (root / '.artifacts').symlink_to(self.path, target_is_directory=True)
+        self.invoke(success=False)
+        self.assertFalse(Path(spec['cwd']).exists())
+
     def test_multi_repo_from_other_cwd_and_missing_backing(self):
         source,one=self.repository('service')
         _,two=self.repository('client',checkout=False,role='editable')
@@ -205,9 +267,9 @@ class WorkspaceTests(unittest.TestCase):
         self.invoke('--check',success=False)
         self.assertFalse((self.path/'other-ledger.json').exists())
 
-    def test_ledger_cannot_live_in_owned_workspace(self):
+    def test_ledger_cannot_live_in_owned_checkout(self):
         _,spec=self.repository('service',checkout=False)
-        self.env['ACT_MKT_CLEANUP_LEDGER']=str(Path(self.manifest['workspace']['root'])/'ledger.json')
+        self.env['ACT_MKT_CLEANUP_LEDGER']=str(Path(spec['cwd'])/'ledger.json')
         self.invoke(success=False)
         self.assertFalse(Path(self.manifest['workspace']['root']).exists())
 

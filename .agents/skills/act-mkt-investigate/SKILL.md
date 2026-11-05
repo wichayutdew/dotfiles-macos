@@ -32,6 +32,10 @@ Before finishing, execute any independent ready step. When the review artifact i
 
 Every new investigation creates a ticket-ID-plus-description directory (description only without a ticket) under the captured invocation directory. Follow [task directory](generic/task-directory.md) during intake; persist the plan, local report and `.task-context.json` there. Revisions reuse the absolute root. A later `act-mkt-breakdown` request inherits that directory and adds its own plan/draft without replacing investigation artifacts. Explicit canonical report destinations remain authoritative.
 
+## Task artifact location
+
+For a new task, establish one absolute task root before writing any files. Keep all task-specific plans, manifests, references, evidence, reports, scratch files, review actions and cleanup records inside `<root>` (the existing investigation plan, report and context remain at the root), and repository checkouts under `<root>`. Set `ACT_MKT_CLEANUP_LEDGER=<root>/.artifacts/cleanup-ledger.json` and `ACT_MKT_REGISTER_LEDGER=1` in every worker that creates resources. Record the root and ledger in the task checkpoint and reuse them on continuation. Never place task files beside the task root. A user-specified canonical destination or an instruction requiring an external review copy remains authoritative; record it and keep a local copy in the root. Do not move existing tasks or override their recorded paths.
+
 ## Workflow
 
 | Step | Instructions | Next |

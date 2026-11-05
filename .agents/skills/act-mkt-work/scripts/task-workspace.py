@@ -264,22 +264,40 @@ def prepare(manifest, check):
                   (recorded_ledger, supplied_ledger, environment_ledger) if value]
     if len(set(candidates)) > 1:
         raise Unsafe('cleanup ledger conflicts with the recorded workspace; no implicit ledger migration')
-    ledger = candidates[0] if candidates else str(Path.home()/'.local/state/act-mkt/workspaces.json')
+    ledger = candidates[0] if candidates else str(root/'.artifacts'/'cleanup-ledger.json')
     ledger_path = absolute(ledger,'cleanupLedger')
-    resources = [root] + [backing(root,spec) for spec in repos]
+    resources = [Path(spec['cwd']) for spec in repos] + [backing(root,spec) for spec in repos]
     if any(ledger_path == resource or resource in ledger_path.parents for resource in resources):
         raise Unsafe('cleanup ledger must live outside task resources')
     GIT_ENV['ACT_MKT_CLEANUP_LEDGER'] = ledger
+    if ledger_path == root/'.artifacts'/'cleanup-ledger.json':
+        GIT_ENV['ACT_MKT_REGISTER_LEDGER'] = '1'
     preflight(root, repos, check)
     if check:
         result = dict(manifest, repositories=[verify_target(root,spec) for spec in repos], cleanupLedger=ledger)
         return result
     if root.exists() and not known:
         # Discovery clones are deliberately separated from final worktree paths.
-        unexpected = {p.name for p in root.iterdir()} - {'.sources'}
+        unexpected = {p.name for p in root.iterdir()} - {'.sources', '.artifacts', '.task-context.json'}
         if unexpected:
             raise Unsafe(f'workspace directory already contains unbound paths: {root}')
+        context = root / '.task-context.json'
+        if context.is_symlink() or (context.exists() and not context.is_file()):
+            raise Unsafe(f'unsafe task context: {context}')
+        if (root / '.artifacts').exists():
+            if not context.is_file():
+                raise Unsafe('existing artifacts require a task context identifying this workspace')
+            context_data = json.loads(context.read_text())
+            existing_workspace = context_data.get('workspace') if isinstance(context_data, dict) else None
+            if not isinstance(existing_workspace, dict) or any(
+                existing_workspace.get(key) != manifest['workspace'].get(key)
+                for key in ('launchDirectory', 'workId', 'workIdSource', 'root')
+            ):
+                raise Unsafe('task context does not identify the requested workspace')
     root.mkdir(exist_ok=True)
+    artifacts = root / '.artifacts'
+    if artifacts.is_symlink() or (artifacts.exists() and not artifacts.is_dir()):
+        raise Unsafe(f'unsafe artifact directory: {artifacts}')
     lock_path = root / '.task-workspace.lock'
     if lock_path.is_symlink():
         raise Unsafe(f'symlink workspace lock: {lock_path}')
