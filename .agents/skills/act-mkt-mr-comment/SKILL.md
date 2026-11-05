@@ -24,6 +24,8 @@ This package includes its own [local code access](generic/local-code-access.md),
 
 ## Task artifact location
 
+Immediately after creating a new, empty task root, run `python3 /absolute/skill/scripts/cleanup-workspaces.py register-root <absolute-root>` before creating task artifacts or repositories. This creates the owned task ledger and registers the root even when no Git repository is needed. A continuation reuses its recorded root and must not register it as new. On an explicit cleanup request, use the cleanup helper to remove the complete owned task root, including all artifacts.
+
 Recover the preceding work task’s absolute root before writing any files; do not create a second root. Keep all task-specific plans, manifests, references, evidence, reports, scratch files, review actions and cleanup records under `<root>/.artifacts/`, and repository checkouts under `<root>`. Use the inherited `cleanupLedger` in every worker; for a new task-local ledger also set `ACT_MKT_REGISTER_LEDGER=1`. Record the root and ledger in the task checkpoint and reuse them on continuation. Never place task files beside the task root. A user-specified canonical destination or an instruction requiring an external review copy remains authoritative; record it and keep a local copy in the root. Do not move existing tasks or override their recorded paths.
 
 ## Workflow direction

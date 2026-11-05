@@ -34,6 +34,8 @@ Every new investigation creates a ticket-ID-plus-description directory (descript
 
 ## Task artifact location
 
+Immediately after creating a new, empty task root, run `python3 /absolute/skill/scripts/cleanup-workspaces.py register-root <absolute-root>` before creating task artifacts or repositories. This creates the owned task ledger and registers the root even when no Git repository is needed. A continuation reuses its recorded root and must not register it as new. On an explicit cleanup request, use the cleanup helper to remove the complete owned task root, including all artifacts.
+
 For a new task, establish one absolute task root before writing any files. Keep all task-specific plans, manifests, references, evidence, reports, scratch files, review actions and cleanup records inside `<root>` (the existing investigation plan, report and context remain at the root), and repository checkouts under `<root>`. Set `ACT_MKT_CLEANUP_LEDGER=<root>/.artifacts/cleanup-ledger.json` and `ACT_MKT_REGISTER_LEDGER=1` in every worker that creates resources. Record the root and ledger in the task checkpoint and reuse them on continuation. Never place task files beside the task root. A user-specified canonical destination or an instruction requiring an external review copy remains authoritative; record it and keep a local copy in the root. Do not move existing tasks or override their recorded paths.
 
 ## Workflow

@@ -21,6 +21,8 @@ class WorkspaceTests(unittest.TestCase):
         self.ledger = self.path / 'ledger.json'
         self.env = dict(os.environ, ACT_MKT_CLEANUP_LEDGER=str(self.ledger), GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null', GIT_AUTHOR_NAME='Fixture', GIT_AUTHOR_EMAIL='fixture@example.test', GIT_COMMITTER_NAME='Fixture', GIT_COMMITTER_EMAIL='fixture@example.test')
         self.manifest = {'workspace': {'launchDirectory':str(self.launch), 'workId':'ACTB-3022', 'workIdSource':'tracker', 'root':str(self.launch / 'ACTB-3022')}, 'repositories':[]}
+        self.env['ACT_MKT_CLEANUP_INDEX'] = str(self.path / 'index.json')
+        self.env['ACT_MKT_CLEANUP_LEGACY_LEDGER'] = str(self.path / 'legacy.json')
         self.file = self.path / 'manifest.json'
 
     def run_command(self, *args, cwd=None, check=True):
@@ -95,8 +97,8 @@ class WorkspaceTests(unittest.TestCase):
         self.run_command(sys.executable, helper, 'clean', '--all', '--apply')
         self.assertFalse(Path(one['cwd']).exists())
         self.assertFalse(Path(two['cwd']).exists())
-        self.assertTrue(Path(first['cleanupLedger']).exists())
-        self.assertTrue(Path(second['cleanupLedger']).exists())
+        self.assertFalse(Path(first['cleanupLedger']).exists())
+        self.assertFalse(Path(second['cleanupLedger']).exists())
 
     def test_unidentified_artifacts_are_not_adopted(self):
         _, spec = self.repository('service')

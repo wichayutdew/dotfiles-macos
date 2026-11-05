@@ -294,7 +294,10 @@ def prepare(manifest, check):
                 for key in ('launchDirectory', 'workId', 'workIdSource', 'root')
             ):
                 raise Unsafe('task context does not identify the requested workspace')
+    new_root = not root.exists()
     root.mkdir(exist_ok=True)
+    if new_root and ledger_path == root/'.artifacts'/'cleanup-ledger.json':
+        command(sys.executable, Path(__file__).with_name('cleanup-workspaces.py'), 'register-root', root)
     artifacts = root / '.artifacts'
     if artifacts.is_symlink() or (artifacts.exists() and not artifacts.is_dir()):
         raise Unsafe(f'unsafe artifact directory: {artifacts}')
