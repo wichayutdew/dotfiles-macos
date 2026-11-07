@@ -34,6 +34,8 @@ Treat the invoking request and later user steering as the authoritative work req
 
 Execute the linked lifecycle stages in order and automatically; within implementation, schedule independent tasks concurrently using this skill’s execution policy below. Carry the invoking request and complete source evidence forward using the continuation contract below. After each stage, immediately dispatch its declared outcome route without returning control to the user. `gaps` and `handoff` follow their declared recovery routes automatically.
 
+Before PR/MR handoff, require local manual testing of the happy path and 1–2 relevant edge cases, A/B comparison captures for experiments, and reviewer-accessible proof in the permitted description region. [Verify](workflows/verify.md) produces this evidence; [publish](workflows/publish-remote.md) gates delivery on it alongside required CI.
+
 Collect known user decisions, required authorizations and publication choices in the complete plan-review gate below. After approval, continue every authorized route without routine reconfirmation. If a new material decision or required user action prevents dependent work, raise only that item through the applicable review or clarification route and continue independent approved work. Preserve explicit user exceptions within their stated scope; changed assumptions follow the recovery contract below.
 
 A `blocked` outcome is terminal only when safe continuation is impossible: report the factual blocker, never bypass required evidence, access, authority, or safety checks. Report recoverable stale evidence through the declared recovery route instead.

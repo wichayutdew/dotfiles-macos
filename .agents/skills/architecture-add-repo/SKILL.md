@@ -1,78 +1,76 @@
 ---
 name: architecture-add-repo
 description: |
-  Manage repositories in this multi-repo workspace using the bare-clone + worktree strategy.
-  Use this skill whenever the user wants to add a new repo, remove a repo, check repo status,
-  update repos, or clean up incorrectly cloned repositories. Also trigger when you detect a need
-  to clone or add a repository to the workspace — never run raw git clone into repos/ or repo-cache/
-  without this skill.
+  Use when adding or removing workspace repositories, checking repository status,
+  updating managed checkouts, or repairing incorrectly cloned repositories.
 user-invocable: true
 ---
 
-# Repo Management
+# Repository Management
 
-This workspace uses **bare-clone + worktree** — not regular git clones.
+Use the scripts shipped with this skill. `repos.conf` owns membership;
+`repo-cache/<name>.git` holds the bare Git store and `repos/<name>` is its worktree.
+Never clone directly into these directories or delete them with `rm -rf`.
 
-```
-repo-cache/<name>.git   (bare clone, shared object store)
-    └── worktree →  repos/<name>   (working directory)
-```
+Run from the workspace containing `repos.conf`, or set
+`ARCHITECTURE_WORKSPACE_ROOT` to its absolute path. `SKILL_ROOT` below is the
+installed directory containing this `SKILL.md`. Scripts require Python 3.9 or later and Git
+on Linux or macOS. They do not read or write delegation state or profile settings.
 
-- `repos.conf` — source of truth for which repos belong
-- Both `repos/` and `repo-cache/` are gitignored
-
-**Never run `git clone` directly into `repos/` or `repo-cache/`.** Always run the scripts shipped with this skill: `bash "${SKILL_ROOT}/scripts/add-repo.sh" ...`. Do not assume the project has `./scripts/add-repo.sh` at its root.
-
-Run from the **multi-repo workspace root** (directory containing `repos.conf`), or set `ARCHITECTURE_WORKSPACE_ROOT` to that directory when invoking the scripts.
-
-## Add a Repo
+## Add a Repository
 
 ```bash
 bash "${SKILL_ROOT}/scripts/add-repo.sh" <git-url> [directory-name] [branch]
 ```
 
-The repo will be added to `repos.conf` automatically. To update the workspace documentation with the new repo, run the `architecture-generate-architecture-docs` skill in workspace mode.
+The script creates a bare cache and worktree before registering the repository.
+An existing matching worktree is preserved. Conflicting manifest rows, origins,
+branches, unmanaged clones, unsafe names, and symlinked managed paths are refused.
+Use HTTPS URLs without embedded credentials in the workspace manifest.
 
-## Remove a Repo
+## Remove a Repository
 
-```bash
-git -C repo-cache/<name>.git worktree remove repos/<name>
-rm -rf repo-cache/<name>.git   # optional: remove bare cache
-```
-
-Then delete the entry from `repos.conf`. To update the workspace documentation after removal, run the `architecture-generate-architecture-docs` skill in workspace mode.
-
-## Status / Pull / Init
+Preserve local work first. Remove the named checkout and manifest entry with:
 
 ```bash
-bash "${SKILL_ROOT}/scripts/init.sh" --status   # branch + changes per repo
-bash "${SKILL_ROOT}/scripts/init.sh" --pull     # fetch + pull all
-bash "${SKILL_ROOT}/scripts/init.sh"             # set up missing repos from repos.conf
-bash "${SKILL_ROOT}/scripts/init.sh" --clean    # wipe and re-clone everything
+bash "${SKILL_ROOT}/scripts/remove-repo.sh" <directory-name>
 ```
 
-## Clean Up Unexpected Clones
+The cache is retained by default. When removal of that exact cache is authorized:
 
-A correct repo has `.git` as a **file** (worktree pointer). A plain clone has `.git` as a **directory**.
-
-**Detect problems:**
 ```bash
-for dir in repos/*/; do
-  name=$(basename "$dir")
-  if [ -d "$dir/.git" ]; then echo "PLAIN CLONE: $name"
-  elif [ -f "$dir/.git" ]; then echo "OK: $name"
-  fi
-done
-# Also check for repos not in repos.conf
-for dir in repos/*/; do
-  name=$(basename "$dir")
-  grep -q "^${name}\b" repos.conf 2>/dev/null || echo "UNLISTED: $name"
-done
+bash "${SKILL_ROOT}/scripts/remove-repo.sh" <directory-name> --remove-cache
 ```
 
-**Fix a plain clone:**
-1. Check for uncommitted changes: `git -C repos/<name> status --short`
-2. Get remote URL: `git -C repos/<name> remote get-url origin`
-3. Get branch: `git -C repos/<name> branch --show-current`
-4. Remove: `rm -rf repos/<name>`
-5. Re-add: `bash "${SKILL_ROOT}/scripts/add-repo.sh" <url> <name> [branch]`
+Removal refuses dirty or ignored files, unpushed commits, locked or stale worktrees,
+hidden index flags (assume-unchanged or skip-worktree), foreign origins, and caches used by any other worktree. Cache deletion also checks
+local branch, tag, stash, and note tips against freshly fetched remote history.
+A fetch failure refuses removal. Resolve the reported condition and rerun the
+same command; do not bypass checks with force or manual deletion. These Git
+checks do not prove an agent has stopped: stop any owner and its tools before
+requesting removal.
+
+## Status, Pull, and Setup
+
+```bash
+bash "${SKILL_ROOT}/scripts/init.sh" --status
+bash "${SKILL_ROOT}/scripts/init.sh" --pull
+bash "${SKILL_ROOT}/scripts/init.sh"
+```
+
+Setup reads `repos.conf` and creates missing repositories. Pull refuses local
+changes and uses fast-forward updates. Add `--no-check` to skip the shipped
+post-pull hook. Failures return a nonzero exit code. Bulk `--clean` is disabled;
+remove individually named repositories after preserving their work.
+
+## Repair Unexpected Clones
+
+A managed worktree has a `.git` file; a plain clone has a `.git` directory.
+Check `git -C repos/<name> status --short`, its origin, branch, and unpushed work.
+Preserve the unexpected clone outside managed directories before running add.
+The scripts refuse to replace it automatically.
+
+After membership changes, refresh architecture docs with
+`architecture-generate-architecture-docs` in workspace mode. Refresh repository
+search metadata with `python3 scripts/repo-map.py refresh` when available; it uses
+live GitLab metadata. The map remains a discovery hint, never a search boundary.

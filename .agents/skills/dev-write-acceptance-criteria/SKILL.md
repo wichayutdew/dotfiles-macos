@@ -15,6 +15,7 @@ Acceptance criteria (ACs) are pass/fail contracts for the story. They are not a 
 
 - **One AC = one observable outcome.** You can demo it. People may argue about *how* it's built, never about *whether* it passes.
 - **Independent.** If AC-2 fails, AC-1 still has a clear pass/fail result.
+- **Label matches `Then` 1-to-1.** If the bold AC label names an event, state, or ordering (e.g. `Visit precedes Seen/Reveal`), `Then` must assert every named item—or remove the unasserted item from the label.
 - **Given / When / Then is the default.** Each clause must be real:
   - **Given**: a start state a tester can set up (user on Activities home, empty search overlay, no booking context, city = Bangkok). Name a fixture or test data when the state depends on data.
   - **When**: one action (a click, a request, a pipeline run).
@@ -43,7 +44,9 @@ Besides the happy path, add an AC for each of these that applies:
 - **Invalid**: bad input, unsupported locale, unmapped ID.
 - **Error**: downstream fails or times out. Say what the user or caller sees.
 - **Don't break the sibling**: neighbouring sections, flows, or variants still behave as before.
-- **Non-functional**, only when measurable: "overlay renders in < 300 ms p95 on QA", "screen reader announces the section title".
+- **Non-functional**, only when measurable: e.g. "screen reader announces the section title".
+- **Latency / timing / deferral**: Never write `< X ms`, `after the deferral window`, or `eventually` without a clock anchor. State `T_start` (the exact call/event that starts the clock), `T_end` (the observable emission/response), the bound (`0 < T_end - T_start <= X ms`), and the test conditions in `Given` (e.g. mocked downstream latency `<= 50 ms`).
+- **Event ordering / gating (`A` before `B`)**: Whenever `B` is deferred behind or ordered after `A`, add an edge AC for **when `A` never fires** (e.g. API `500`, empty result, tab hidden) stating the hard deadline (`T_start + MaxDeadline`) by which `B` still executes (or is intentionally suppressed).
 
 ### 4. Experiments (A/B)
 
@@ -53,6 +56,8 @@ If the story *is* the experiment, the variant goes in the Given. Write separate 
 - **B**: the new behaviour.
 
 Never put both variants in one paragraph.
+
+- **Match AC scope to the code's blast radius, not just the bug report.** If a fix touches shared code that executes across multiple platforms or page-type families (e.g. Mobile `9000–9002` and Desktop/Tablet `9100–9102`), cover all affected platforms in `Given` rather than only the platform where the bug was reported.
 
 ### 5. What does not belong in an AC
 
@@ -77,6 +82,7 @@ Reject or rewrite any Then that contains:
 - "able to navigate correctly" without the destination URL or screen
 - "as agreed", "per the mapping", "documented", "consistent", "coherent"
 - placeholders: `X`, `TBD`, `<event>`, "the relevant field"
+- "after the deferral window", "eventually", or `< X ms` when unanchored by `T_start`/`T_end`
 
 If a value is genuinely unknown (event name not yet defined), the AC is not ready. Say so in the ticket rather than writing a placeholder.
 
@@ -104,6 +110,8 @@ For each AC:
 - [ ] When is a single action
 - [ ] Then is observable without reading code, with no phrase from rule 6
 - [ ] Pass/fail stays defined if any other AC fails
+- [ ] Label matches Then: no event, state, or ordering is named in the AC label unless Then asserts it
+- [ ] Time/ordering ACs are bounded: every latency or deferral AC defines T_start, T_end, <= MaxDeadline, test conditions in Given, and an edge AC for when the prerequisite event never fires
 
 For the set:
 
@@ -112,6 +120,7 @@ For the set:
 - [ ] Each experiment variant has its own AC
 - [ ] No process items, implementation details, or out-of-scope notes
 - [ ] ~8 ACs or fewer, or a split is proposed
+- [ ] Platform blast radius covered: if touched files run on multiple platforms or page-type families, ACs cover each affected surface
 
 ## Output Format
 

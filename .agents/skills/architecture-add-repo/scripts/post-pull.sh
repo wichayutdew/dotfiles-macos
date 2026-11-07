@@ -6,7 +6,4 @@
 
 set -euo pipefail
 
-echo ""
-echo "=== Post-pull checks ==="
-echo "No post-pull checks are currently configured."
-echo "=== Post-pull checks complete ==="
+exec python3 "$(dirname "${BASH_SOURCE[0]}")/repositories.py" post-pull "$@"
