@@ -111,7 +111,7 @@
         "https://mcp.linear.app/mcp"
       ]
     },
-    "ag-activities-agent-memory": {
+    "agent-memory": {
       "url": "${HINDSIGHT_URL}"
     }
   }
