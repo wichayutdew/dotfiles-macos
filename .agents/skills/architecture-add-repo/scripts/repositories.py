@@ -9,6 +9,7 @@ import shlex
 import shutil
 import subprocess
 import sys
+from urllib.parse import urlsplit
 
 
 def git(directory, *args):
@@ -76,11 +77,27 @@ def verify_worktree(target, cache):
         raise ValueError('Worktree belongs to another cache')
 
 
-def add(root, url, name, branch=None):
-    requested_branch = branch
-    target, cache = paths(root, name)
+def normalize_url(url, allow_ssh=False):
     if not url or url.startswith('-') or any(c.isspace() or c in "#'\"" for c in url):
         raise ValueError('Invalid repository URL')
+    if url.lower().startswith('https://'):
+        parsed = urlsplit(url)
+        if parsed.username is not None or parsed.password is not None:
+            raise ValueError('HTTPS repository URLs must not contain embedded credentials')
+    if not allow_ssh:
+        for prefix in ('git@gitlab.agodadev.io:', 'ssh://git@gitlab.agodadev.io/'):
+            if url.startswith(prefix):
+                return 'https://gitlab.agodadev.io/' + url[len(prefix):]
+        if (url.lower().startswith(('ssh://', 'git+ssh://', 'ssh+git://')) or
+                re.match(r'[^/:]+:(?!//)', url)):
+            raise ValueError('SSH repository URLs require explicit --ssh opt-in')
+    return url
+
+
+def add(root, url, name, branch=None, *, allow_ssh=False):
+    url = normalize_url(url, allow_ssh)
+    requested_branch = branch
+    target, cache = paths(root, name)
     if branch:
         git(root, 'check-ref-format', '--branch', branch)
     rows = manifest(root)
@@ -174,7 +191,8 @@ def initialize(root, mode, no_check):
                       ' changes=' + str(len(git(target, 'status', '--short').splitlines()))) if target.exists() else 'not set up'
             print(f'{name}: {status}')
         else:
-            add(root, url, name, branch[0] if branch else None)
+            # Manifest URLs retain the transport chosen when they were registered.
+            add(root, url, name, branch[0] if branch else None, allow_ssh=True)
             if mode == '--pull':
                 if git(target, 'status', '--porcelain'):
                     raise ValueError(f'{name} has local changes; pull refused')
@@ -198,6 +216,8 @@ def main():
     add_parser.add_argument('url')
     add_parser.add_argument('name', nargs='?')
     add_parser.add_argument('branch', nargs='?')
+    add_parser.add_argument('--ssh', action='store_true',
+                            help='Preserve an SSH URL instead of defaulting to HTTPS')
     remove_parser = commands.add_parser('remove')
     remove_parser.add_argument('name')
     remove_parser.add_argument('--remove-cache', action='store_true')
@@ -216,7 +236,8 @@ def main():
     with (root / '.architecture-repos.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if args.command == 'add':
-            add(root, args.url, args.name or args.url.rstrip('/').split('/')[-1].removesuffix('.git'), args.branch)
+            add(root, args.url, args.name or args.url.rstrip('/').split('/')[-1].removesuffix('.git'),
+                args.branch, allow_ssh=args.ssh)
         elif args.command == 'remove':
             remove(root, args.name, args.remove_cache)
         else:

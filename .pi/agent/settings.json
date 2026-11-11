@@ -27,7 +27,5 @@
   "quietStartup": false,
   "outputPad": 1,
   "theme": "system",
-  "extensions": [
-    "/Users/wphongphanpa/.hindsight/coding-agents/dist/pi.js"
-  ]
+  "extensions": []
 }

@@ -14,6 +14,11 @@ $ARGUMENTS
 ## Load Skills
 
 - `dev-create-merge-request`
+- `dev-code-review`
+- `dev-mr-babysit`
+
+Load `dev-peer-review` only inside the separately spawned Step 7 reviewer. The
+parent must not load or execute that skill inline.
 
 ## Steps to follow
 
@@ -138,12 +143,14 @@ If the worker reports `blocked` (often a genuine external blocker, e.g. missing 
    ```
 3. Tell the user the resume path: once the blocker is cleared, re-invoke `/dev-implement-ticket [jira-id]` for the same ticket. On re-invoke, Step 1's resume rule reads `implementation_progress/[jira-id].md`, skips `complete` phases, and resumes from this `blocked` phase, no full restart and no re-running `/dev-research-ticket`.
 
-### Step 4: Review the Branch
+### Step 4: Review the Branch with dev-code-review
 
 - Spawn a subagent with this spec to review the branch after implementation phases are complete: `Agent(skill="dev-code-review", args=<review-target>)`.
 - Treat `critical` and `high` findings as required fixes before moving forward.
 - Route required fixes back through a spawned `dev-full-stack-engineer` subagent and keep them within the approved implementation scope.
 - If review findings require plan changes or broader scope, stop and resolve that with the user before continuing.
+
+- Run `dev-code-review` first. Independent `dev-peer-review` follows in Step 7, after the MR URL exists; do not pass a branch name to the MR-only peer reviewer.
 
 ### Step 5: Run Automated Tests
 
@@ -159,7 +166,27 @@ If the worker reports `blocked` (often a genuine external blocker, e.g. missing 
 - In `auto` mode, invoke `dev-create-merge-request` immediately.
 - In `manual` mode, show the branch, target, final checks, commits, and planned `act-sdd` label, then wait for user approval before invoking `dev-create-merge-request`.
 - If manual approval is not granted, stop. The user can run `/dev-create-merge-request` later.
-- Return the MR URL when done.
+- Capture the MR URL and exact MR head SHA for Step 7. Creating the MR is not the final handoff.
+
+### Step 7: Independent Peer Review
+
+- After `dev-code-review` and automated checks pass and Step 6 returns an MR URL, spawn a **separate Agent**: `Agent(skill="dev-peer-review", args=<peer-review-handoff>)`. The parent must never substitute inline review, even for a small change or an unavailable subagent tool.
+- Use this skill's bundled `scripts/dispatch-peer-review.mjs` and the [dispatch contract](references/peer-review-dispatch.md) to wrap that actual Agent call. Pass the MR URL, exact fetched head SHA, absolute store root, actual parent native session ID, and runtime model/thinking effort. The helper supplies fresh dispatch context; the native adapter supplies the spawned child's actual session/run IDs and terminal status from the runtime, independently of reviewer output.
+- The reviewer resolves `dev-peer-review` from its own skill catalog (or an explicitly supplied absolute installed skill path), reads it there, and resolves **every dependency inside the child** before reviewing. Do not assume the child inherited loaded skills, the parent's cwd, or sibling installation paths. Missing skill, bundled resource, CLI, or native identity is `blocked`.
+- If Agent is unavailable, dispatch fails, dependencies cannot resolve, the child is not separate, or the native run does not complete, record `blocked` and **stop before review completion, labeling, or Step 8**. No inline fallback and no label or babysit invocation from this failure path.
+- Require the helper's stored-record gate to pass. It checks exact MR/head, completed verification, and dispatch/parent/child/run provenance against dispatcher-held native lifecycle context. A chat verdict, existing label, old standalone record, or arbitrary self-claimed provenance does not satisfy this gate.
+- Keep the peer skill's evidence-first review, local versioned record and `peer-reviewed::<model>--<thinking effort>` label gate. The child must refetch the MR head before labeling; a changed head makes the review stale. Missing child resources or identity must stop before labeling. Honor caller restrictions on GitLab writes.
+- Fix required findings within the approved scope, rerun affected checks, push, and repeat peer review on the new head before handoff. The peer reviewer automatically publishes its original summary and confirmed inline findings unless caller restrictions prohibit writes; existing-comment replies/resolution remain outside peer review.
+- Carry every explicit offline/read-only/draft-only/no-write request into the native child instructions alongside the unchanged dispatcher arguments; the child must suppress both publication and labeling. Retain the child's concise report and chat-only `Posted to MR` section from native completion. Include its status heading, reviewed SHA, counts, short actionable findings, material gaps, confirmed receipt-derived summary/inline content and links, publication outcomes and absolute record path in the actual parent chat reply, even if handoff is blocked. Do not expand it with full proof/command/rejected-hypothesis lists or return only JSON/`recordPath`.
+- Record the reviewed SHA, native child/run IDs, dispatch ID, findings, checks, review-record path, publication receipts/status and label status in implementation progress. If review/persistence or the gate fails, record the gap and stop; do not claim review complete.
+
+### Step 8: Hand Off to dev-mr-babysit
+
+- Refetch the MR head and call the retained Step 7 gate's `verifyCurrent` immediately before handoff. A changed MR/head, replaced/missing record, or missing live dispatcher context blocks handoff; dispatch a new separate review. A resumed parent must dispatch again rather than trusting provenance copied from progress or JSON.
+- Invoke `dev-mr-babysit` with the MR URL, reviewed head SHA, check evidence, outstanding findings and progress path in the current foreground session.
+- The babysit handoff explicitly invokes `dev-resolve-review-thread --aggressive` for proven in-scope fixes, tests and replies. Preserve every caller restriction: a read-only/draft-only/no-write handoff must stop with passive drafts or blocked status and must never become mutation authorization. Aggressive selection needs no per-comment reconfirmation; independently refetch the head/ownership before each effect. Neither mode toggles discussion resolution.
+- Babysit now owns the bounded resolve -> scoped commit/push -> exact-head CI loop. Preserve its original deadline/counters on every return. If it changes the head, rerun Step 7's separate-Agent review and gate before claiming current-head reviewed readiness. Event subscription expiry alone cannot enforce a deadline; unsupported bounded waiting blocks handoff continuation.
+- Return the MR URL, pipeline/review state, drafts and any remaining blockers. Do not report ready-to-merge while required checks or reviews remain outstanding.
 
 
 **CRITICAL**: If you find conflicting information between implementation plan and actual code, alert user and stop the implementation phase unless user provides permission. Work with user to clear this conflict before moving forward.

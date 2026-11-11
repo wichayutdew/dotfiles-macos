@@ -21,9 +21,19 @@ Parse `$ARGUMENTS` before doing anything else.
 - `--pipeline-failure` — skip Step 2 gate, execute Step 3 only
 - `--resolve-comments` — skip Step 2 gate, execute Step 5 only
 - `--rebase` — skip Step 2 gate, execute Step 4 using rebase path
-- `--babysit` — after completing all requested steps, hand control back to `dev-mr-babysit`
+- `--babysit` — standalone request to continue one bounded foreground job after successful handlers; never recurse from an existing owner
+- `--passive` / `--aggressive` — review-comment action mode, independent of target scope; passive is default. Reject conflicting mode flags.
 
 Multiple flags may be combined (e.g., `--pipeline-failure --resolve-comments`).
+
+**Existing babysit owner — applies before flag dispatch and to every handler:**
+retain its supplied `babysitOwner` (verified context/expected head, original
+startedAt/deadlineAt, iterations/maxIterations), restrictions and repair receipts.
+Return tested scoped changes uncommitted to that same owner. Do not independently
+commit/push, reset its budget, or recursively invoke babysit. This includes
+`--pipeline-failure`, which skips Step 5. If ownership/budget is missing, stop
+blocked instead of treating the call as standalone. History-changing conflict
+resolution in Step 4 is unavailable within this local repair handoff.
 
 **Extract MR identifier** (the non-flag token in `$ARGUMENTS`):
 - If URL (contains `merge_requests/`): `echo "$ARGUMENTS" | grep -oE 'merge_requests/[0-9]+' | grep -oE '[0-9]+'`
@@ -103,14 +113,42 @@ mcp__gitlab__get_pipeline_job_output(project_id=<project>, job_id=<job-id>)
 2. **Check code changes** - correlate failures with the MR diff
 3. **Suggest fix** - propose specific code changes or configuration updates
 4. **Load artifacts** for write-back: invoke the `dev-load-context` skill with `<jira-id>` to load the research plan and implementation progress artifacts, if present.
-5. **Apply fix** if user agrees:
-   ```bash
-   PRE_PHASE_SHA=$(git rev-parse HEAD)
-   git add <files>
-   git commit -m "fix(<scope>): <description>"
-   git push
-   ```
-6. **Write back** — run the [Write-back procedure](#write-back-procedure) below using `PRE_PHASE_SHA` and the loaded artifacts, with `mr_assist_fix: <description>` as the note.
+5. **Apply and test** only a proven in-scope repair within the caller's existing
+   authorization/restrictions. Capture PRE_PHASE_SHA before editing. Inspect all
+   changed paths and run focused checks; unavailable proof or failed tests block.
+6. **Existing babysit owner:** leave changes **uncommitted** and unpublished.
+   Return the repair's changedPaths, passed=true and test evidence, with the
+   unchanged babysitOwner and expected head. The one outer loop performs its
+   guarded source-project/source-branch commit/push and inspects the new head's
+   CI. Do not use the standalone publication path or invoke babysit again.
+   The loop has advanced the resolver state's sourceGeneration before this
+   failed-CI handoff. Finish/test the repair before the owner's current-source
+   comment validation, preserving that supplied ledger. Even at the same remote
+   SHA, prior claim/fix/test evidence cannot certify the repaired local source.
+   Return to validation before publication; never repair after it and reuse its proof.
+7. **Standalone:** without explicit publication authorization, return the local
+   tested repair. Authorized publication must verify scoped paths/tests, live
+   ownership/head/permissions, fast-forward ancestry and an exact expected remote
+   head guard; persist intents and confirmed commit/push receipts. Do not use a
+   bare git push or infer the destination from cwd. After observed publication,
+   run the [Write-back procedure](#write-back-procedure) with PRE_PHASE_SHA and
+   the loaded artifacts, noting `mr_assist_fix: <description>`. For an existing
+   owner, return that write-back metadata for the owner to record after its commit.
+
+Use the bundled scripts/finish-pipeline-repair.mjs `finishPipelineRepair` after
+native repair/proof, importing it by this skill's own absolute directory:
+
+    finishPipelineRepair({
+      repair: { changedPaths, passed, evidence }, babysitOwner,
+      publicationAuthorized: false, publish: nativeGuardedStandalonePublisher
+    })
+
+The helper always returns local changes/budget for a supplied existing owner,
+even if publicationAuthorized=true. Do not omit that owner to reach standalone
+publication. A missing/invalid owner in an owner invocation blocks before this
+call. Only a standalone explicitly authorized call may omit babysitOwner and
+set publicationAuthorized=true; publish must implement the guards above and
+return native confirmed evidence. The helper supplies no Git/GitLab adapter.
 
 ## Step 4: Resolve Conflicts
 
@@ -199,71 +237,48 @@ git commit -m "fix: resolve merge conflicts with <target-branch>"
 git push
 ```
 
-## Step 5: MR Comments
+## Step 5: Review comments
 
-> Only execute if user selected "MR comments" or `--resolve-comments` flag is active
+Execute when selected or --resolve-comments is active. Target scope and action
+mode are separate: MR-only selects all open threads; a specific discussion/note
+selects one thread. Default action mode is passive. --aggressive explicitly
+selects proven safe fixes, focused tests and replies within the approved scope.
 
-### 5.1 Load artifacts
+### 5.1 Load artifacts and scope
 
-#### Research plan
+Load the existing research/implementation artifacts and code context. Bind exact
+MR head, source branch/project, actor, reservation owner and caller restrictions.
+Do not turn a read-only or no-post handoff into mutation permission.
 
-Read `.sdd/output/research/<jira-id>.md`:
-- Overview
-- Current State Analysis
-- Desired End State
-- What We're NOT Doing
-- Implementation Approach
-- Success Criteria
+### 5.2 Delegate to the resolver
 
-#### Implementation plan
+Invoke dev-resolve-review-thread with the MR, selected scope, passive/aggressive
+mode and unchanged restrictions. It validates every selected reviewer comment,
+including followups, and accounts for verdict/draft/disposition per note.
 
-Read `.sdd/output/implementation_progress/<jira-id>.md`:
-- Phases completed
-- Decisions made
-- Any blockers noted
+Passive produces all drafts and STOP: no code patches even in scratch and no
+posts without approval. Explicit aggressive selection authorizes proven in-scope
+fixes/tests and replies without fresh per-comment confirmation. Unverified proof,
+unsafe suggestions, changed head/ownership or unavailable permissions block.
+Neither mode toggles discussion resolution, approves, merges or deploys.
 
-#### Code changes
+### 5.3 Return fixes and receipts to the owner
 
-```
-mcp__gitlab__get_merge_request_diffs(project_id=<project>, merge_request_iid=<mr-iid>)
-```
+When invoked by an existing babysit job, return local scoped changes, tests,
+per-comment receipts and any blocker to that same foreground owner. Do not
+commit/push independently, reset its counters/deadline, or pass --babysit.
+The owner performs its dirty-only commit/push/exact-head CI loop.
 
-#### MR comments and discussions
-
-```
-mcp__gitlab__get_mr_discussions(project_id=<project>, merge_request_iid=<mr-iid>, only_unresolved_comments=false)
-```
-
-### 5.2 Answer reviewer questions
-
-When user shares a reviewer question:
-
-1. **Search artifacts first** - research plan and implementation plan
-2. **Check code changes** - trace through the diff
-3. **Formulate response** with `file_path:line_number` references
-4. **Quote relevant sections** from research/implementation plans
-
-### 5.3 Make changes (when requested)
-
-If user asks to address feedback:
-
-1. **Confirm scope** with `AskUserQuestion`
-2. **Capture pre-fix state**: `PRE_PHASE_SHA=$(git rev-parse HEAD)`
-3. **Make edits** using `Edit` tool
-4. **Commit**:
-   ```bash
-   git add <files>
-   git commit -m "fix(<scope>): <description>"
-   ```
-5. **Push**:
-   ```bash
-   git push
-   ```
-6. **Write back** — run the [Write-back procedure](#write-back-procedure) below using `PRE_PHASE_SHA` and the artifacts loaded in Step 5.1, with `mr_assist_fix: <description>` and `comment_ref: <the specific reviewer comment addressed>` as the note.
+For a standalone authorized publication, capture PRE_PHASE_SHA before changes,
+inspect scoped dirty paths and passing checks, then commit/push only when that
+publication is authorized. A clean result requires no commit or push. Use the
+write-back procedure for observed commits; record the specific comment references.
 
 ### Write-back procedure
 
-Shared by Step 3.4 and Step 5.3. Skip silently for any artifact file that does not exist for this ticket.
+Shared by authorized standalone publication from Step 3.4/5.3, or by the existing
+owner after its observed commit. Skip silently for any artifact file that does
+not exist for this ticket.
 
 `PRE_PHASE_SHA` below refers to the value captured earlier in Step 3.4/5.3 (`PRE_PHASE_SHA=$(git rev-parse HEAD)`); since it was set in a separate command invocation, substitute the actual SHA value captured then rather than assuming the shell variable is still set.
 
@@ -286,24 +301,15 @@ Shared by Step 3.4 and Step 5.3. Skip silently for any artifact file that does n
    Tell the user explicitly that the fix expanded scope beyond the phase's documented plan — do not file it as a normal `mr_assist_fix` note.
 5. **If either artifact file doesn't exist** for the ticket, skip write-back for that artifact and tell the user — do not fail the fix.
 
-### 5.4 Reply to MR (optional)
+## Step 6: Return to the current owner
 
-Before posting, show the user the draft reply and confirm:
+If an existing babysit job invoked this skill, return its result directly with
+the original state, expected SHA, counters and deadline. Never recursively invoke
+dev-mr-babysit, including after failures.
 
-1. **Draft the reply** in the conversation -- show the exact text that will be posted.
-2. **Ask for confirmation** using `AskUserQuestion`:
-   - Option A: "Post this reply" -- proceed to post the note
-   - Option B: "Edit the reply" -- revise and re-confirm
-   - Option C: "Skip" -- do not post
-
-Only after the user selects "Post this reply":
-
-```
-mcp__gitlab__create_merge_request_note(project_id=<project>, merge_request_iid=<mr-iid>, body="<response>")
-```
-
-## Step 6: Handover to mr-babysit (conditional)
-
-If `--babysit` flag was active, invoke the `dev-mr-babysit` skill with `<mr-iid>` as the argument to resume the babysit loop.
-
-Do this unconditionally — whether the steps above succeeded or failed. mr-babysit will re-gather MR state and decide the next action.
+For a standalone --babysit request, start or resume one foreground babysit job
+only after the requested work and checks complete successfully and no blocker
+remains. Carry source identity, receipts and all caller restrictions. The babysit
+workflow selects aggressive explicitly; read-only/draft-only restrictions still
+block mutations. Failed or partial handlers report the blocker and stop rather
+than unconditionally starting another loop.

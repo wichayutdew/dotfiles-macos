@@ -157,19 +157,22 @@ In YAML files (where HTML comments aren't valid), annotations use `#` comments:
 When no nearby `sg:lookup` annotation exists, derive exact `repo:` filters from
 `repos.conf` instead of relying on a static table.
 
+Register new repositories with HTTPS URLs by default using `architecture-add-repo`.
+SSH registration requires its explicit `--ssh` option.
+
 Conversion rules:
 
-- `git@gitlab.agodadev.io:Group/project.git`
-  → `repo:^gitlab.agodadev.io/Group/project$`
 - `https://gitlab.agodadev.io/Group/project.git`
+  → `repo:^gitlab.agodadev.io/Group/project$`
+- Legacy or explicitly opted-in SSH: `git@gitlab.agodadev.io:Group/project.git`
   → `repo:^gitlab.agodadev.io/Group/project$`
 - Strip the `.git` suffix and anchor with `^` and `$`
 
 Examples:
 
-- `git@gitlab.agodadev.io:Activities/activity-content-api.git`
+- `https://gitlab.agodadev.io/Activities/activity-content-api.git`
   → `repo:^gitlab.agodadev.io/Activities/activity-content-api$`
-- `git@gitlab.agodadev.io:full-stack/Agoda-SEO/SEOGPTContent.git`
+- `https://gitlab.agodadev.io/full-stack/Agoda-SEO/SEOGPTContent.git`
   → `repo:^gitlab.agodadev.io/full-stack/Agoda-SEO/SEOGPTContent$`
 
 Combine multiple repos with OR:

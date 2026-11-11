@@ -64,12 +64,16 @@ If the plugin is already installed, state that and continue.
 
 If the user wants to document a repo that is not present in the workspace:
 
-1. Ask for the Git URL and optional directory name or branch if needed.
+1. Ask for an HTTPS Git URL without embedded credentials and an optional directory name or branch if needed.
 2. Invoke the `architecture-add-repo` skill rather than cloning manually.
 3. Verify the repo was added to `repos.conf`.
 4. Verify the working tree exists under `repos/<name>` or the expected path.
 
 If the repo already exists, skip this step and confirm the path you will use.
+
+New registrations default to HTTPS, including GitLab SSH URLs supplied to
+`architecture-add-repo`. Use an SSH URL with `--ssh` only when SSH is explicitly
+requested. Local paths remain unchanged.
 
 ---
 

@@ -263,6 +263,8 @@ Each non-blank, non-comment line has the form:
 ```
 
 - `directory-name` maps to `repos/<directory-name>`
+- `git-url` defaults to HTTPS without embedded credentials; register through
+  `architecture-add-repo`, using `--ssh` only for explicit SSH opt-in
 - `branch` is optional; defaults to the repo's default branch
 - Lines starting with `#` are comments
 

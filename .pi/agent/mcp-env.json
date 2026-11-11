@@ -103,9 +103,16 @@
       "url": "${QUICK_SHARE_MCP_URL}"
     },
     "linear": {
-			"source": "custom",
+      "source": "custom",
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/mcp"]
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.linear.app/mcp"
+      ]
+    },
+    "ag-activities-agent-memory": {
+      "url": "${HINDSIGHT_URL}"
     }
   }
 }

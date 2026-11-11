@@ -38,6 +38,24 @@ const validate = record => {
   }
   requiredArray(mr.assignees, 'mr.assignees');
   const review = record.review ?? {};
+  if (review.dispatch !== undefined) {
+    const dispatch = review.dispatch;
+    for (const field of ['dispatch_id', 'parent_session_id', 'child_session_id', 'run_id']) {
+      if (typeof dispatch?.[field] !== 'string' || !dispatch[field].trim()) {
+        throw new Error(`review.dispatch.${field} must be a non-empty string`);
+      }
+    }
+    if (dispatch.child_session_id === dispatch.parent_session_id) {
+      throw new Error('review.dispatch must identify a separate child session');
+    }
+  }
+  for (const field of ['model', 'thinking_effort']) {
+    const value = review[field];
+    if (value !== undefined && value !== null &&
+        (typeof value !== 'string' || !value.trim())) {
+      throw new Error(`review.${field} must be a non-empty string or null`);
+    }
+  }
   requiredString(review.reviewed_at, 'review.reviewed_at');
   requiredString(review.head_sha, 'review.head_sha');
   requiredString(review.verdict, 'review.verdict');
@@ -94,7 +112,11 @@ if (fs.existsSync(output)) {
 }
 const sources = [...(previous?.sources ?? []), ...(incoming.sources ?? [])];
 const uniqueSources = [...new Map(sources.map(source => [sourceKey(source), source])).values()];
-const record = {...incoming, sources: uniqueSources};
+const record = {...incoming, sources: uniqueSources, review: {
+  ...incoming.review,
+  model: incoming.review.model ?? null,
+  thinking_effort: incoming.review.thinking_effort ?? null
+}};
 atomicWrite(output, record);
 console.log(JSON.stringify({output, created: previous === null,
   replaced: previous !== null, sources: uniqueSources.length}));

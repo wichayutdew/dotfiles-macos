@@ -1,6 +1,6 @@
 {
   "skill_name": "dev-peer-review",
-  "notes": "GitLab peer-review evals. Prompts should be run offline unless the user explicitly authorizes posting. The important discriminator is whether the skill performs independent MR review from the diff plus material MR-body evidence, ignores review threads unless explicitly requested, validates findings within a reasonable effort cap, and drafts no duplicate/speculative comments.",
+  "notes": "Offline GitLab peer-review evaluations. Use supplied fixtures/fake glab only; no live comment, label, approval, merge, resolution, source or push effects. Confirm independent evidence collection, readable status, caller restrictions and separate immutable collection/publication receipts.",
   "evals": [
     {
       "id": 0,
@@ -40,8 +40,127 @@
         "bounded-effort: report explains the chosen validation effort and avoids broad test runs unless justified",
         "unique-peer-findings-section: report includes unique peer findings or explicitly states none survived validation",
         "rejected-hypotheses-section: report includes rejected hypotheses or explicitly states none were rejected",
-        "survivors-only-in-drafts: drafted comments contain only findings marked valid or unverified questions",
+        "survivors-only-in-drafts: inline publication contains only independently confirmed actionable findings; unverified questions remain in the report",
         "atomic-review-record: the completed review is stored at .peer-review/<encoded-project>/<iid>.json and is usable by the summary renderer"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "model-effort-label",
+      "prompt": "Peer review https://gitlab.example.com/group/project/-/merge_requests/123 using model gpt-6.1 sol with High thinking effort. Use mocked GitLab responses for this offline evaluation: the head stays unchanged and the MR has label backend. Capture the proposed API request without sending it.",
+      "expected_output": "The run proposes adding peer-reviewed::gpt-6.1 sol--High after completing the review, preserves the backend label, verifies the head and returned label, and sends no live writes.",
+      "files": [],
+      "assertions": [
+        "exact-label: proposed add_labels value is peer-reviewed::gpt-6.1 sol--High",
+        "additive-update: request uses add_labels rather than replacing all labels",
+        "head-check: label is skipped if the current head differs from the reviewed SHA",
+        "offline: no live GitLab writes are performed"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "label-metadata-unavailable",
+      "prompt": "Peer review https://gitlab.example.com/group/project/-/merge_requests/123 in an offline evaluation. The runtime and caller provide no model or thinking-effort metadata. Explain how labeling is handled.",
+      "expected_output": "The run reports missing label metadata and skips the label without guessing from the example or MR content.",
+      "files": [],
+      "assertions": [
+        "no-guessed-metadata: neither model nor effort is invented",
+        "label-gap: missing metadata and skipped labeling are reported",
+        "offline: no live GitLab writes are performed"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "readable-clean-ci-separate",
+      "prompt": "Use dev-peer-review offline with fixture MR https://gitlab.example.com/group/project/-/merge_requests/123, reviewed head 0123456789abcdef, complete review verification, no findings, failed CI and label attachment denied. Return the chat result; do not call live GitLab.",
+      "expected_output": "A readable clean heading, exact SHA, zero counts, complete review verification, failed CI and label gap. Publication and labeling are skipped; no embedded JSON.",
+      "files": [],
+      "assertions": [
+        "heading is Peer review: No actionable issues found",
+        "failed CI and label error do not make review verification incomplete",
+        "chat includes absolute stored record path; raw JSON remains local",
+        "offline restrictions prevent all external writes"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "incomplete-with-confirmed-and-unverified",
+      "prompt": "Use offline fixture MR !123 at 0123456789abcdef. Required focused proof is unavailable; one separate issue was confirmed by a reproduction and another remains speculative. Render the result and proposed publication using fake glab only.",
+      "expected_output": "Incomplete heading with one confirmed issue; the gap and unverified issue stay visible, and only the proven issue is eligible inline.",
+      "files": [],
+      "assertions": [
+        "incomplete heading takes precedence",
+        "one confirmed issue and correct blocking count",
+        "unverified issue excluded from inline posts and confirmed count",
+        "missing/invalid diff position stays in summary with honest location"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "incomplete-zero",
+      "prompt": "Use offline fixture MR !123 at 0123456789abcdef. Review verification could not finish and no actionable issue is yet confirmed. Return a readable report and capture a proposed summary through fake glab.",
+      "expected_output": "Peer review: Incomplete — 0 confirmed issues, explicit gaps, no clean conclusion and no inline findings.",
+      "files": [],
+      "assertions": [
+        "zero confirmed issues never implies clean when verification is incomplete",
+        "summary explicitly explains missing proof",
+        "no speculative inline comment"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "same-and-new-sha-publication",
+      "prompt": "Using only local fake glab, publish an incomplete fixture review, retry it, complete it at the same SHA, then review a new SHA where the same independently reconfirmed finding moved by one line. Inspect receipts and render the chat result.",
+      "expected_output": "Same-SHA retry reuses its summary; completion updates it; new head creates another summary; unchanged finding is not duplicated.",
+      "files": [],
+      "assertions": [
+        "exactly one summary per reviewed SHA and preserved earlier history",
+        "same original inline finding reused across heads",
+        "chat has observed summary and inline links",
+        "collection record bytes remain unchanged"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "restrictions-and-parent-report",
+      "prompt": "Act as an implementation parent receiving a separate peer reviewer native result. The caller requested draft-only. Use local fixtures only. Return the actual parent chat reply, not a description of a future reply.",
+      "expected_output": "The parent returns readable status, SHA, counts, gaps, absolute stored record path and explicit skipped publication/label status. No network write is attempted.",
+      "files": [],
+      "assertions": [
+        "caller restriction forwarded alongside unchanged dispatch identity",
+        "both labels and original comments skipped",
+        "parent chat includes readable review rather than only recordPath/JSON",
+        "separate native execution and exact-head gate remain required"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "uncertain-and-drift",
+      "prompt": "Using fake glab only, lose an inline POST response after the server stored it, then retry. Separately, change the head after one observed inline effect and before summary publication. Also model a timeout with no observable native receipt.",
+      "expected_output": "Lost response is reconciled without duplicate; drift stops remaining writes while retaining observed receipts; absent uncertain receipt blocks retry.",
+      "files": [],
+      "assertions": [
+        "native author/body/position/ID evidence required for success",
+        "no duplicate POST after lost response",
+        "head refetched immediately before each effect",
+        "uncertain absent effect is not assumed failed",
+        "malformed state/identity fails before effects"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "concise-report-and-actual-posted-receipts",
+      "prompt": "Using fake glab only, review fixture MR !123 with one confirmed issue and detailed proof/commands/rejected hypotheses. Reuse its original inline at a new head after changing the current title, then model confirmed inline creation followed by a lost summary response. Return the concise parent chat result and captured MR summary.",
+      "expected_output": "Short actionable findings and material gaps remain visible; detailed proof/commands/rejected hypotheses stay inline/local. Chat includes Posted to MR with actual receipt-derived summary headline and current-review inline titles/native links, including an old reused title. Partial/unconfirmed outcomes are explicit. MR summary excludes Posted to MR bookkeeping.",
+      "files": [],
+      "assertions": [
+        "default output omits full trigger/proof/successful-command/rejected-hypothesis dumps without hiding material gaps",
+        "Posted to MR uses observed receipt body labels and native links rather than changed drafts",
+        "unrelated historical findings and full posted bodies are excluded",
+        "confirmed inline with unconfirmed summary remains explicitly partial",
+        "skipped/no-post/error/unconfirmed states are accurate",
+        "external link-label brackets/backslashes are escaped and quick actions remain inert",
+        "parent preserves concise report and Posted to MR section; MR summary does not recursively include it"
       ]
     }
   ]

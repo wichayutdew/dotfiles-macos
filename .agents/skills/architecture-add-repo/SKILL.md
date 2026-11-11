@@ -20,13 +20,42 @@ on Linux or macOS. They do not read or write delegation state or profile setting
 ## Add a Repository
 
 ```bash
-bash "${SKILL_ROOT}/scripts/add-repo.sh" <git-url> [directory-name] [branch]
+bash "${SKILL_ROOT}/scripts/add-repo.sh" [--ssh] <git-url> [directory-name] [branch]
 ```
 
 The script creates a bare cache and worktree before registering the repository.
 An existing matching worktree is preserved. Conflicting manifest rows, origins,
 branches, unmanaged clones, unsafe names, and symlinked managed paths are refused.
-Use HTTPS URLs without embedded credentials in the workspace manifest.
+
+HTTPS is the default for new registrations. HTTPS URLs stay unchanged, and
+`git@gitlab.agodadev.io:group/repo.git` and
+`ssh://git@gitlab.agodadev.io/group/repo.git` are cloned and written to
+`repos.conf` as `https://gitlab.agodadev.io/group/repo.git`.
+HTTPS URLs with embedded credentials are rejected before cloning.
+Local filesystem paths and `file://` URLs remain unchanged.
+
+To explicitly opt in to SSH, supply an SSH URL with `--ssh`:
+
+```bash
+bash "${SKILL_ROOT}/scripts/add-repo.sh" --ssh git@gitlab.agodadev.io:group/repo.git
+```
+
+`--ssh` preserves the supplied SSH URL; it does not change an HTTPS URL.
+Other SSH URLs require `--ssh` as well. Setup and pull honor URLs already
+registered in `repos.conf`; existing entries are not migrated automatically.
+
+### Verified CodeMaster limitation
+
+New repositories are registered with HTTPS by default because this SSH command
+failed as observed in CodeMaster:
+
+```text
+Command: ssh -o BatchMode=yes -o ConnectTimeout=8 -T git@gitlab.agodadev.io
+stdout: (empty)
+stderr:
+git@gitlab.agodadev.io: Permission denied (publickey).
+Exit code: 255
+```
 
 ## Remove a Repository
 
