@@ -15,20 +15,13 @@ Make the smallest coherent change, follow local conventions, and support claims 
 
 ## Planning and approval
 
-- Save plans under `~/repositories/personal/plans/plannotator/`.
+- Save complete plans under `~/repositories/personal/plans/`, or the task-local location required by the workflow; link the canonical artifact from the active conversation.
 - For implementation, reuse a suitable linked worktree or create one under `~/repositories/worktrees/`.
-- Obtain Plannotator approval before editing product code.
+- Review plans in the active conversation. Lead with the intended outcome, a compact table of observable acceptance criteria, a small diagram when it explains the flow, and the exact decision/actions to approve. Keep implementation detail and machine-readable handoffs in the linked complete plan.
+- Obtain explicit approval of the current plan and scoped actions before editing product code or making gated external writes. Native Plan mode is optional and controlled by the host; read-only planning and conversation approval work without it.
+- Record the approved artifact version and the user’s decision. Feedback revises the same plan; silence, tool acknowledgments and bot decisions are not approval. Revisit only changes that invalidate the approved scope.
 - After approval, complete all in-scope work and verification without asking for routine approval again.
 - Stop only for missing required information, credentials, authority, an out-of-scope decision, or a failure that available evidence cannot resolve.
-
-<!-- plannotator:blocking-plan-review:start -->
-### Plannotator plan review
-
-Submit the complete saved plan through Plannotator Inbox with an explicit approval request and the plan attached. Record the pending review and notify the user with its reference, then end the turn without polling or waiting. Do not edit product code until explicit approval of the current plan is received. On a later response, incorporate feedback and resubmit if needed; after approval, proceed with authorized work. Silence, submission, or tool failure is not approval. If Inbox is unavailable, report the blocker and plan path.
-<!-- plannotator:blocking-plan-review:end -->
-
-For all Plannotator review and approval requests, use the same Plannotator Inbox service and its `send_message` tool; attach the complete artifact, request a decision in a `:::question` block, record the thread reference, notify the user, and end the turn without polling. Reuse the existing Inbox thread for the same work stream, and use a separate thread for a different work stream. Do not launch a blocking Plannotator CLI review or infer approval from submission. If the Inbox is unavailable, report the blocker and artifact path. Explicit user instructions for a different review interface take precedence.
-
 
 ## PRs and merge requests
 
@@ -49,17 +42,3 @@ For all Plannotator review and approval requests, use the same Plannotator Inbox
 - Keep chat concise and reports easy to scan. Use headings and bullets where useful.
 - Put machine-readable handoffs under `## Machine-readable handoff` in a valid fenced JSON block.
 - In workflows, use `blocked` only for genuine blockers and `retry` only for transient failures needing no user input. Do not disguise questions as `retry`, `handoff`, or next-step outcomes.
-
-<!-- plannotator-inbox:start v8 · added by Plannotator. Remove it in the Inbox's Settings or with `plannotator uninstall` -->
-## Plannotator Inbox
-
-The person keeps a Plannotator Inbox on this computer: a window where they read what agents send and answer when they can.
-If you have a `plannotator_inbox` tool or a `plannotator-inbox` MCP server, use its `send_message` to ask a decision only they can make (as a `:::question` block) or to hand over finished long work (a short summary with its pictures in place, `![alt](path)` in the body, and the files to read in `attachments`). Then keep working.
-A decision inside a report or summary still goes in a `:::question` block, one block per decision.
-Their reply comes back to this session by itself where your agent supports that; otherwise read the thread later with `read_thread`.
-Be proactive about Inbox updates and about replying to the person through the Inbox when you think they would want you to. Don't withhold important updates or decisions, and don't batch updates to send later: proactivity is better than procrastination.
-One thread per work stream, unless the person says otherwise.
-A decision you sent to the Inbox stays there. When the person writes in this chat, say what is waiting there (a short summary and the thread's link), but never also ask it in the chat with a blocking question tool (AskUserQuestion or similar): that blocks the chat and splits the answer. Ask in the chat only about something new they raised here that needs no pictures or files, or when they ask for it.
-Before reply_to into a thread you have not read in this context window, call read_thread with no id and match the subject.
-In a `:::question` block, keep the choices in their natural order and never move your recommendation first; put it on its own line after the choices as `Recommended: <label>`, and never write "(recommended)" in a choice label.
-<!-- plannotator-inbox:end -->
