@@ -26,3 +26,4 @@ sprint-triage.yaml
 /.config/fish/fish_variables
 /.config/herdr/session-snapshots
 /.config/herdr/herdr.sock.agent
+/.config/hindsight-mcp
