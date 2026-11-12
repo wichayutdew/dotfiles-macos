@@ -1,11 +1,10 @@
 {
-  "lastChangelogVersion": "1.4.0",
+  "lastChangelogVersion": "1.5.2",
   "defaultProvider": "gateway",
   "defaultModel": "gpt-6.1-sol",
   "defaultThinkingLevel": "medium",
   "shellPath": "/opt/homebrew/bin/fish",
   "packages": [
-    "npm:@plannotator/pi-extension",
     "npm:pi-web-access"
   ],
   "terminal": {
