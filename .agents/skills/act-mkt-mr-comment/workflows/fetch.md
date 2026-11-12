@@ -4,11 +4,11 @@ Use the invoking request and complete source evidence, inline or through the evi
 
 ---
 
-Recover the preceding `act-mkt-work` task record and its published review identities from this same session per [Task workspace](../generic/task-workspace.md), then fetch the current GitHub PR(s) or GitLab MR(s). Read-only; use `glab`/`gh` per [Host CLI](../generic/host-cli.md).
+Recover the matching task record and published review identities across conversations per [Task workspace](../generic/task-workspace.md), then fetch the current GitHub PR(s) or GitLab MR(s). A supplied mapping with a missing artifact follows recovery; only verified absence of prior work permits that guide’s standalone intake. Read-only; use `glab`/`gh` per [Host CLI](../generic/host-cli.md).
 
-Input: `the invoking request and inherited work task checkpoint`
+Input: `the invoking request, canonical review identity and supplied task mapping/checkpoint (or verified standalone entry)`
 
-Read the canonical `<root>/.task-context.json` and retain its absolute path, the inherited absolute task root, repository manifest, branches/heads, dirty baselines, cleanup ledger and publication IDs. The current launch directory may be unrelated or non-Git; it does not select a review or a replacement workspace. Use explicit Jira/Linear references with the named tracker connector when needed for full requirements or linked-review resolution; preserve direct input unchanged. Resolve ambiguity against the inherited publication readback instead of guessing a PR/MR.
+Read the canonical `<root>/.task-context.json` and retain its absolute path, the recorded absolute task root, repository manifest, branches/heads, dirty baselines, cleanup ledger and publication IDs. For standalone entry record verified no-prior-context evidence and proposed repository bindings; editable paths may remain unprepared until approval. The current launch directory may be unrelated or non-Git; it does not select a review or a replacement workspace. Use explicit Jira/Linear references with the named tracker connector when needed for full requirements or linked-review resolution; preserve direct input unchanged. Resolve ambiguity against the inherited publication readback instead of guessing a PR/MR.
 
 For each implicated review, retrieve canonical URL, host/repository/number, source and target repository/origin identities (including forks), open/merged/closed state, source/target branches and SHAs, inherited local origin/status, changed files/diff, checks and all relevant discussion pages. Include replies and general comments explicitly targeted by the user, with IDs, author, timestamp, anchors, resolution state and original text. Preserve prior reply IDs and delivery state from the checkpoint. A closed/merged review retires only that review’s code-delivery actions; retain evidence for its local report and continue independent active reviews.
 

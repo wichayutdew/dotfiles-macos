@@ -1,6 +1,18 @@
 # Review plan
 
-Lead with the verdict or finding count. Use a compact findings table and short evidence bullets; keep exact proposed comments in the publication table. Add Mermaid only when a flow is needed to explain a finding. Preserve all finding evidence, anchors and publication fields.
+Present the review in this order: verdict, observable acceptance criteria, a small useful flow diagram, findings/interpretation, then the exact publication decision. Keep the full evidence and technical publication ledger below as supporting detail in this saved artifact. In conversation, show the concise review and exact proposed comments, linking the artifact rather than dumping its internal fields. Preserve every material limit, action and anchor.
+
+## Acceptance criteria
+
+| Criterion | Evidence / observed result | Status or limitation |
+| --- | --- | --- |
+| <supported behavior or explicit new contract> | <base/head evidence> | <confirmed failure, passes, or unverified> |
+
+## Flow
+<A small Mermaid diagram of the affected interaction when it clarifies the finding; otherwise omit.>
+
+## Decision
+<Plain-language interpretation, supporting/counter-evidence and what to publish. Include exact proposed comment text, destination and scope of approval. With no findings and no requested summary, state no publication and finish locally.>
 
 ## Reviews
 <Reviewed base/head, applicable consumer revisions/conditions, source coverage and limitations. For each finding: severity, path/line, trigger, baseline or explicit contract, impact, evidence with artifact/revision/environment checked, verification limits, and exact proposed comment. Or: No actionable findings.>

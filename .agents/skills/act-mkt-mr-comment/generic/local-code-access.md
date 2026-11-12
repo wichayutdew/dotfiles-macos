@@ -4,10 +4,10 @@ Inspect code only in local Git clones searched with `rg`. Do not use Sourcegraph
 
 ## Location
 
-- `<root>` is the absolute `workspace.root` inherited from the preceding `act-mkt-work` run in this session. Its name is the ticket ID itself or a short descriptive summary, and its original default location is below that run's captured invocation directory. Keep its actual path when this skill is launched elsewhere.
+- `<root>` is the absolute `workspace.root` recovered from the canonical review-to-task mapping, including across conversations, or established by the genuinely standalone entry in [task workspace](task-workspace.md). Existing task names and paths remain unchanged; a new standalone root uses that guide’s naming and immediate ownership registration.
 - Each repository's `cwd`, origin, source branch/base/head and editable/reference role come from the [task workspace manifest](task-workspace.md). Names are unique within the root; use a namespace prefix for equal remote basenames.
 - Inspect inherited worktrees in place without syncing, detaching or switching their branches. Use the helper's read-only `--check` for a helper-managed layout; validate explicitly approved custom contexts against their recorded identities directly.
-- If additional read-only source evidence is required, use a dedicated inspection location such as `<root>/.inspection/`, record it and its SHA, and keep it separate from worktree paths. Do not infer a new editable repository from a reference alone; include material scope additions in plan review.
+- If additional read-only source evidence is required, use a dedicated inspection location such as `<root>/.sources/`, record it and its SHA, and keep it separate from worktree paths. Do not infer a new editable repository from a reference alone; include material scope additions in plan review.
 
 ## Get or refresh: `scripts/repo-sync.sh`
 

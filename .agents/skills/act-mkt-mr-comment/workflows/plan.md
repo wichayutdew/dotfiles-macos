@@ -6,7 +6,7 @@ Use the invoking request and complete source evidence, inline or through the evi
 
 ---
 
-Validate the current feedback against the inherited work task directory, bound code and explicit user intent. Read-only. Preserve its actual root, repository paths, source branches, known local progress and publication IDs even when this skill was launched elsewhere.
+Validate the current feedback against the recovered task directory or verified standalone intake, bound read-only evidence and explicit user intent. Read-only. Preserve its actual root, repository paths, source branches, known local progress and publication IDs even when this skill was launched elsewhere.
 
 Input: `the invoking request`
 Evidence: `{{last.summary}}`
@@ -14,7 +14,7 @@ Prior artifact/feedback: `{{gate.artifact}}` / `{{gate.feedback}}`
 
 Reconcile all relevant comments with current code, replies and the checkpoint. Distinguish new/changed or reopened feedback from already-addressed feedback. An older unresolved thread with a confirmed adequate reply needs no identical reply; new follow-up text still needs assessment.
 
-For each comment record canonical review/source repository identity, native identity/anchor, evidence, and an `implement`, `decline`, or `already-addressed` verdict. Validate suggestions rather than accepting them blindly. Record applicable repository guidance and existing candidate paths/symbols: fit or gap, reuse/extension/new-code decision, and owning responsibility. Keep fixes within approved scope.
+For each comment record canonical review/source repository identity, native identity/anchor, the reviewer’s concern, your interpretation, supporting and counter-evidence, and an `implement`, `decline`, or `already-addressed` recommendation with reasoning. Explain uncertainty and invite the user to challenge that comprehension before approval; incorporate corrections in the same artifact. Validate suggestions rather than accepting them blindly. Record applicable repository guidance and existing candidate paths/symbols: fit or gap, reuse/extension/new-code decision, and owning responsibility. Keep fixes within approved scope.
 
 For each actionable implement/decline verdict, provide one exact response and one `publication.replies` entry with canonical review identity, its native discussion/comment ID and reply type; equal numeric IDs in different reviews are distinct. Inline feedback uses its existing discussion; a general comment uses the host's general-comment capability. Already-addressed/no-action entries have evidence but no new reply. An implement reply may claim only checks that delivery will actually confirm.
 
@@ -22,9 +22,11 @@ Group related fixes into coherent tasks. For each changing group, record depende
 
 For code changes, list repository-qualified scoped paths, local worker/check commands, required CI and an imperative Conventional Commit subject, verified source origin, existing review source branch and non-force push action per changing repository. Retain `repositories[]` roles: `primary` and `editable` permit approved fixes; `reference` remains read-only. A fix affecting an additional repository must establish its requirement/review identity and obtain approval for the added scope; do not create unrelated review branches. Map each reply claim to all prerequisite repositories/checks. Honor explicit local-only/no-commit restrictions by disabling those delivery actions. Include all implementation, validation and publication choices in the complete approval artifact; feedback revises that artifact at the same gate.
 
-Any missing workspace/resource recovery must name the inherited paths and exact resources to recreate after approval, with identity/collision decisions resolved; do not authorize a second root as a routine fallback.
+Any missing workspace/resource recovery must name the inherited paths and exact resources to recreate after approval, with identity/collision decisions resolved; do not authorize a second root as a routine fallback. A verified standalone entry instead names its proposed editable manifest and exact preparation actions under its already-registered root. Confirm source-branch write authority; being assigned to an MR alone does not grant permission to change another author’s branch.
 
 A newer head requires revalidation; a changed verdict, scope or publication action requires approval of the revised artifact. Retain existing approval when that artifact and its assumptions remain valid. New comments are a separate delta, never implicit authority to expand an approved plan.
+
+Present the actionable conversation review per [approval procedure](../generic/approval-review.md): outcome, acceptance criteria, useful flow, comment comprehension/recommendations and exact replies, then the precise decision. Keep detailed execution state in the complete linked artifact.
 
 `ready`: actionable verdicts and exact delivery contract are ready for the approval gate.
 `done`: no actionable delta or active delivery remains across the implicated reviews; report evidence locally without an empty approval/publication cycle. For an externally merged/closed review, retire only that entry’s obsolete delivery and report its completed/undelivered actions; continue planning independent active entries.

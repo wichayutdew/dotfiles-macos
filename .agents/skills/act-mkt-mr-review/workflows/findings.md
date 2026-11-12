@@ -11,6 +11,10 @@ Evidence: `{{last.summary}}`
 
 CI does not gate this stage: review the available code now and report relevant CI context without waiting for green checks. Findings must establish an introduced failure or explicit contract violation with a concrete trigger, impact and evidence. A standalone maintainability or stylistic benefit is not a finding.
 
+## Show the read-only approach
+
+Before substantive review, show the current base/head and a concise coverage outline in the active conversation: the intended behavior/acceptance criteria, affected flow (a small Mermaid diagram when useful), boundaries and planned evidence checks. This is a visible approach, not a separate mandatory approval gate for already requested read-only review. Resolve material interpretation questions with the user; continue independent evidence work. Exact finding/comment approval happens after validation in the plan stage.
+
 ## Review method
 
 - In the local clone from fetch (`<root>/.sources/<repo-name>`, detached at head), compare base and head with `git diff <base_sha>...<head_sha>` and `git show <base_sha>:<path>`. Trace changed code into callers, consumers, response models, configuration and tests with `rg` (search guidance in [Local code access](../generic/local-code-access.md)); a diff alone is insufficient. When a caller/consumer lives in another repository, sync it into `<root>/.sources/<other-repo>` per [Local code access](../generic/local-code-access.md) at the revision relevant to the supported contract or intended rollout, and record that association plus repo and SHA with the finding's evidence. If only default-branch HEAD is available, state that limitation; it alone does not establish compatibility with the reviewed change.

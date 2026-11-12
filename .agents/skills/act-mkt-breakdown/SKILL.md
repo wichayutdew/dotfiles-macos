@@ -14,6 +14,7 @@ Turn an investigation report into a reviewable epic and stories. Refine the draf
 Apply this format to plans, reports, reviews, replies and chat responses:
 
 - Lead with the answer, verdict or decision in one short sentence.
+- Make review actionable: lead with the outcome, show observable acceptance criteria and a small useful diagram, then state the exact decision and consequences. Keep detailed implementation steps, evidence and machine-readable state in the complete saved artifact; link them instead of flooding the review conversation.
 - Prefer compact tables for comparisons, findings, tasks, risks and validation results; keep cells brief.
 - Prefer a small Mermaid diagram for flows, dependencies or interactions when it makes the relationships clearer. If the destination cannot render Mermaid, use a concise numbered flow or bullets.
 - Put necessary detail in short bullets, one point each. Use short prose only for nuance that needs it; keep simple answers to a sentence or a few bullets.
@@ -26,7 +27,7 @@ Read each linked step prompt before executing it. Track the current step, comple
 
 Continue independent work while resolving material questions. Missing optional sources become explicit limitations. Pause dependent work for required user input, review, an explicit pause/cancellation, or a factual blocker that prevents further authorized work. State the exact blocker and retained progress. Honor explicit user/AGENTS requirements for additional approval gates.
 
-Before finishing, execute any independent ready step. When the review artifact is ready, submit it through Plannotator Inbox, notify the user, and end the turn without waiting for a decision.
+Before finishing, execute any independent ready step. When the complete creation proposal is ready, present the actionable review in the active conversation using [creation approval](generic/approval-review.md), record the pending decision, and end the turn. Creation waits for explicit approval.
 
 ## Task directory
 
@@ -39,8 +40,10 @@ Follow these step prompts in order, preserving their approval and permission req
 1. [Read the report](workflows/read-report.md)
 2. [Plan the breakdown](workflows/plan.md) using the [plan template](generic/plan-template.md)
 3. [Draft the backlog](workflows/draft.md)
-4. [Review and refine](workflows/review.md), launching [Plannotator](generic/plannotator-review.md) for the complete creation proposal
+4. [Review and refine](workflows/review.md), presenting the complete creation proposal for [conversation approval](generic/approval-review.md)
 5. [Create approved items](workflows/create.md)
+
+Use native Plan mode when the host exposes it; mode switching remains host-controlled. When it is unavailable, perform the same read-only planning and review in the active conversation. No particular UI or mode-switch tool is required.
 
 ## Delivery and continuation
 

@@ -6,7 +6,7 @@ Lead with the question or decision in one sentence. Use compact tables for quest
 <Idea/feature/question, desired understanding or decision, and questions the report must answer.>
 
 ## Scope and audience
-<Current context, accepted decisions, constraints, non-goals, and requested depth; preserve the active task’s working context.>
+<Question, audience, in/out of scope, requested depth/output, user-supplied decisions, and material scope questions resolved in conversation; preserve the active task’s working context.>
 
 ## Report format and destination
 <Requested format and depth; supplied template or suitable report structure; chat or the existing canonical file/document; any separately authorized hosted writes.>
@@ -21,4 +21,4 @@ Lead with the question or decision in one sentence. Use compact tables for quest
 <Supplied material and relevant sources with revisions/conditions, coverage/access limits, observations versus inferences/assumptions, superseded information to reconcile, and unavailable evidence.>
 
 ## Open questions
-<Material questions, evidence gaps, required user actions/authorizations, and independent research that can continue. Retain approval/acceptance state, incorporated feedback and completed/remaining work in the current task record.>
+<Remaining evidence questions, required user actions/authorizations, and independent research within the established scope that can continue. Reopen discussion before research affected by a new material scope choice. Retain approval/acceptance state, incorporated feedback and completed/remaining work in the current task record.>

@@ -24,7 +24,7 @@ Paths below are relative to the skill root containing `SKILL.md`. Use absolute h
 
 | Script | Use |
 | --- | --- |
-| `scripts/task-workspace.py` | validate the inherited manifest with `--check`; recreate only approved missing resources at inherited paths ([Task workspace](task-workspace.md)) |
+| `scripts/task-workspace.py` | validate an existing manifest with `--check`; prepare only approved standalone or recovered worktrees at recorded paths ([Task workspace](task-workspace.md)) |
 | `scripts/repo-sync.sh` | clone/fetch/pin dedicated inspection clones only; never repin an inherited editable worktree ([Local code access](local-code-access.md)) |
 | `scripts/cleanup-workspaces.py` | register/list/preview/delete workflow-created resources ([Cleanup](cleanup.md)) |
 | `scripts/ci-wait.sh` | poll the pipeline/checks for one SHA until terminal or timeout |

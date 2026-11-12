@@ -1,6 +1,6 @@
 # Breakdown plan
 
-Lead with the intended outcome. Use a compact story table for scope and dependencies, with short bullets for drafting details and open decisions. Add a small Mermaid dependency diagram when it makes sequencing clearer. Retain every required artifact and tracker field.
+Lead with the intended outcome, then a compact table of observable acceptance criteria and a small useful dependency diagram. Follow with a compact story table and the exact creation decision. Keep the supporting drafting details and required artifact/tracker fields in this saved plan; do not paste internal metadata into the review conversation.
 
 ## Source report
 <Canonical report reference/version, relevant decisions, and unresolved assumptions.>

@@ -6,7 +6,7 @@ Use the invoking request and complete source evidence, inline or through the evi
 
 ---
 
-Turn reviewer findings into comments the user can approve.
+Turn reviewer findings into comments the user can assess and approve. Lead the conversation with a verdict, an observable acceptance-criteria table, a small diagram when it explains the failure, and the exact proposed comments/actions. Keep the complete evidence and publication ledger in the saved artifact. A compact presentation must still expose every action and material limitation; do not bury the approval decision in an internal appendix.
 
 Input: `the invoking request`
 Findings: `{{last.summary}}`
@@ -15,7 +15,7 @@ Feedback: `{{gate.feedback}}`
 
 Use only actionable, evidence-based findings anchored to the reviewed head. Keep the proposed published text specific, professional, and consistent with its detailed suggestion. Include every user-answerable review decision and its impact in the existing `Reviews` or `Publication contract` sections; do not ask separately. Approval feedback returns to this plan stage and the artifact is re-presented at the same review gate.
 
-Carry each finding's severity, trigger, baseline/contract, impact and verification limits into the proposed comment. Deduplicate existing discussions and root causes. Always complete this plan step. With no findings and no requested summary publication, record the reviewed SHA, coverage and limitations using the template, set publication to None, and return `done`; no ceremonial comment or empty approval cycle is implied.
+Explain the interpretation of each finding, supporting evidence, credible counter-evidence and remaining uncertainty. Invite the user to challenge the comprehension or proposed comment; incorporate corrections in the same artifact before asking for explicit publication approval. Carry each finding's severity, trigger, baseline/contract, impact and verification limits into the proposed comment. Deduplicate existing discussions and root causes. Always complete this plan step. With no findings and no requested summary publication, record the reviewed SHA, coverage and limitations using the template, set publication to None, and return `done`; no ceremonial comment or empty approval cycle is implied.
 
 Give every publication action a stable marker and capture current review state/head plus confirmed/unconfirmed action IDs for retry reconciliation. Refresh stale evidence instead of publishing obsolete anchors.
 

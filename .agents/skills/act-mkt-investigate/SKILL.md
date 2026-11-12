@@ -7,13 +7,14 @@ description: Use when investigating an idea, feature, technical or general quest
 
 Run `scripts/...` commands from this skill root (beside `SKILL.md`) or use absolute paths. Markdown links are relative to their containing document.
 
-Produce an evidence-backed report and refine it with the user until they are satisfied. The request may be an idea, feature proposal, technical question, general question, or an existing report to revise; a tracker issue is optional.
+Refine the investigation scope with the user before substantive research, then produce an evidence-backed report and refine it until they are satisfied. The request may be an idea, feature proposal, technical question, general question, or an existing report to revise; a tracker issue is optional.
 
 ## Concise output
 
 Apply this format to plans, reports, reviews, replies and chat responses:
 
 - Lead with the answer, verdict or decision in one short sentence.
+- Make scope and report review actionable: show the question being answered, key findings and a small useful diagram, then the focused feedback needed. Keep supporting evidence and machine-readable state in the complete saved artifact; link them instead of flooding the review conversation.
 - Prefer compact tables for comparisons, findings, tasks, risks and validation results; keep cells brief.
 - Prefer a small Mermaid diagram for flows, dependencies or interactions when it makes the relationships clearer. If the destination cannot render Mermaid, use a concise numbered flow or bullets.
 - Put necessary detail in short bullets, one point each. Use short prose only for nuance that needs it; keep simple answers to a sentence or a few bullets.
@@ -24,9 +25,9 @@ Apply this format to plans, reports, reviews, replies and chat responses:
 
 Read each linked step prompt before executing it. Track the current step, completed outputs, remaining steps, and review decision in the continuation record. Follow the listed order and advance to the next step immediately when its prerequisites are met; a progress update, working outline, completed research, or saved draft is not a handoff or completion condition.
 
-Continue independent work while resolving material questions. Missing optional sources become explicit limitations. Pause dependent work for required user input, review, an explicit pause/cancellation, or a factual blocker that prevents further authorized work. State the exact blocker and retained progress. Honor explicit user/AGENTS requirements for additional approval gates.
+During intake, resolve material scope questions before substantive research or report drafting; continue only source discovery needed to clarify that scope. After scope is established, continue independent research while resolving later evidence questions. Missing optional sources become explicit limitations. Pause dependent work for required user input, review, an explicit pause/cancellation, or a factual blocker that prevents further authorized work. State the exact blocker and retained progress. Honor explicit user/AGENTS requirements for additional approval gates.
 
-Before finishing, execute any independent ready step. When the review artifact is ready, submit it through Plannotator Inbox, notify the user, and end the turn without waiting for a decision.
+Before finishing, execute any independent ready step allowed by the current scope. When the report is ready, present it for discussion in the active conversation using [report review](generic/report-review.md), record pending feedback, and end the turn.
 
 ## Task directory
 
@@ -42,14 +43,14 @@ For a new task, establish one absolute task root before writing any files. Keep 
 
 | Step | Instructions | Next |
 | --- | --- | --- |
-| Understand | [intake.md](workflows/intake.md) | Plan; clarify only material missing context |
+| Understand | [intake.md](workflows/intake.md) | Refine scope in chat; resolve material scope questions before Plan |
 | Plan | [plan.md](workflows/plan.md) | Prepare the working research outline, then research |
 | Research and draft | [research.md](workflows/research.md) | Validate |
 | Validate | [validate.md](workflows/validate.md) | Write report, or return to research for evidence gaps |
-| Present report | [write-report.md](workflows/write-report.md) | Launch Plannotator review in the same turn |
+| Present report | [write-report.md](workflows/write-report.md) | Present the report for discussion in the active conversation |
 | Review and refine | [review-report.md](workflows/review-report.md) | Revise and present again; finish only when the user accepts the report |
 
-Always prepare the working outline from [the plan template](generic/plan-template.md) after intake, then begin read-only research and drafting; there is no separate scope-plan approval gate unless explicit user/AGENTS instructions require one. Ask focused questions when missing information materially changes the report, while continuing independent research. Present the report itself for review, not a plan in place of the report.
+First restate the question, audience, in/out of scope and expected report in the active conversation. Reuse scope already supplied by the user; ask focused questions only about material gaps. Once those gaps are resolved, prepare the working outline from [the plan template](generic/plan-template.md), then begin read-only research and drafting. There is no formal scope-plan approval gate unless explicit user/AGENTS instructions require one. Present the report itself for review, not a plan in place of the report.
 
 ## Report choice
 
@@ -62,20 +63,20 @@ Adapt the headings to the question and audience. Do not force engineering rollou
 
 ## Review loop
 
-Use [the Plannotator review procedure](generic/plannotator-review.md) for the complete report and each revision. End the turn after notifying the user; consume the decision before advancing on a later turn.
+Use [report review](generic/report-review.md) for the complete Markdown report and each revision. Lead with the answer and findings, a useful diagram or comparison, and the material evidence/limits; link the complete saved report. Discuss feedback in the active conversation and record acceptance only when the user expresses satisfaction.
 
-Use the latest user-edited report as canonical. Feedback changes that same report; research further when needed, preserve agreed content, and present the revised result with a short account of material changes. Stay in this loop without a fixed iteration limit. Silence, a tool launch, or presenting the report does not mean it is accepted. On explicit acceptance or satisfaction, finish and retain the accepted report reference/version for a possible later breakdown request.
+Use the latest user-edited report as canonical. Feedback changes that same report; research further when needed, preserve agreed content, and present the revised result with a short account of material changes. Stay in this loop without a fixed iteration limit. Silence, a delivery acknowledgment, or presenting the report does not mean it is accepted. On explicit acceptance or satisfaction, finish and retain the accepted report reference/version for a possible later breakdown request.
 
 Accepting the report does not authorize implementing it, creating tickets, or automatically starting another skill. A later backlog request can consume the report through `act-mkt-breakdown`; that skill is not required to complete this investigation.
 
 ## Sources, destinations, and permissions
 
 - Use available sources suited to the question: supplied material, local code, internal knowledge, public primary sources, or relevant telemetry. A code repository and traffic measurements are not required for every investigation. Put evidence next to the claim; distinguish observations, inferences, proposals, assumptions, and unknowns. State relevant source coverage, revisions and access limits; reconcile superseded information against the latest supported evidence and user direction. An assistant assertion alone does not establish an executed result.
-- Keep chat as the default delivery destination and honor an explicit local report path or existing document destination. Save the complete report as a local review artifact for Plannotator; this does not authorize a hosted write or replace the canonical destination. Read current content before revisions and preserve unrelated user edits and finalized request/response contracts.
+- Keep chat as the default delivery destination and honor an explicit local report path or existing document destination. Save the complete Markdown report as a local review artifact; this does not authorize a hosted write or replace the canonical destination. Read current content before revisions and preserve unrelated user edits and finalized request/response contracts.
 - Drafting/reviewing does not authorize hosted writes. Before an external update, show the concrete content and destination and obtain approval for that write, unless the user already authorized those exact changes. Read back saved content before claiming delivery.
 - Product code stays read-only. Use the active checkout without branch switching; for another repo use [local code access](generic/local-code-access.md) and the helpers in `scripts/`. Record newly created clones per [cleanup](generic/cleanup.md); “clean everything up” takes that cleanup-only route. Never enroll a reused existing checkout.
 - Use [host CLI](generic/host-cli.md) for MR/PR metadata when relevant. Do not wait for CI. Select an available model/effort appropriate to the research, respecting the user's choice and runtime restrictions; no mandatory per-step delegation is needed.
 
 ## Continuation
 
-Persist one current task record at `<workspace.root>/.task-context.json` per [task directory](generic/task-directory.md), including the absolute root and plan/report/review paths. Keep it current with: latest request and boundaries, accepted decisions, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, completed/remaining work, acceptance state, and any confirmed/unconfirmed hosted writes. Incorporate relevant steps from another workflow without restarting completed research or changing the requested deliverable or authorization. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.
+Persist one current task record at `<workspace.root>/.task-context.json` per [task directory](generic/task-directory.md), including the absolute root and plan/report/review paths. Keep it current with: latest request and boundaries, scope discussed and material questions resolved, accepted decisions, current report/template/destination, source references and revisions, user feedback already incorporated, open questions, completed/remaining work, acceptance state, and any confirmed/unconfirmed hosted writes. Incorporate relevant steps from another workflow without restarting completed research or changing the requested deliverable or authorization. Resume the same report after interruption rather than restarting or replacing it with an older draft. A missing optional source becomes a stated limitation; decision-critical inaccessible evidence is a factual blocker. Reconcile ambiguous writes before retrying.

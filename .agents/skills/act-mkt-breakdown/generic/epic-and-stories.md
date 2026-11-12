@@ -1,6 +1,6 @@
 # Epic and stories draft
 
-Start with a compact story/scope/dependency table; add a small Mermaid diagram when sequencing needs explanation. If the destination cannot render Mermaid, use a short numbered flow. Keep each story's descriptions, steps and criteria in concise bullets. Link to audience-accessible evidence or summarize essential evidence when unavailable; retain material requirements and failure cases without repeating the same criterion.
+Lead with the intended outcome, then a compact acceptance-criteria table and a small Mermaid dependency diagram when sequencing needs explanation. Follow with the story/scope/dependency table and complete item details; keep internal task records out of the human review. If the destination cannot render Mermaid, use a short numbered flow. Keep each story's descriptions, steps and criteria in concise bullets. Link to audience-accessible evidence or summarize essential evidence when unavailable; retain material requirements and failure cases without repeating the same criterion.
 
 Source report: <canonical report reference and version>
 Creation destination: <tracker and workspace/team/project>
@@ -31,4 +31,4 @@ State prerequisite draft stories or existing tracker items; omit if none.
 Repeat the story sections for each proposed story. Draft labels are local references, not claimed tracker IDs.
 
 ## Questions and creation approval
-State unresolved report/backlog/destination decisions. Once resolved, state: "Approving this proposal authorizes creating exactly the epic/stories above with the listed metadata and relationships in <tracker and workspace/team/project>." Use the real destination, then submit the complete document through [the review procedure](plannotator-review.md). No work items have been created yet.
+State unresolved report/backlog/destination decisions. Once resolved, state: "Approving this proposal authorizes creating exactly the epic/stories above with the listed metadata and relationships in <tracker and workspace/team/project>." Use the real destination, then submit the complete document through [conversation approval](approval-review.md). No work items have been created yet.

@@ -181,149 +181,113 @@
       "installedAt": "2026-08-21T18:45:39.208Z",
       "updatedAt": "2026-09-20T15:41:14.823Z"
     },
-    "plannotator-tui": {
-      "source": "plannotator/herdr-annotate",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/plannotator/herdr-annotate.git",
-      "skillPath": "skills/plannotator-tui/SKILL.md",
-      "skillFolderHash": "c6b9c35885b352dc4784d762519876730c8e332f",
-      "installedAt": "2026-09-06T16:58:10.994Z",
-      "updatedAt": "2026-10-30T05:05:34.708Z"
-    },
     "act-mkt-investigate": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-investigate/SKILL.md",
-      "skillFolderHash": "b14515955263a9de69b1b2fcf84c82f318dea0fe9dab84237d05a4dfe5d6b177",
+      "skillFolderHash": "fde546f3a8b27b4b6d9cb8858f42697508713986f32dbc1ac2e5e0a7fcbc9b06",
       "installedAt": "2026-09-22T06:04:48.170Z",
-      "updatedAt": "2026-11-05T09:43:57.180Z"
+      "updatedAt": "2026-11-12T09:59:49.778Z"
     },
     "act-mkt-mr-comment": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-comment/SKILL.md",
-      "skillFolderHash": "2946ecb507d33846ca5f35140b3de54d88807fc4aed293e563a1ac230739c0e2",
+      "skillFolderHash": "c21bd43673c45f8c1853d59377f55fce9a5ebb16db944c4b9bc5cec2257cec32",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-11-05T09:43:57.362Z"
+      "updatedAt": "2026-11-12T09:59:49.965Z"
     },
     "act-mkt-mr-review": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mr-review/SKILL.md",
-      "skillFolderHash": "908700005ea2585ede839eaa0acf3c5b67b8226cdb6202b294870c193b232bc9",
+      "skillFolderHash": "b45adda9ccc6e0e678e0bfedab0a3e5aa9559ac9090b7d53324ae7140df71684",
       "installedAt": "2026-09-22T06:04:48.171Z",
-      "updatedAt": "2026-11-05T09:43:57.521Z"
+      "updatedAt": "2026-11-12T09:59:50.128Z"
     },
     "act-mkt-work": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-work/SKILL.md",
-      "skillFolderHash": "a178553e61ef695f90ef8e5c99ce73af88c86eaae14bac3589b6a2aa321b183b",
+      "skillFolderHash": "d3e08ce00bb58a75f71e53c6d5796b21d4c3b72b0fe53051c447716e965b6022",
       "installedAt": "2026-09-22T06:04:48.174Z",
-      "updatedAt": "2026-11-07T08:18:32.901Z"
+      "updatedAt": "2026-11-12T09:59:50.357Z"
     },
     "act-mkt-codebase-search": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-codebase-search/SKILL.md",
-      "skillFolderHash": "14be89f2b012a1cd3aaf9fd8bc9e13ddf1406d0faee27b1de6a84e5ca3b974dc",
+      "skillFolderHash": "6d77200ebe82f698d58bc12a286802d336e057a477cc331f0eb9e76001cfba62",
       "installedAt": "2026-09-23T06:10:08.927Z",
-      "updatedAt": "2026-10-09T09:47:18.142Z"
+      "updatedAt": "2026-11-12T07:48:19.058Z"
     },
     "act-mkt-content-quality-compare": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-content-quality-compare/SKILL.md",
-      "skillFolderHash": "f0f9d7c9d02ad55b90460376c76094fc7b211fd6bcb84fd47c6e836cab665624",
+      "skillFolderHash": "e45beea69792cc876e10807f7fe19c6458cacb38ea947889ddb7d5484d4fcffd",
       "installedAt": "2026-09-23T06:10:08.934Z",
-      "updatedAt": "2026-10-09T09:47:18.143Z"
+      "updatedAt": "2026-11-12T07:48:19.180Z"
     },
     "act-mkt-mse-sanity-check": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-mse-sanity-check/SKILL.md",
-      "skillFolderHash": "212c82b460a67f763ee274b81594831fa1d90e884100dec85e5f1bfb5e9512ed",
+      "skillFolderHash": "3e93e25c6382b18bcdb8b49ba6d7ab0492d40bf3c35a596c3220322f9466e06d",
       "installedAt": "2026-09-23T06:10:08.960Z",
-      "updatedAt": "2026-10-09T09:47:18.147Z"
+      "updatedAt": "2026-11-12T07:48:19.243Z"
     },
     "act-mkt-prompt-quality-eval": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-prompt-quality-eval/SKILL.md",
-      "skillFolderHash": "95ddd06d142be9097f031d4e825c3011dd49cea8d1ca880f3aa9c3fe1d1a2c56",
+      "skillFolderHash": "656ede05f666f1bb9690805258338bddb112ad21e42c0e7b19f60b13cea7cfde",
       "installedAt": "2026-09-23T06:10:08.967Z",
-      "updatedAt": "2026-10-09T09:47:18.147Z"
+      "updatedAt": "2026-11-12T07:48:19.341Z"
     },
     "act-mkt-sample-activities-offers": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-sample-activities-offers/SKILL.md",
-      "skillFolderHash": "95f9acb005b131bb1a2d922dd5e80b50e2a88cc4458216548d73f9d01d7e8302",
+      "skillFolderHash": "a79b7f46a9ad773c3a20ad2cd178860c21da05fdf107544c35ef2bad75f0cb2b",
       "installedAt": "2026-09-23T06:10:08.977Z",
-      "updatedAt": "2026-10-09T09:47:18.148Z"
+      "updatedAt": "2026-11-12T07:48:19.433Z"
     },
     "act-mkt-trigger-content-enhancement": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-trigger-content-enhancement/SKILL.md",
-      "skillFolderHash": "c63425839c9fba78501e58b7a3adcbe1e08a7726fd3b8a975f3330551dbb0f0c",
+      "skillFolderHash": "83b16b2f815fbc31a13dce45402768f9ad01a65fe873548c29c936382907aa86",
       "installedAt": "2026-09-23T06:10:08.990Z",
-      "updatedAt": "2026-10-09T09:47:18.151Z"
+      "updatedAt": "2026-11-12T07:48:19.499Z"
     },
     "act-mkt-share-markdown": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-share-markdown/SKILL.md",
-      "skillFolderHash": "e3f4fa46b756a51bc5f90b4dfba01847686a3e5030d63a5d1630ec7f2c3aee05",
+      "skillFolderHash": "3542396f3b32cb61dd125879baee41c66539b5d13d48835607b48cf15d167db7",
       "installedAt": "2026-10-09T09:47:18.149Z",
-      "updatedAt": "2026-10-15T10:46:38.648Z"
-    },
-    "plannotator-visual-explainer": {
-      "source": "backnotprop/plannotator",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
-      "skillPath": "apps/skills/extra/plannotator-visual-explainer/SKILL.md",
-      "skillFolderHash": "48b1d39f317db181b75c8c4dafba6b78bb8f17a4",
-      "installedAt": "2026-10-15T10:30:13.520Z",
-      "updatedAt": "2026-10-23T11:12:51.808Z"
-    },
-    "plannotator-setup-goal": {
-      "source": "backnotprop/plannotator",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
-      "skillPath": "apps/skills/extra/plannotator-setup-goal/SKILL.md",
-      "skillFolderHash": "29d5d60c2b8a88c1786d7bbdbbfa37e44b64f6a5",
-      "installedAt": "2026-10-15T10:30:13.544Z",
-      "updatedAt": "2026-10-15T10:30:13.544Z"
-    },
-    "plannotator-compound": {
-      "source": "backnotprop/plannotator",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/backnotprop/plannotator.git",
-      "skillPath": "apps/skills/extra/plannotator-compound/SKILL.md",
-      "skillFolderHash": "73dcebd303714bcc3fbdffae162068435eb49d97",
-      "installedAt": "2026-10-15T10:30:13.562Z",
-      "updatedAt": "2026-10-31T15:40:38.631Z"
+      "updatedAt": "2026-11-12T07:48:19.555Z"
     },
     "act-mkt-breakdown": {
       "source": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "sourceType": "git",
       "sourceUrl": "git@gitlab.agodadev.io:Activities/activities-marketing-tech/act-mkt.git",
       "skillPath": "skills/act-mkt-breakdown/SKILL.md",
-      "skillFolderHash": "cc4d96a8cba801cf4ac66cc6a6b9b7f05006f0e6e9c3e907a5e61fb099e3fd99",
+      "skillFolderHash": "dcb4b25035a6856c62a52ce56d01d3514ee55f4089605ad756831a0f76d85043",
       "installedAt": "2026-10-22T13:38:18.853Z",
-      "updatedAt": "2026-11-03T06:26:55.760Z"
+      "updatedAt": "2026-11-12T09:59:50.489Z"
     },
     "dev-add-experiment": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -331,8 +295,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-add-experiment/SKILL.md",
       "skillFolderHash": "8270710694835cf5b9da890ee154062af8400b72c8f403c35a83e9b66184dbef",
-      "installedAt": "2026-11-11T04:18:22.211Z",
-      "updatedAt": "2026-11-11T04:18:22.211Z"
+      "installedAt": "2026-11-12T04:31:03.191Z",
+      "updatedAt": "2026-11-12T04:31:03.191Z"
     },
     "dev-code-review": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -340,8 +304,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-code-review/SKILL.md",
       "skillFolderHash": "84984b9096e39744dd2913013815fbc6856db9541e35fad0e96cde91559c2b8e",
-      "installedAt": "2026-11-11T04:18:22.213Z",
-      "updatedAt": "2026-11-11T04:18:22.213Z"
+      "installedAt": "2026-11-12T04:31:03.193Z",
+      "updatedAt": "2026-11-12T04:31:03.193Z"
     },
     "dev-create-merge-request": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -349,8 +313,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-create-merge-request/SKILL.md",
       "skillFolderHash": "b358c6b0f3850eec6eb4db3332542c54134ffe4a23a8bf50e8d8658333c28d7e",
-      "installedAt": "2026-11-11T04:18:22.213Z",
-      "updatedAt": "2026-11-11T04:18:22.213Z"
+      "installedAt": "2026-11-12T04:31:03.193Z",
+      "updatedAt": "2026-11-12T04:31:03.193Z"
     },
     "dev-discover-project-conventions": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -358,8 +322,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-discover-project-conventions/SKILL.md",
       "skillFolderHash": "7ac09377e06e43a456b15bc09cf02ab1792a7ec40081d12ac59014f718623311",
-      "installedAt": "2026-11-11T04:18:22.214Z",
-      "updatedAt": "2026-11-11T04:18:22.214Z"
+      "installedAt": "2026-11-12T04:31:03.194Z",
+      "updatedAt": "2026-11-12T04:31:03.194Z"
     },
     "dev-epic-sync": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -367,8 +331,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-epic-sync/SKILL.md",
       "skillFolderHash": "348391a9c5a7bad3915a7521bc4a15d59b23f71c3c2de224ea5b7dd5fef81056",
-      "installedAt": "2026-11-11T04:18:22.214Z",
-      "updatedAt": "2026-11-11T04:18:22.214Z"
+      "installedAt": "2026-11-12T04:31:03.195Z",
+      "updatedAt": "2026-11-12T04:31:03.195Z"
     },
     "dev-execute-testing-plan": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -376,8 +340,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-execute-testing-plan/SKILL.md",
       "skillFolderHash": "369a7f9cb18be1b69109418d3005d9d74b7dd49836e406e1eb4d834fb1880f39",
-      "installedAt": "2026-11-11T04:18:22.215Z",
-      "updatedAt": "2026-11-11T04:18:22.215Z"
+      "installedAt": "2026-11-12T04:31:03.195Z",
+      "updatedAt": "2026-11-12T04:31:03.195Z"
     },
     "dev-experiment-integration-planner": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -385,8 +349,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-experiment-integration-planner/SKILL.md",
       "skillFolderHash": "0992e90d86b130c92335e2734f40251c9e5dc9e570b18f02953a48dde04d04a2",
-      "installedAt": "2026-11-11T04:18:22.216Z",
-      "updatedAt": "2026-11-11T04:18:22.216Z"
+      "installedAt": "2026-11-12T04:31:03.196Z",
+      "updatedAt": "2026-11-12T04:31:03.196Z"
     },
     "dev-feature-signoff": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -394,8 +358,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-feature-signoff/SKILL.md",
       "skillFolderHash": "45c5acde2f8a767b3d2c46c3c549fe754b41385934719546758c8ca64af4dc5b",
-      "installedAt": "2026-11-11T04:18:22.217Z",
-      "updatedAt": "2026-11-11T04:18:22.217Z"
+      "installedAt": "2026-11-12T04:31:03.197Z",
+      "updatedAt": "2026-11-12T04:31:03.197Z"
     },
     "dev-fetch-figma-context": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -403,8 +367,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-fetch-figma-context/SKILL.md",
       "skillFolderHash": "aeb745109d469e0795f0d382c42652b04024e0c699bee1c37f6adafe8178f02b",
-      "installedAt": "2026-11-11T04:18:22.217Z",
-      "updatedAt": "2026-11-11T04:18:22.217Z"
+      "installedAt": "2026-11-12T04:31:03.198Z",
+      "updatedAt": "2026-11-12T04:31:03.198Z"
     },
     "dev-fetch-jira-context": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -412,8 +376,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-fetch-jira-context/SKILL.md",
       "skillFolderHash": "7d752bc150d229614bfa15b6fa3316616c21dd12c974582f056e6e2934e5c5fe",
-      "installedAt": "2026-11-11T04:18:22.218Z",
-      "updatedAt": "2026-11-11T04:18:22.218Z"
+      "installedAt": "2026-11-12T04:31:03.198Z",
+      "updatedAt": "2026-11-12T04:31:03.198Z"
     },
     "dev-full-stack-engineer": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -421,8 +385,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-full-stack-engineer/SKILL.md",
       "skillFolderHash": "5d5abb1a6cf80a22d4248537cf80291e2d90087194be13e04dfa7432871fb5d9",
-      "installedAt": "2026-11-11T04:18:22.218Z",
-      "updatedAt": "2026-11-11T04:18:22.218Z"
+      "installedAt": "2026-11-12T04:31:03.199Z",
+      "updatedAt": "2026-11-12T04:31:03.199Z"
     },
     "dev-getting-started": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -430,8 +394,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-getting-started/SKILL.md",
       "skillFolderHash": "43a23b55ddc4d15284de02bdc746294c3d8cd92ed308000b7381192a9b46e826",
-      "installedAt": "2026-11-11T04:18:22.219Z",
-      "updatedAt": "2026-11-11T04:18:22.219Z"
+      "installedAt": "2026-11-12T04:31:03.199Z",
+      "updatedAt": "2026-11-12T04:31:03.199Z"
     },
     "dev-glab": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -439,8 +403,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-glab/SKILL.md",
       "skillFolderHash": "68e45f5075115d99b157ea11ca2c3623b31857189cf2ac6b1f7d2bdf2c581f56",
-      "installedAt": "2026-11-11T04:18:22.219Z",
-      "updatedAt": "2026-11-11T04:18:22.219Z"
+      "installedAt": "2026-11-12T04:31:03.200Z",
+      "updatedAt": "2026-11-12T04:31:03.200Z"
     },
     "dev-handover": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -448,8 +412,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-handover/SKILL.md",
       "skillFolderHash": "e4f688d956d990263c4877a142bc19d7a97402af21bbfb0339a93c4406c61e8d",
-      "installedAt": "2026-11-11T04:18:22.220Z",
-      "updatedAt": "2026-11-11T04:18:22.220Z"
+      "installedAt": "2026-11-12T04:31:03.201Z",
+      "updatedAt": "2026-11-12T04:31:03.201Z"
     },
     "dev-implement-ticket": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -457,8 +421,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-implement-ticket/SKILL.md",
       "skillFolderHash": "d5eaadacd95db77eb9b90209e25ba8f5254f44837898b9e47e933db9eea7c3f3",
-      "installedAt": "2026-11-11T04:18:22.220Z",
-      "updatedAt": "2026-11-11T04:18:22.220Z"
+      "installedAt": "2026-11-12T04:31:03.201Z",
+      "updatedAt": "2026-11-12T04:31:03.201Z"
     },
     "dev-jira-ticket": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -466,8 +430,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-jira-ticket/SKILL.md",
       "skillFolderHash": "cfa9beec06259a01cf8a192337963395b0d87dd6faa366c53d0323415b7d9f49",
-      "installedAt": "2026-11-11T04:18:22.221Z",
-      "updatedAt": "2026-11-11T04:18:22.221Z"
+      "installedAt": "2026-11-12T04:31:03.202Z",
+      "updatedAt": "2026-11-12T04:31:03.202Z"
     },
     "dev-load-context": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -475,8 +439,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-load-context/SKILL.md",
       "skillFolderHash": "b658d50be36950c0fc149fa2fcc25fa07534792efe109d36041b767a52fbaf0f",
-      "installedAt": "2026-11-11T04:18:22.222Z",
-      "updatedAt": "2026-11-11T04:18:22.222Z"
+      "installedAt": "2026-11-12T04:31:03.203Z",
+      "updatedAt": "2026-11-12T04:31:03.203Z"
     },
     "dev-mr-assist": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -484,8 +448,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-mr-assist/SKILL.md",
       "skillFolderHash": "a2c495655f95a9cbd076d3e7642e264d628a08fec5d3f9a584fa40423540fc0a",
-      "installedAt": "2026-11-11T04:18:22.222Z",
-      "updatedAt": "2026-11-11T04:18:22.222Z"
+      "installedAt": "2026-11-12T04:31:03.203Z",
+      "updatedAt": "2026-11-12T04:31:03.203Z"
     },
     "dev-mr-babysit": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -493,8 +457,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-mr-babysit/SKILL.md",
       "skillFolderHash": "87c419532cfed86d6d6504b1d4b6f921508c55ab077103e2b0e3be4a8d8017d8",
-      "installedAt": "2026-11-11T04:18:22.223Z",
-      "updatedAt": "2026-11-11T04:18:22.223Z"
+      "installedAt": "2026-11-12T04:31:03.204Z",
+      "updatedAt": "2026-11-12T04:31:03.204Z"
     },
     "dev-paint-user-journey-impact": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -502,8 +466,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-paint-user-journey-impact/SKILL.md",
       "skillFolderHash": "73c5ef4759300a23cc1cb03b506da6afc0f9e7ac2f93985b58f59b9e30cd6054",
-      "installedAt": "2026-11-11T04:18:22.224Z",
-      "updatedAt": "2026-11-11T04:18:22.224Z"
+      "installedAt": "2026-11-12T04:31:03.205Z",
+      "updatedAt": "2026-11-12T04:31:03.205Z"
     },
     "dev-peer-review": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -511,8 +475,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-peer-review/SKILL.md",
       "skillFolderHash": "c2e5f082b56dfd4a681ba7f7db7b9b9fe7499e76f9d6e1ff4979a8503c3634ff",
-      "installedAt": "2026-11-11T04:18:22.224Z",
-      "updatedAt": "2026-11-11T04:18:22.224Z"
+      "installedAt": "2026-11-12T04:31:03.206Z",
+      "updatedAt": "2026-11-12T04:31:03.206Z"
     },
     "dev-playwright-cli": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -520,8 +484,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-playwright-cli/SKILL.md",
       "skillFolderHash": "211d1c94ffb02544c12ac939f741bb3efa4d169cb57fc30fe922c1f40e5913bc",
-      "installedAt": "2026-11-11T04:18:22.226Z",
-      "updatedAt": "2026-11-11T04:18:22.226Z"
+      "installedAt": "2026-11-12T04:31:03.207Z",
+      "updatedAt": "2026-11-12T04:31:03.207Z"
     },
     "dev-reconcile-experiment-populations": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -529,8 +493,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-reconcile-experiment-populations/SKILL.md",
       "skillFolderHash": "16bbb196185a224ba9a5c36cadd61a5700a5dbc79d38f5690d3deb1464f8ff14",
-      "installedAt": "2026-11-11T04:18:22.226Z",
-      "updatedAt": "2026-11-11T04:18:22.226Z"
+      "installedAt": "2026-11-12T04:31:03.207Z",
+      "updatedAt": "2026-11-12T04:31:03.207Z"
     },
     "dev-repo-init": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -538,8 +502,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-repo-init/SKILL.md",
       "skillFolderHash": "d271590ec3a71af734432086a7938a9a58e1913d40ef150da0e014dc7efdee2e",
-      "installedAt": "2026-11-11T04:18:22.227Z",
-      "updatedAt": "2026-11-11T04:18:22.227Z"
+      "installedAt": "2026-11-12T04:31:03.208Z",
+      "updatedAt": "2026-11-12T04:31:03.208Z"
     },
     "dev-research-epic": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -547,8 +511,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-research-epic/SKILL.md",
       "skillFolderHash": "4b3fec43f22e14c2e05ec3fde405866a611678d047902a7cdf73a762b5815c49",
-      "installedAt": "2026-11-11T04:18:22.227Z",
-      "updatedAt": "2026-11-11T04:18:22.227Z"
+      "installedAt": "2026-11-12T04:31:03.209Z",
+      "updatedAt": "2026-11-12T04:31:03.209Z"
     },
     "dev-research-ticket": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -556,8 +520,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-research-ticket/SKILL.md",
       "skillFolderHash": "a1dff4d6398f01b8f6269fc362c8527fbc1ba14c9779f2e881639fa1f0f0bda3",
-      "installedAt": "2026-11-11T04:18:22.228Z",
-      "updatedAt": "2026-11-11T04:18:22.228Z"
+      "installedAt": "2026-11-12T04:31:03.209Z",
+      "updatedAt": "2026-11-12T04:31:03.209Z"
     },
     "dev-resolve-review-thread": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -565,8 +529,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-resolve-review-thread/SKILL.md",
       "skillFolderHash": "4faf8fbbd233e5c11f73a903c3493ffda98a68e16d4eeb763f7ed06387def641",
-      "installedAt": "2026-11-11T04:18:22.229Z",
-      "updatedAt": "2026-11-11T04:18:22.229Z"
+      "installedAt": "2026-11-12T04:31:03.210Z",
+      "updatedAt": "2026-11-12T04:31:03.210Z"
     },
     "dev-skeptical-flow-rca": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -574,8 +538,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-skeptical-flow-rca/SKILL.md",
       "skillFolderHash": "49580e05e3499f762d7bc12b84ea4523956f87a5885ffd2c25d1df2b4f7bc067",
-      "installedAt": "2026-11-11T04:18:22.229Z",
-      "updatedAt": "2026-11-11T04:18:22.229Z"
+      "installedAt": "2026-11-12T04:31:03.211Z",
+      "updatedAt": "2026-11-12T04:31:03.211Z"
     },
     "dev-superset-dashboard": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -583,8 +547,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-superset-dashboard/SKILL.md",
       "skillFolderHash": "5ac600ed4cbe1bae2dd47ffc5d830b8be813c87103f210e756f5b52892244060",
-      "installedAt": "2026-11-11T04:18:22.230Z",
-      "updatedAt": "2026-11-11T04:18:22.230Z"
+      "installedAt": "2026-11-12T04:31:03.211Z",
+      "updatedAt": "2026-11-12T04:31:03.211Z"
     },
     "dev-testing-plan": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -592,8 +556,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-testing-plan/SKILL.md",
       "skillFolderHash": "3e3cc5cc87e74ba719c1b6443ec1146b6ed1e74f2fd056a1b46052bab0a99300",
-      "installedAt": "2026-11-11T04:18:22.231Z",
-      "updatedAt": "2026-11-11T04:18:22.231Z"
+      "installedAt": "2026-11-12T04:31:03.212Z",
+      "updatedAt": "2026-11-12T04:31:03.212Z"
     },
     "dev-worktree-manager": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -601,8 +565,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-worktree-manager/SKILL.md",
       "skillFolderHash": "7888483547dae20ffb59213908bdc4293d31db8006ec8d239ddcda49bfb65fdc",
-      "installedAt": "2026-11-11T04:18:22.231Z",
-      "updatedAt": "2026-11-11T04:18:22.231Z"
+      "installedAt": "2026-11-12T04:31:03.213Z",
+      "updatedAt": "2026-11-12T04:31:03.213Z"
     },
     "dev-write-acceptance-criteria": {
       "source": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
@@ -610,8 +574,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-dev-skills.git",
       "skillPath": "skills/dev-write-acceptance-criteria/SKILL.md",
       "skillFolderHash": "4c534ea7f6cf7410d71e5bc19def90e6aaff847ee37c5f041e7cd66b2ba36eb9",
-      "installedAt": "2026-11-11T04:18:22.232Z",
-      "updatedAt": "2026-11-11T04:18:22.232Z"
+      "installedAt": "2026-11-12T04:31:03.213Z",
+      "updatedAt": "2026-11-12T04:31:03.213Z"
     },
     "triage-analyze-grafana-alert": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -619,8 +583,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-analyze-grafana-alert/SKILL.md",
       "skillFolderHash": "7a47bc37535deda1e44dafc4ff8aa4db6a0a49e723e503d0b3dbf7f0971f80e6",
-      "installedAt": "2026-11-11T04:18:27.125Z",
-      "updatedAt": "2026-11-11T04:18:27.125Z"
+      "installedAt": "2026-11-12T04:31:08.567Z",
+      "updatedAt": "2026-11-12T04:31:08.567Z"
     },
     "triage-analyze-slack-alert-history": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -628,8 +592,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-analyze-slack-alert-history/SKILL.md",
       "skillFolderHash": "f91b1476a5b0637ff917b8103d209a3dfeada0a42cf857810bc1eae12f2ac1e6",
-      "installedAt": "2026-11-11T04:18:27.127Z",
-      "updatedAt": "2026-11-11T04:18:27.127Z"
+      "installedAt": "2026-11-12T04:31:08.569Z",
+      "updatedAt": "2026-11-12T04:31:08.569Z"
     },
     "triage-grafana-logs": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -637,8 +601,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-grafana-logs/SKILL.md",
       "skillFolderHash": "b636fe3c6b73c7e1e367eeccbb6c64fda29cc85541b74c396227d09fd9c357e5",
-      "installedAt": "2026-11-11T04:18:27.128Z",
-      "updatedAt": "2026-11-11T04:18:27.128Z"
+      "installedAt": "2026-11-12T04:31:08.570Z",
+      "updatedAt": "2026-11-12T04:31:08.570Z"
     },
     "triage-start-on-call": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -646,8 +610,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-start-on-call/SKILL.md",
       "skillFolderHash": "42119b0633118e2cc2e08908df130fd9ef5213d5e2dcdc5908890457caa2c19f",
-      "installedAt": "2026-11-11T04:18:27.129Z",
-      "updatedAt": "2026-11-11T04:18:27.129Z"
+      "installedAt": "2026-11-12T04:31:08.571Z",
+      "updatedAt": "2026-11-12T04:31:08.571Z"
     },
     "triage-start-triage": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -655,8 +619,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-start-triage/SKILL.md",
       "skillFolderHash": "ce892af8ee2f6d604893e9a96e1d38c1cdabccc95834126ea35f6a52f8226c4f",
-      "installedAt": "2026-11-11T04:18:27.129Z",
-      "updatedAt": "2026-11-11T04:18:27.129Z"
+      "installedAt": "2026-11-12T04:31:08.572Z",
+      "updatedAt": "2026-11-12T04:31:08.572Z"
     },
     "triage-whitefalcon-guide": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -664,8 +628,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-whitefalcon-guide/SKILL.md",
       "skillFolderHash": "65ecb10b96336caf567fac92fbf465661f640705a6d2cc4a944cf69dd1579445",
-      "installedAt": "2026-11-11T04:18:27.130Z",
-      "updatedAt": "2026-11-11T04:18:27.130Z"
+      "installedAt": "2026-11-12T04:31:08.572Z",
+      "updatedAt": "2026-11-12T04:31:08.572Z"
     },
     "triage-whitelabel-analyzer": {
       "source": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
@@ -673,8 +637,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-triage-skills.git",
       "skillPath": "skills/triage-whitelabel-analyzer/SKILL.md",
       "skillFolderHash": "abaebba7ab16d9076af79d8a1ae9ab3dd7dd9be71b2ec4bcbf31485127f43e88",
-      "installedAt": "2026-11-11T04:18:27.131Z",
-      "updatedAt": "2026-11-11T04:18:27.131Z"
+      "installedAt": "2026-11-12T04:31:08.573Z",
+      "updatedAt": "2026-11-12T04:31:08.573Z"
     },
     "architecture-add-repo": {
       "source": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
@@ -682,8 +646,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
       "skillPath": "skills/architecture-add-repo/SKILL.md",
       "skillFolderHash": "343116297b04c910adca05cf60bbab8deb9376f50fce63e5f2d958986107dc58",
-      "installedAt": "2026-11-11T04:18:32.141Z",
-      "updatedAt": "2026-11-11T04:18:32.141Z"
+      "installedAt": "2026-11-12T04:31:13.813Z",
+      "updatedAt": "2026-11-12T04:31:13.813Z"
     },
     "architecture-generate-architecture-docs": {
       "source": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
@@ -691,8 +655,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
       "skillPath": "skills/architecture-generate-architecture-docs/SKILL.md",
       "skillFolderHash": "94deaba4c8bd4604d42caeb7644493d1ddf03af8b23bf3c2c9697810671c2233",
-      "installedAt": "2026-11-11T04:18:32.143Z",
-      "updatedAt": "2026-11-11T04:18:32.143Z"
+      "installedAt": "2026-11-12T04:31:13.816Z",
+      "updatedAt": "2026-11-12T04:31:13.816Z"
     },
     "architecture-getting-started": {
       "source": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
@@ -700,8 +664,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
       "skillPath": "skills/architecture-getting-started/SKILL.md",
       "skillFolderHash": "1d6414568c5cc25121e37942dc2e557c58890d2417da1ea5da404109e0863386",
-      "installedAt": "2026-11-11T04:18:32.144Z",
-      "updatedAt": "2026-11-11T04:18:32.144Z"
+      "installedAt": "2026-11-12T04:31:13.817Z",
+      "updatedAt": "2026-11-12T04:31:13.817Z"
     },
     "architecture-manage-worktree": {
       "source": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
@@ -709,8 +673,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
       "skillPath": "skills/architecture-manage-worktree/SKILL.md",
       "skillFolderHash": "5eb37dd057153c001ac0927547167430cbc7daf382fbb756613a76fde4829d4f",
-      "installedAt": "2026-11-11T04:18:32.144Z",
-      "updatedAt": "2026-11-11T04:18:32.144Z"
+      "installedAt": "2026-11-12T04:31:13.819Z",
+      "updatedAt": "2026-11-12T04:31:13.819Z"
     },
     "architecture-search-code-sourcegraph": {
       "source": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
@@ -718,8 +682,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-architecture-skills.git",
       "skillPath": "skills/architecture-search-code-sourcegraph/SKILL.md",
       "skillFolderHash": "4d7ed7a6595f8fb10a53cc54980690871241832a2b4dd6ea299b95ab043dafc2",
-      "installedAt": "2026-11-11T04:18:32.145Z",
-      "updatedAt": "2026-11-11T04:18:32.145Z"
+      "installedAt": "2026-11-12T04:31:13.820Z",
+      "updatedAt": "2026-11-12T04:31:13.820Z"
     },
     "shared-meeting-transcript": {
       "source": "https://gitlab.agodadev.io/Activities/agent-shared-skills.git",
@@ -727,8 +691,8 @@
       "sourceUrl": "https://gitlab.agodadev.io/Activities/agent-shared-skills.git",
       "skillPath": "skills/shared-meeting-transcript/SKILL.md",
       "skillFolderHash": "dd28e1ac1926a8f225898c7dbbb8c4b9da139e0dd68201efd59696836298bb6d",
-      "installedAt": "2026-11-11T04:18:36.624Z",
-      "updatedAt": "2026-11-11T04:18:36.624Z"
+      "installedAt": "2026-11-12T04:31:18.579Z",
+      "updatedAt": "2026-11-12T04:31:18.579Z"
     }
   },
   "dismissed": {

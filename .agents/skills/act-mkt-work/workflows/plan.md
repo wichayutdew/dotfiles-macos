@@ -31,6 +31,8 @@ Workspace: `workspace.workId` is the tracker key exactly as returned (e.g. `ACTM
 
 Before `ready`, put every user-answerable missing fact, decision, required authorization, and publication choice in the artifact's `Risks/Decisions Needed` section. Do not ask these separately or invent answers. Approval feedback returns to this plan stage and the artifact is re-presented at the same review gate.
 
+Prepare the conversation review using the [approval procedure](../generic/approval-review.md): outcome, observable acceptance criteria, useful diagram and exact decision. Keep the detailed task table and execution appendix in the linked complete artifact.
+
 `ready`: the complete plan artifact and publication metadata, including all open decision questions, are ready for review.
 `gaps`: intake evidence is incomplete; name the missing fields.
 `handoff`: actionable planning work remains and requires no user input.

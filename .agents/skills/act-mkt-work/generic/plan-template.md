@@ -1,9 +1,15 @@
 # Work plan
 
-Lead with a one-sentence outcome. Use compact tables for acceptance criteria, tasks, validation and risks; short bullets for remaining details. Add a small Mermaid diagram for meaningful dependencies or flow. Keep every required field and machine-readable block; link supporting evidence instead of repeating it.
+Lead with a one-sentence outcome. Use compact tables for acceptance criteria, tasks, validation and risks; short bullets for remaining details. Add a small Mermaid diagram for meaningful dependencies or flow. Keep every required field and machine-readable block in this saved artifact; link supporting evidence instead of repeating it. Present the acceptance criteria, flow and exact decision in the review conversation; the execution appendix is supporting detail, not the review surface.
 
 ## Goal/Acceptance Criteria
 <Current requested outcome and observable completion criteria, including relevant conditions and affected consumers.>
+
+## Flow
+<Small Mermaid diagram of the meaningful behavior/dependencies, or a concise numbered flow when rendering is unavailable.>
+
+## Decision to approve
+<Recommended choice, material alternatives/risks and the exact scoped implementation, validation and publication actions approval permits. List unresolved user choices without burying them in the execution appendix.>
 
 ## Non Goal
 <Scope boundaries and behavior outside this change.>
@@ -39,7 +45,7 @@ publication:
   repositories: [<per-repository actions, source/target identities, title/template and authorization>]
 contextArtifact: <root/.task-context.json>
 cleanupLedger: <absolute-ledger-path>
-reviews: [<canonical URL, host/project/number, sourceOrigin/targetOrigin, sourceBranch/sourceHead, target branch, confirmed commit/push/CI/reply IDs>]
+reviews: [<canonical URL, host/project/number, sourceOrigin/targetOrigin, sourceBranch/sourceHead, target branch, taskContext path, known execution workspace/session/host/thread references or null, confirmed commit/push/CI/reply IDs>]
 ```
 
-Preserve this complete task record and its absolute artifact path in the same session for `act-mkt-mr-comment`; that workflow reuses the root and repository bindings. Store the helper input as JSON using the schema in [Task workspace](task-workspace.md); YAML above is the plan presentation, not helper input.
+Preserve this complete task record and its absolute artifact path across conversations for `act-mkt-mr-comment`; that workflow reuses the root and repository bindings. Store the helper input as JSON using the schema in [Task workspace](task-workspace.md); YAML above is the plan presentation, not helper input.
