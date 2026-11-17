@@ -1,0 +1,16 @@
+{
+  "source": "https://agoda.atlassian.net/wiki/spaces/ACV/pages/1164148794/Activities+app+release+sign-off+run+book",
+  "source_snapshot": "d1:2",
+  "retrieved_on": "2026-11-09",
+  "assertion_provenance": "Expected cells are empty in the runbook. Assertions below are proposed and must be reconciled with current requirements before execution.",
+  "links": [
+    {"id":"HOME-UL","url":"https://www.agoda.com/activities","destination":"Activities Home"},
+    {"id":"HOME-DL","url":"agoda://activities","destination":"Activities Home"},
+    {"id":"SEARCH-UL","url":"https://www.agoda.com/th-th/activities/search?cid=1909881&cityId=4064&selectedActivity=1044592&currency=THB&googleSrc=bm&gl=en-TH&gs=search&gf=nav&gacs&device=m&pslc=1","destination":"Activities search for city 4064; preserve the requested selected activity and relevant parameters"},
+    {"id":"SEARCH-DL","url":"agoda://activities/search?cid=1909881&cityId=4064&selectedActivity=1044592&currency=THB&googleSrc=bm&gl=en-TH&gs=search&gf=nav&gacs&device=m&pslc=1","destination":"Activities search for city 4064; preserve the requested selected activity and relevant parameters"},
+    {"id":"DETAIL-UL","url":"https://www.agoda.com/th-th/activities/detail?cid=1909881&cityId=4064&activityId=1044592&currency=THB&googleSrc=bm&gl=en-TH&gs=search&gf=nav&gacs&device=m&pslc=1","destination":"Detail for activity 1044592, city 4064; verify requested currency and content"},
+    {"id":"DETAIL-DL","url":"agoda://activities/detail?cid=1909881&cityId=4064&activityId=1044592&currency=THB&googleSrc=bm&gl=en-TH&gs=search&gf=nav&gacs&device=m&pslc=1","destination":"Detail for activity 1044592, city 4064; verify requested currency and content"},
+    {"id":"SEO-UL","url":"https://www.agoda.com/th-th/activities/detail/th/pattaya/easykart-go-karting-pattaya-bali-hai-pier","destination":"Detail for the activity addressed by the canonical SEO path"},
+    {"id":"SEO-DL","url":"agoda://activities/detail/th/pattaya/easykart-go-karting-pattaya-bali-hai-pier","destination":"Detail for the activity addressed by the canonical SEO path"}
+  ]
+}

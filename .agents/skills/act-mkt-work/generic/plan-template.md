@@ -1,12 +1,12 @@
 # Work plan
 
-Lead with a one-sentence outcome. Use compact tables for acceptance criteria, tasks, validation and risks; short bullets for remaining details. Add a small Mermaid diagram for meaningful dependencies or flow. Keep every required field and machine-readable block in this saved artifact; link supporting evidence instead of repeating it. Present the acceptance criteria, flow and exact decision in the review conversation; the execution appendix is supporting detail, not the review surface.
+Lead with a one-sentence outcome. Use compact tables for acceptance criteria, tasks, validation and risks; short bullets for remaining details. Include an overall architecture and data-flow Mermaid diagram or picture. Keep every required field and machine-readable block in this saved artifact; link supporting evidence instead of repeating it. Present the acceptance criteria, architecture/data-flow visual, TDD overview bullets, separate E2E verification methods list and exact decision in the review conversation; the execution appendix is supporting detail, not the review surface.
 
 ## Goal/Acceptance Criteria
 <Current requested outcome and observable completion criteria, including relevant conditions and affected consumers.>
 
 ## Flow
-<Small Mermaid diagram of the meaningful behavior/dependencies, or a concise numbered flow when rendering is unavailable.>
+<Required overall architecture and data-flow Mermaid diagram or picture showing relevant entry points, components, interfaces/dependencies, data stores where applicable, and data movement through the affected path. If Mermaid cannot render, include a picture; prose or task dependencies alone do not replace this visual.>
 
 ## Decision to approve
 <Recommended choice, material alternatives/risks and the exact scoped implementation, validation and publication actions approval permits. List unresolved user choices without burying them in the execution appendix.>
@@ -17,6 +17,13 @@ Lead with a one-sentence outcome. Use compact tables for acceptance criteria, ta
 ## Implementation Steps and Tests
 <Scoped changes and applicable repository guidance. Record candidate paths/symbols, fit or gap, reuse/extension/new-code decision, and owning responsibilities. Group coherent tasks and explain independence or necessary serialization.>
 
+### TDD overview
+
+- <Behavior/contract and unit-test coverage required for each code/behavior change, with established test commands.>
+- <Red: intended failing test; green: implementation; refactor/check: cleanup and passing tests where TDD is useful. Unit tests remain mandatory when a forced TDD cycle has no benefit.>
+- <Independent task groups whose test/implementation cycles can run in parallel; prerequisites that must finish first and shared files/resources that require sequencing. State why work is sequential when no tasks are independent.>
+- <For docs/config-only work, relevant validation and why no unit tests or forced red-green cycle apply.>
+
 | Task / deliverable | Depends on | Exclusive writable paths | Interface prerequisites | Checks / exclusive resources | Testing approach and rationale | Concurrency group |
 | --- | --- | --- | --- | --- | --- | --- |
 | <ID and coherent result> | <IDs or none> | <paths owned by this task> | <stable contracts or prerequisite results> | <commands, shared services/build outputs, combined reruns> | <TDD with benefit, or relevant validation> | <ready together or sequential reason> |
@@ -24,7 +31,19 @@ Lead with a one-sentence outcome. Use compact tables for acceptance criteria, ta
 <Parent scheduling: normally 2–3 independent ready workers, bounded by runtime capacity; parent owns shared-file integration and Git/index mutations. Record any explicit test mandates.>
 
 ## Validation
-<Evidence required per acceptance criterion, the artifact/revision/environment checked, applicable current-source CI, and any explicit waivers/limitations. Reuse valid checks; rerun those invalidated by later changes.>
+### E2E verification methods
+
+<List all applicable E2E methods through real local entry points, separately from unit/TDD and other checks. Include the happy path and 1–2 relevant edge cases; cover both variants for experiments. Plan API request/response captures or UI screenshots under `<workspace.root>/.artifacts/`, attached/linked from verification results. Unit tests, mocks, static checks and CI alone do not satisfy E2E evidence.>
+
+| Method / acceptance criteria | Local setup / real entry point | Inputs / actions | Expected observable result | Evidence to capture |
+| --- | --- | --- | --- | --- |
+| <Scenario and AC IDs> | <Startup command, prerequisites, local API or rendered UI> | <Executable request or browser interaction> | <Response/status, rendered behavior or actual downloaded bytes/format> | <Request/response capture or UI screenshot path> |
+
+<For docs/config-only changes with no runnable feature, explain why product E2E captures do not apply and specify a workflow/example walkthrough instead.>
+
+### Other required checks and limitations
+
+<Unit-test coverage and commands are recorded in `Implementation Steps and Tests`. Retain any integration, static, build and applicable current-source CI checks here, separate from the E2E list. Record the artifact/revision/environment checked and explicit waivers/limitations; reuse valid evidence and rerun checks invalidated by later changes.>
 
 ## Risks/Decisions Needed
 <Material risks, required prerequisites with confirmed readiness or remaining assumptions, user-answerable decisions/actions, and required authorizations.>

@@ -8,8 +8,12 @@ Present the review in the active conversation in this order:
 
 1. **Outcome:** one sentence describing the resulting behavior and scope.
 2. **Acceptance criteria:** a compact table of observable pass/fail outcomes and how each will be checked. Lead with what the user will experience.
-3. **Flow:** a small Mermaid diagram when it explains the change or dependencies. Use a concise numbered flow if rendering is unavailable.
-4. **Decision:** the concrete recommendation, material alternatives/risks, unresolved user choices and exact actions approval authorizes. Link the complete saved plan and identify its version. Keep execution commands and machine-readable appendices out of the review message unless requested.
+3. **Architecture and data flow:** an overall Mermaid diagram or picture showing relevant entry points, components, interfaces/dependencies, data stores where applicable, and data movement through the affected path. If Mermaid cannot render, include a picture; prose or task dependencies alone do not replace this visual.
+4. **TDD overview:** short bullets showing intended red, green and refactor/check steps where TDD is useful, mandatory unit-test coverage for every code/behavior change, independent parallel groups, and dependencies requiring sequencing. For docs/config-only work, state the relevant validation instead of inventing tests.
+5. **E2E verification methods:** list all applicable real local API/UI scenarios separately from unit/TDD checks. Show acceptance-criteria mapping, setup prerequisites, inputs/actions, expected results, and planned API request/response captures or UI screenshot evidence. Include the happy path and 1–2 relevant edge cases (both variants for experiments). For work with no runnable feature, explain why product E2E evidence does not apply and show the planned workflow/example walkthrough.
+6. **Decision:** the concrete recommendation, material alternatives/risks, unresolved user choices and exact actions approval authorizes. Link the complete saved plan and identify its version. Keep execution commands and machine-readable appendices out of the review message unless requested.
+
+Show the architecture/data-flow visual, TDD bullets and E2E methods list in the active conversation as well as the saved artifact; a link alone is insufficient. Keep the overview concise and leave detailed task/check commands in the linked plan.
 
 For review feedback, include each current interpretation, supporting/counter-evidence and implement/decline/already-addressed recommendation, plus exact proposed reply bodies and their thread identities. Invite the user to challenge the reasoning before approving. Do not bury consequential changes, missing permissions or publication actions in an appendix. When there are many decisions, group them clearly under the same versioned plan rather than losing actions through truncation.
 

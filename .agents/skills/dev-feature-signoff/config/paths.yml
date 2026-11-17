@@ -1,0 +1,21 @@
+# Output directory structure and file naming conventions
+
+output:
+  # Root directory for sign-off artifacts (relative to repository root)
+  root: .sdd/output/signoff
+
+  # Subdirectories under {root}/{jira_id}/
+  subdirs:
+    scripts: scripts
+    media: media
+    videos: media/videos
+
+  # File naming patterns
+  files:
+    signoff_doc: signoff.md
+    screenshot_script: scripts/capture_image.sh
+    video_script: scripts/capture-video.sh
+
+# Credentials configuration file location
+credentials:
+  config_file: ~/.confluence/feature-sign-off-publish-config.yml

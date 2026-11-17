@@ -15,8 +15,8 @@ Make the smallest coherent change, follow local conventions, and support claims 
 
 ## Planning and approval
 
-- Save complete plans under `~/repositories/personal/plans/`, or the task-local location required by the workflow; link the canonical artifact from the active conversation.
-- For implementation, reuse a suitable linked worktree or create one under `~/repositories/worktrees/`.
+- If the agent has questions about the user’s input, that round requires plan review and explicit user approval before implementation.
+- Before submitting a plan for review, ask the user to resolve any ambiguity that existing evidence cannot answer. Continue asking follow-up questions until the requirements and acceptance criteria are clear.
 - Review plans in the active conversation. Lead with the intended outcome, a compact table of observable acceptance criteria, a small diagram when it explains the flow, and the exact decision/actions to approve. Keep implementation detail and machine-readable handoffs in the linked complete plan.
 - Obtain explicit approval of the current plan and scoped actions before editing product code or making gated external writes. Native Plan mode is optional and controlled by the host; read-only planning and conversation approval work without it.
 - Record the approved artifact version and the user’s decision. Feedback revises the same plan; silence, tool acknowledgments and bot decisions are not approval. Revisit only changes that invalidate the approved scope.

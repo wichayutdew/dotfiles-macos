@@ -1,0 +1,4 @@
+interface:
+  display_name: "Activity iOS Sanity Check"
+  short_description: "Test Activities iOS journeys and MR experiments"
+  default_prompt: "Use $act-mkt-ios-sanity-check to test this MR on my iOS Simulator or connected iPhone and report results with evidence."

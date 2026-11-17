@@ -1,0 +1,12 @@
+{
+  "opsbot": {
+    "datasetEndpoint": "https://opsbot.agodadev.io/api/ticket_insight/dataset",
+    "channelId": "C04SM1C4BNH",
+    "timeZone": "Asia/Bangkok",
+    "ticketStatuses": [
+      "done"
+    ],
+    "includeAllUnclosed": false,
+    "user": "all"
+  }
+}

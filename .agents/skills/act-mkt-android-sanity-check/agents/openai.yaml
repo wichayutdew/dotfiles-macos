@@ -1,0 +1,4 @@
+interface:
+  display_name: "Activity Android Sanity Check"
+  short_description: "Test Android Activities journeys with A/B evidence"
+  default_prompt: "Use $act-mkt-android-sanity-check to test this Android build on my emulator or device. The target can be an optional MR, a main/master branch build, or a release candidate. Report smoke results and any requested feature A/B checks with screenshots or videos."

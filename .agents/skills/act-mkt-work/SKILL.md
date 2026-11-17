@@ -13,10 +13,10 @@ Apply this format to plans, reports, reviews, replies and chat responses:
 
 - Lead with the answer, verdict or decision in one short sentence.
 - Prefer compact tables for comparisons, findings, tasks, risks and validation results; keep cells brief.
-- Prefer a small Mermaid diagram for flows, dependencies or interactions when it makes the relationships clearer. If the destination cannot render Mermaid, use a concise numbered flow or bullets.
+- Prefer a small Mermaid diagram for flows, dependencies or interactions when it makes the relationships clearer. Plans and their conversation reviews must include an overall architecture and data-flow Mermaid diagram or picture; prose alone does not replace this visual. For other outputs, use a concise numbered flow or bullets when Mermaid is unavailable.
 - Put necessary detail in short bullets, one point each. Use short prose only for nuance that needs it; keep simple answers to a sentence or a few bullets.
 - Let each table or diagram replace the equivalent prose. Include only visuals that explain the content.
-- Make plan review actionable: outcome, acceptance-criteria table, useful flow diagram, then the exact decision and authorized actions. Save detailed execution notes and machine-readable state in the linked plan instead of flooding the review conversation.
+- Make plan review actionable: outcome, acceptance-criteria table, overall architecture/data-flow visual, bullet overview of TDD steps and parallel groups, separate E2E verification methods list, then the exact decision and authorized actions. Show these elements in both the saved plan and active conversation; keep detailed execution notes and machine-readable state in the linked plan.
 - Preserve technical facts, evidence links, material limitations, required handoffs and complete required artifact or machine-readable fields. Honor explicitly requested detail; link supporting evidence instead of repeating it. Use plain, concise language without requiring a separate brevity skill.
 
 ## Local resources and cleanup
@@ -57,7 +57,7 @@ This skill supplies the complete scheduling, testing and review policy for its s
 - Plan tasks with dependencies, exclusive writable paths, stable interface prerequisites, verification commands and a testing rationale. Group small related edits into coherent tasks; parallelize only genuinely independent work.
 - After approval and workspace preparation, the parent normally runs 2–3 ready implementation workers concurrently, bounded by available runtime capacity. A task is ready when its prerequisites are verified and its writable paths, interface changes and check resources do not conflict with running tasks. Keep coupled work sequential; an independent task can run while another task is reviewed.
 - Give each worker exclusive file ownership inside the approved `primary` and `editable` repository worktrees, qualified by repository name. The parent owns shared-file integration and Git/index mutations. Reference repositories remain read-only. Workers report changed paths and verification evidence; the parent reconciles the combined tree before independent verification.
-- Choose TDD for behavioral changes where a failing test usefully proves the intended correction or contract. Mechanical documentation/configuration edits use relevant validation; do not invent tests, force a red-green cycle, or request a routine TDD exception for them. Record the choice and assessable benefit per task. Honor explicit user/repository test requirements.
+- Unit tests are required for every code/behavior change; record the coverage and commands separately from E2E verification. Choose TDD for behavioral changes where a failing test usefully proves the intended correction or contract, and outline red, green and refactor/check steps in short bullets with parallel groups and dependencies. Mandatory unit tests do not require blanket TDD. Mechanical documentation/configuration-only edits use relevant validation; do not invent tests, force a red-green cycle, or request a routine TDD exception for them. Record the choice and assessable benefit per task. Honor explicit user/repository test requirements.
 - Review task results as they arrive, keep unrelated ready work moving, and run the required combined verification after integration. Do not impose a new human approval gate between approved tasks. Preserve the existing plan and publication gates.
 
 ## Continuation and recovery
@@ -81,7 +81,7 @@ This skill supplies the complete scheduling, testing and review policy for its s
 
 ## Plan approval gate
 
-Build the complete artifact using this skill’s [plan template](generic/plan-template.md), preserving its required headings and fields. Before `plan` continues with `ready`, save that complete artifact and present an actionable review led by acceptance criteria and a useful diagram, with the exact approval decision.
+Build the complete artifact using this skill’s [plan template](generic/plan-template.md), preserving its required headings and fields. Before `plan` continues with `ready`, save that complete artifact and present its acceptance criteria, required architecture/data-flow visual, TDD bullets with concurrency/dependencies, and separate E2E verification methods list, followed by the exact approval decision. Plan E2E checks through real local entry points with API request/response captures or UI screenshots; unit-test results do not substitute for that evidence.
 
 Obtain explicit human approval of the complete artifact before continuing. Include every user-resolvable question, missing decision, and required authorization in this artifact; do not ask separately. On denial or feedback, revise and re-present the artifact at this gate. After approval, continue under the task record and recovery rules above.
 

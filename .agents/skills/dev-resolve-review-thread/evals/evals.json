@@ -1,0 +1,149 @@
+{
+  "skill_name": "dev-resolve-review-thread",
+  "notes": "Resolver evals default to passive: read-only proof, per-comment drafts, no code patches even scratch and no posts. Explicit aggressive selection authorizes proven in-scope fixes/tests/replies subject to all caller restrictions. Never merge, approve, deploy, or toggle resolution state.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "resolve-one-thread-by-id",
+      "prompt": "Resolve discussion abc123 on this GitLab MR without posting anything: https://gitlab.agodadev.io/Activities/activity-marketing-spark/-/merge_requests/352",
+      "expected_output": "The run resolves exactly one matching thread, validates its concrete claim with bounded evidence, and drafts a reply/resolution recommendation without writing.",
+      "files": [],
+      "assertions": [
+        "one-thread-mode: report says it resolved one target thread, not all MR threads",
+        "claim-extracted: report states the concrete claim and suggested change",
+        "bounded-proof: report uses read-only, local, or clearly capped validation",
+        "no-writes: report states no GitLab write, suggestion apply, push, approval, merge, or resolve happened"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "resolve-all-open-threads",
+      "prompt": "Resolve all open review threads on this GitLab MR and do not post anything: https://gitlab.agodadev.io/bookingapi/booking-creation/-/merge_requests/9106",
+      "expected_output": "Fetch every discussion page and account for every selected root/followup note with verdict, evidence, draft and disposition; exclude only evidenced system/own generated events. No writes in passive mode.",
+      "files": [],
+      "assertions": [
+        "all-thread-mode: report says the MR URL alone triggered all-open-thread resolution",
+        "per-comment-accounting: every selected note/followup has a verdict and draft",
+        "deduplicated: duplicate comments are grouped or marked duplicate",
+        "no-writes: no GitLab write or CI trigger occurred"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "incorrect-reviewer-suggestion",
+      "prompt": "Validate this reviewer comment on https://gitlab.agodadev.io/team/sample-backend/-/merge_requests/101: `Remove this null check; the upstream service always returns a value.` Do not mutate the MR.",
+      "expected_output": "The run searches callers/contracts or constructs the null-return case, rejects the suggestion if the null check is load-bearing, and drafts pushback evidence.",
+      "files": [],
+      "assertions": [
+        "does-not-trust-comment: report treats the reviewer statement as a claim, not fact",
+        "codebase-evidence: report cites caller, contract, test, or constructed input evidence",
+        "invalid-or-unverified: verdict is invalid if disproven, otherwise unverified with blocker",
+        "draft-pushback-only: reply is drafted but not posted"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "valid-claim-bad-fix",
+      "prompt": "Validate this CodeBuddy suggestion on https://gitlab.agodadev.io/team/sample-service/-/merge_requests/102: `This endpoint can return stale cache data; fix it by disabling cache for all requests.`",
+      "expected_output": "The run proves or rejects the stale-cache claim separately from the suggested broad fix and uses valid_claim_bad_fix when the claim is real but the fix is too broad.",
+      "files": [],
+      "assertions": [
+        "claim-and-fix-separated: report validates the issue separately from the suggested fix",
+        "passive-read-only: compare the broad fix using read-only proof; do not patch even scratch",
+        "verdict-supported: valid_claim_bad_fix includes evidence for both real issue and bad fix",
+        "no-suggestion-apply: no native GitLab suggestion is applied"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "over-engineered-suggestion",
+      "prompt": "Validate this review thread on https://gitlab.agodadev.io/team/sample-ui/-/merge_requests/103: `Introduce a strategy pattern here so we can support future providers.`",
+      "expected_output": "The run checks current callers and extension points, marks the suggestion over_engineered when it adds complexity without current correctness value, and drafts a concise reply.",
+      "files": [],
+      "assertions": [
+        "caller-search: report searches current callers or extension points",
+        "complexity-assessed: report explains what complexity is added and what correctness it buys",
+        "over-engineered-verdict: verdict is over_engineered when no concrete need exists",
+        "terse-reply: draft reply is concise and evidence-backed"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "stale-or-fixed-comment",
+      "prompt": "Validate this comment on https://gitlab.agodadev.io/team/sample-backend/-/merge_requests/104: `This test still fails after the latest commit.`",
+      "expected_output": "The run checks the current MR head, runs or inspects the relevant test, and marks the thread stale_or_fixed if the latest head no longer has the problem.",
+      "files": [],
+      "assertions": [
+        "current-head-used: report validates against the current MR head",
+        "stale-detected: stale_or_fixed is used when the issue no longer reproduces",
+        "evidence-shown: report includes command output or read-only proof",
+        "no-resolve-write: resolving is only recommended, not performed"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "duplicate-comment",
+      "prompt": "Resolve all open threads on https://gitlab.agodadev.io/team/sample-service/-/merge_requests/105 where two reviewers complain about the same missing validation. Do not post anything.",
+      "expected_output": "Validate shared root causes once, deduplicate code fixes, and retain a separate verdict/draft/disposition for every selected reviewer comment. Passive performs no writes.",
+      "files": [],
+      "assertions": [
+        "root-cause-grouped: duplicate comments are grouped by root cause",
+        "single-validation: shared claim is not re-tested wastefully for every duplicate",
+        "duplicate-verdict: redundant threads are marked duplicate",
+        "per-comment-drafts: duplicates retain their own draft and evidence reference"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "non-actionable-bot-chatter",
+      "prompt": "Resolve this CodeBuddy thread on https://gitlab.agodadev.io/team/sample-service/-/merge_requests/106: `Review completed. No issues found.`",
+      "expected_output": "The run marks the thread not_actionable because it contains no concrete claim or suggested change and does not spend validation effort.",
+      "files": [],
+      "assertions": [
+        "not-actionable: verdict is not_actionable",
+        "no-fake-validation: report does not invent a claim to test",
+        "minimal-effort: report avoids code checkout or tests",
+        "no-writes: nothing is posted or resolved"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "backend-bounded-proof",
+      "prompt": "Validate this backend review comment on https://gitlab.agodadev.io/team/sample-backend/-/merge_requests/107: `This retry change breaks idempotency under duplicate messages.`",
+      "expected_output": "The run uses bounded backend proof: code/caller exploration plus targeted unit and integration/regression testing if available, not broad unrelated suites.",
+      "files": [],
+      "assertions": [
+        "backend-cap-applied: validation effort stays within targeted unit plus integration/regression proof",
+        "idempotency-evidence: report cites concrete duplicate-message evidence or marks unverified",
+        "broad-suite-avoided: broad tests are not run unless justified as the smallest meaningful proof",
+        "verdict-supported: verdict maps directly to observed behavior"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "frontend-bounded-proof",
+      "prompt": "Validate this frontend review comment on https://gitlab.agodadev.io/team/sample-ui/-/merge_requests/108: `This change breaks keyboard navigation in the modal.`",
+      "expected_output": "The run uses bounded frontend proof: component/unit testing and targeted integration or e2e validation if needed, not unrelated broad suites.",
+      "files": [],
+      "assertions": [
+        "frontend-cap-applied: validation effort stays within unit plus integration/component/e2e proof",
+        "keyboard-evidence: report cites concrete keyboard-navigation evidence or marks unverified",
+        "passive-no-patch: proof uses existing code/tests only, no source patches even in scratch",
+        "verdict-supported: verdict maps directly to observed behavior"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "ci-needed-not-triggered",
+      "prompt": "Validate this review thread on https://gitlab.agodadev.io/team/sample-service/-/merge_requests/109: `Only the deployment smoke CI can prove this ingress change is safe.` Do not trigger CI.",
+      "expected_output": "The run performs local/read-only validation first, then proposes the exact CI job/ref/evidence if CI is still needed, without triggering it.",
+      "files": [],
+      "assertions": [
+        "local-first: report attempts read-only or local proof before proposing CI",
+        "ci-proposal-specific: report names exact job, ref, and expected evidence",
+        "ci-not-triggered: report states CI was not triggered",
+        "unverified-if-needed: verdict is unverified when CI is required but not authorized"
+      ]
+    }
+  ]
+}
